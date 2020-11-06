@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const hypervideo = new Hypervideo();
 
-    hypervideo._test2();
+    hypervideo.setupHypervideo("");
 
 
 })
