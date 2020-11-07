@@ -1,9 +1,13 @@
 class Hypervideo {
 
-    constructor(videoURL, hypervideoID) {
+    constructor(videoURL, videoType, hypervideoID) {
         this.videoURL = videoURL;
+        this.videoType = videoType;
         this.containerID = hypervideoID;
     }
+
+    static YOUTUBE_TYPE = "YOUTUBE";
+    static VIDEO_TYPE = "VIDEO";
 
     isDOMLoaded() {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
@@ -19,7 +23,7 @@ class Hypervideo {
         //TODO: Pensar si això ho necessitare guardar o no
         this.tagsJSON = tagsJSON;
 
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.containerID);
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID);
         hypervideoControlls.createSkeleton();
     }
     
