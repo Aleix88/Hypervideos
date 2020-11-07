@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    console.log("Dom loaded")
+    importHypervideoAPI(()=> {
+        const hypervideo = new Hypervideo("../TestVideos/video_test.mp4", "hypervideo_123");
+        hypervideo.setupHypervideo("");
+    });
 
-    const hypervideo = new Hypervideo();
-
-    hypervideo.setupHypervideo("");
+    
 
 
 })

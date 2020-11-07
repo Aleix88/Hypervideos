@@ -1,5 +1,3 @@
-import "HypervideoControlls"
-
 class Hypervideo {
 
     constructor(videoURL, hypervideoID) {
@@ -21,7 +19,7 @@ class Hypervideo {
         //TODO: Pensar si això ho necessitare guardar o no
         this.tagsJSON = tagsJSON;
 
-        hypervideoControlls = new HypervideoControlls(this.videoURL, this.containerID);
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.containerID);
         hypervideoControlls.createSkeleton();
     }
     

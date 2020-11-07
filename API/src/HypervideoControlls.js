@@ -12,9 +12,9 @@ class HypervideoControlls {
     playVideo() {}
 
     createSkeleton() {
-        hypervideo = document.getElementById(this.containerID);
-        container = this.htmlManager.createElement("div", "hypervideo-container");
-        tagsContainer = this.htmlManager.createElement("div", "tags-container");
+        const hypervideo = document.getElementById(this.containerID);
+        const container = this.htmlManager.createElement("div", "hypervideo-container");
+        const tagsContainer = this.htmlManager.createElement("div", "tags-container");
 
         hypervideo.appendChild(container);
 
@@ -25,18 +25,18 @@ class HypervideoControlls {
     }
 
     addVideoElement(container) {
-        video = this.htmlManager.createElement("video");
+        const video = this.htmlManager.createElement("video");
         video.src = this.videoSRC;
         container.appendChild(video);
     }
 
     addTopBarControlls(container) {
-        topContainer = this.htmlManager.createElement("div", "top-controller");
+        const topContainer = this.htmlManager.createElement("div", "top-controller");
         container.appendChild(topContainer);
     }
 
-    addBottomBarControlls() {
-        bottomController = this.htmlManager.createElement("div", "bottom-controller");
+    addBottomBarControlls(container) {
+        const bottomController = this.htmlManager.createElement("div", "bottom-controller");
         container.appendChild(bottomController);
     }
 
