@@ -18,12 +18,14 @@ class HypervideoControlls {
     pauseVideo() {
         const video = document.getElementById(this.videoElementID);
         video.pause();
+        this.changeButtonIcon("control-play-button", "gg-play-button");
         this.isVideoPaused = true;
     }
 
     playVideo() {
         const video = document.getElementById(this.videoElementID);
         video.play();
+        this.changeButtonIcon("control-play-button", "gg-play-pause");
         this.isVideoPaused = false;
     }
 
@@ -43,22 +45,29 @@ class HypervideoControlls {
     requestFullScreen(container) {
         if (container.requestFullscreen) {
             container.requestFullscreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
         } else if (container.mozRequestFullScreen) {
             container.mozRequestFullScreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
         } else if (container.webkitRequestFullscreen) {
             container.webkitRequestFullscreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
         } else if (container.msRequestFullscreen) {
             container.msRequestFullscreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
         }
     }
 
     requestExitFullScreen(container) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
+            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
         }
     }
 
@@ -77,6 +86,20 @@ class HypervideoControlls {
         } else {
             this.pauseVideo();
         }
+    }
+
+    changeButtonIcon(buttonClass, iconName) {
+        const container = document.getElementById(this.containerID);
+        let button = container.getElementsByClassName(buttonClass);
+        if (button.length <= 0) {
+            return;
+        }
+        button = button[0];
+        let icon = button.getElementsByTagName("i");
+        if (icon.length <= 0) {
+            return;
+        }
+        icon[0].className = iconName;
     }
 
     createSkeleton() {
@@ -132,7 +155,7 @@ class HypervideoControlls {
         container.appendChild(bottomController);
         const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
         const replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
-        const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-ratio", this.toggleFullScreen);
+        const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
         const volumeButton = this.createControlButton("control-volume-button", "gg-volume");
         const progressBar = this.createProgressBar();
         bottomController.appendChild(playButton);

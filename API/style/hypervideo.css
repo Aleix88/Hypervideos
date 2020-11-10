@@ -42,7 +42,9 @@ button {
 
 .control-button-container {
     background: white;
-    padding: 0.4em;
+    height: 2em;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
     border: 0.3px solid black;
     cursor: pointer;
 }
@@ -139,38 +141,57 @@ button {
     bottom: -4px;
     left: 0;
 }
-
-.gg-ratio {
+.gg-maximize {
     box-sizing: border-box;
     position: relative;
     display: block;
     transform: scale(var(--ggs,1));
-    width: 24px;
-    height: 20px;
-    border: 2px solid;
-    border-radius: 4px;
-    margin: 0;
+    width: 14px;
+    height: 14px;
+    box-shadow:
+        -6px -6px 0 -4px,
+        6px 6px 0 -4px,
+        6px -6px 0 -4px,
+        -6px 6px 0 -4px;
+    margin: auto;
 }
-.gg-ratio::after,
-.gg-ratio::before {
+
+.gg-minimize {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,1));
+    width: 4px;
+    height: 4px;
+    box-shadow:
+        -8px -4px 0 -1px,
+        -6px -4px 0 -1px,
+        8px 4px 0 -1px,
+        6px 4px 0 -1px,
+        8px -4px 0 -1px,
+        6px -4px 0 -1px,
+        -8px 4px 0 -1px,
+        -6px 4px 0 -1px;
+    margin: auto;
+}
+.gg-minimize::after,
+.gg-minimize::before {
     content: "";
     display: block;
     box-sizing: border-box;
     position: absolute;
-    width: 6px;
-    height: 6px;
+    width: 2px;
+    height: 18px;
+    border-top: 6px solid;
+    border-bottom: 6px solid;
+    box-shadow: 18px 0 0 -2px;
+    top: -7px;
 }
-.gg-ratio::before {
-    border-bottom: 2px solid;
-    border-right: 2px solid;
-    top: 8px;
-    left: 12px;
+.gg-minimize::after {
+    left: -3px;
 }
-.gg-ratio::after {
-    border-top: 2px solid;
-    border-left: 2px solid;
-    top: 2px;
-    left: 2px;
+.gg-minimize::before {
+    right: -3px;
 }
 
 .gg-volume {
@@ -213,4 +234,16 @@ button {
     border-bottom-right-radius: 100px;
     right: -14px;
     top: -6px;
+}
+
+.gg-play-pause {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    transform: scale(var(--ggs,1));
+    width: 8px;
+    height: 10px;
+    border-left: 3px solid;
+    border-right: 3px solid;
+    margin: auto;
 }
