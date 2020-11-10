@@ -8,6 +8,13 @@ class HypervideoControlls {
         this.htmlManager = new HTMLManager(); 
     }
 
+    setVolume(volume) {
+        volume = volume > 1 ? 1 : volume;
+        volume = volume < 0 ? 0 : volume;
+        const video = document.getElementById(this.videoElementID);
+        video.volume = volume;
+    }
+
     pauseVideo() {
         const video = document.getElementById(this.videoElementID);
         video.pause();
@@ -18,6 +25,15 @@ class HypervideoControlls {
         const video = document.getElementById(this.videoElementID);
         video.play();
         this.isVideoPaused = false;
+    }
+
+    setVideoCurrentTime(seconds) {
+        const video = document.getElementById(this.videoElementID);
+        video.currentTime = seconds;
+    }
+
+    restartVideo() {
+        this.setVideoCurrentTime(0);
     }
 
     isFullScreen() {
@@ -115,7 +131,7 @@ class HypervideoControlls {
         const bottomController = this.htmlManager.createElement("div",["bottom-controller"]);
         container.appendChild(bottomController);
         const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
-        const replayButton = this.createControlButton("control-repeat-button", "gg-repeat");
+        const replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
         const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-ratio", this.toggleFullScreen);
         const volumeButton = this.createControlButton("control-volume-button", "gg-volume");
         const progressBar = this.createProgressBar();
