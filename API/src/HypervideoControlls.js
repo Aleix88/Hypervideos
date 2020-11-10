@@ -4,13 +4,64 @@ class HypervideoControlls {
         this.videoSRC = videoSRC;
         this.videoType = videoType;
         this.containerID = containerID;
+        this.isVideoPaused = true;
         this.htmlManager = new HTMLManager(); 
-
     }
 
-    pauseVideo() {}
+    pauseVideo() {
+        const video = document.getElementById(this.videoElementID);
+        video.pause();
+        this.isVideoPaused = true;
+    }
 
-    playVideo() {}
+    playVideo() {
+        const video = document.getElementById(this.videoElementID);
+        video.play();
+        this.isVideoPaused = false;
+    }
+
+    isFullScreen() {
+        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    }
+
+    requestFullScreen(container) {
+        if (container.requestFullscreen) {
+            container.requestFullscreen();
+        } else if (container.mozRequestFullScreen) {
+            container.mozRequestFullScreen();
+        } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+        } else if (container.msRequestFullscreen) {
+            container.msRequestFullscreen();
+        }
+    }
+
+    requestExitFullScreen(container) {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+
+    toggleFullScreen() {
+        const container = document.getElementById(this.containerID);
+        if (this.isFullScreen()) {
+            this.requestExitFullScreen(container);
+        } else {
+            this.requestFullScreen(container);
+        }
+    }
+
+    playButtonClicked() {
+        if (this.isVideoPaused) {
+            this.playVideo();
+        } else {
+            this.pauseVideo();
+        }
+    }
 
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
@@ -28,7 +79,8 @@ class HypervideoControlls {
     }
 
     addVideoTag(container) {
-        const video = this.htmlManager.createElement("video");
+        this.videoElementID = "video-" + this.containerID;
+        const video = this.htmlManager.createElement("video", "", this.videoElementID);
         video.src = this.videoSRC;
         container.appendChild(video);
     }
@@ -62,9 +114,9 @@ class HypervideoControlls {
     addBottomBarControlls(container) {
         const bottomController = this.htmlManager.createElement("div",["bottom-controller"]);
         container.appendChild(bottomController);
-        const playButton = this.createControlButton("control-play-button", "gg-play-button");
+        const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
         const replayButton = this.createControlButton("control-repeat-button", "gg-repeat");
-        const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-ratio");
+        const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-ratio", this.toggleFullScreen);
         const volumeButton = this.createControlButton("control-volume-button", "gg-volume");
         const progressBar = this.createProgressBar();
         bottomController.appendChild(playButton);
@@ -74,12 +126,15 @@ class HypervideoControlls {
         bottomController.appendChild(volumeButton);
     }
 
-    createControlButton(buttonClass, buttonIcon) {
+    createControlButton(buttonClass, buttonIcon, eventHandler) {
         const buttonContainer = this.htmlManager.createElement("div", ["control-button-container"]);
         const button = this.htmlManager.createElement("button", ["control-button",buttonClass]);
         const icon = this.htmlManager.createElement("i", [buttonIcon]);
         buttonContainer.appendChild(button);
         button.appendChild(icon);
+        if (eventHandler !== null && eventHandler !== undefined) {
+            buttonContainer.addEventListener("click", eventHandler.bind(this));
+        }
         return buttonContainer;
     }
 
