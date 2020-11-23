@@ -1,0 +1,10 @@
+class ProgressBar {
+
+    constructor() {
+        super();
+
+    }
+
+
+
+}

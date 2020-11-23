@@ -11,26 +11,26 @@ class HypervideoControlls {
     setVolume(volume) {
         volume = volume > 1 ? 1 : volume;
         volume = volume < 0 ? 0 : volume;
-        const video = document.getElementById(this.videoElementID);
+        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
         video.volume = volume;
     }
 
     pauseVideo() {
-        const video = document.getElementById(this.videoElementID);
+        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
         video.pause();
         this.changeButtonIcon("control-play-button", "gg-play-button");
         this.isVideoPaused = true;
     }
 
     playVideo() {
-        const video = document.getElementById(this.videoElementID);
+        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
         video.play();
         this.changeButtonIcon("control-play-button", "gg-play-pause");
         this.isVideoPaused = false;
     }
 
     setVideoCurrentTime(seconds) {
-        const video = document.getElementById(this.videoElementID);
+        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
         video.currentTime = seconds;
     }
 
@@ -89,12 +89,10 @@ class HypervideoControlls {
     }
 
     changeButtonIcon(buttonClass, iconName) {
-        const container = document.getElementById(this.containerID);
-        let button = container.getElementsByClassName(buttonClass);
+        let button = this.htmlManager.getShadowElementByClassName(this.containerID, buttonClass);
         if (button.length <= 0) {
             return;
         }
-        button = button[0];
         let icon = button.getElementsByTagName("i");
         if (icon.length <= 0) {
             return;
@@ -103,7 +101,7 @@ class HypervideoControlls {
     }
 
     createSkeleton() {
-        const hypervideo = document.getElementById(this.containerID);
+        const hypervideo = document.getElementById(this.containerID).shadowRoot;
         const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
         const tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
 

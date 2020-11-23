@@ -17,4 +17,14 @@ class HTMLManager {
         return element;
     }
 
+    getShadowElementByID(containerID, id) {
+        const shadowContainer = document.getElementById(containerID).shadowRoot;
+        return shadowContainer.getElementById(id);
+    }
+
+    getShadowElementByClassName(containerID, className) {
+        const shadowContainer = document.getElementById(containerID).shadowRoot;
+        return shadowContainer.querySelector("." + className);
+    } 
+
 }
