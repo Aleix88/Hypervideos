@@ -1,7 +1,6 @@
 class ProgressBar {
 
     constructor() {
-        super();
 
     }
 
