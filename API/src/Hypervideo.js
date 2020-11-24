@@ -115,8 +115,7 @@ class Hypervideo {
             height: 10px;
             background: red;
             align-self: center;
-        }
-        
+        }        
         
         /* ICONS */
         

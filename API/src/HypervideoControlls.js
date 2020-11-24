@@ -176,9 +176,9 @@ class HypervideoControlls {
     }
 
     createProgressBar() {
-        const progressContainer = this.htmlManager.createElement("div", ["progress-container"]);
+        const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
         
-        return progressContainer;
+        return progressBar;
     }
 
 }
