@@ -1,0 +1,6 @@
+#No afegim els fitxers babels
+API/babel
+
+#Node modules
+node_modules
+package-lock.json
