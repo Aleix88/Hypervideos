@@ -540,18 +540,25 @@ class XProgressBar extends HTMLElement {
     constructor() {
         super();
         this.htmlManager = new HTMLManager();
+        this.maxLength = 100;
         let shadow = this.attachShadow({mode: 'open'});
         
         const bar = this.htmlManager.createElement("div", ["progress-bar"]);
         shadow.appendChild(this.getStyle());
         shadow.appendChild(bar);
 
-        this.setProgress(20);
+        this.setMaxLength(200);
+        this.setCurrentLength(100);
     }
 
-    setProgress(progress) {
+    setCurrentLength(length) {
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
+        const progress = (length / this.maxLength) * 100;
         progressBar.style.width = progress + "%";
+    }
+
+    setMaxLength(length) {
+        this.maxLength = length;
     }
 
     getStyle() {
