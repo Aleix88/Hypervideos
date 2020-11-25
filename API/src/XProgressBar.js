@@ -11,10 +11,16 @@ class XProgressBar extends HTMLElement {
         const bar = this.htmlManager.createElement("div", ["progress-bar"]);
         shadow.appendChild(this.getStyle());
         shadow.appendChild(bar);
+
+        this.addMarkerAt(10);
+        this.addMarkerAt(40);
     }
 
     addMarkerAt(length) {
-        
+        const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
+        const progress = this.convertLengthToProgress(length);
+        this.shadowRoot.appendChild(marker);
+        marker.style.left = progress + "%";
     }
 
     onClickBar(event) {
@@ -24,10 +30,14 @@ class XProgressBar extends HTMLElement {
         this.setCurrentLength(progress * this.maxLength);
     }
 
+    convertLengthToProgress(length) {
+        return (length / this.maxLength) * 100;
+    }
+
     setCurrentLength(length) {
         this.currentLength = length;
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
-        const progress = (length / this.maxLength) * 100;
+        const progress = this.convertLengthToProgress(length);
         progressBar.style.width = progress + "%";
     }
 
@@ -48,8 +58,17 @@ class XProgressBar extends HTMLElement {
         style.textContent = `
             .progress-bar {
                 background: blue;
+                position: absolute;
                 height: 100%;
                 width: 50%;
+            }
+
+            .progress-bar-marker {
+                width: 10px;
+                height: 100%;
+                top: 0;
+                background: yellow;
+                position: absolute;
             }
         `;
         return style;
