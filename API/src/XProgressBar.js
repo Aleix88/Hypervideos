@@ -71,14 +71,14 @@ class XProgressBar extends HTMLElement {
         const style = document.createElement("style");
         style.textContent = `
             .progress-bar {
-                background: blue;
+                background: rgb(97, 87, 245);
                 position: absolute;
                 height: 100%;
                 width: 0%;
             }
 
             .progress-bar-marker {
-                width: 10px;
+                width: 7px;
                 height: 100%;
                 top: 0;
                 background: yellow;

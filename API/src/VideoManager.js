@@ -3,6 +3,7 @@ class VideoManager {
         this.currentTime = 0;
         this.containerID = containerID;
         this.videoStateChanged = null;
+        this.isFullScreen = false;
         //Convertim la classe en "abstract"
         if (new.target === VideoManager) {
             throw new TypeError("Cannot construct VideoManager instances directly");
@@ -30,7 +31,7 @@ class VideoManager {
     
     toggleFullScreen() {
         const container = document.getElementById(this.containerID);
-        if (this.isFullScreen()) {
+        if (this.isFullScreen) {
             this.requestExitFullScreen(container);
         } else {
             this.requestFullScreen(container);
@@ -44,22 +45,29 @@ class VideoManager {
     requestFullScreen(container) {
         if (container.requestFullscreen) {
             container.requestFullscreen();
+            this.isFullScreen = true;
         } else if (container.mozRequestFullScreen) {
             container.mozRequestFullScreen();
+            this.isFullScreen = true;
         } else if (container.webkitRequestFullscreen) {
             container.webkitRequestFullscreen();
+            this.isFullScreen = true;
         } else if (container.msRequestFullscreen) {
             container.msRequestFullscreen();
+            this.isFullScreen = true;
         }
     }
 
     requestExitFullScreen(container) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
+            this.isFullScreen = false;
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
+            this.isFullScreen = false;
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
+            this.isFullScreen = false;
         }
     }
 }

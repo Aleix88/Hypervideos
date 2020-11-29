@@ -108,7 +108,8 @@ class Hypervideo {
             transition: opacity 0.2s;
         }
 
-        .hypervideo-container:hover > .bottom-controller {
+        .hypervideo-container:hover > .bottom-controller,
+        .hypervideo-container:focus > .bottom-controller {
             opacity: 1;
         }
         
@@ -123,11 +124,6 @@ class Hypervideo {
         
         .control-button-container:not(:last-child) {
             margin-right: 2px;
-        }
-        
-        .control-button-container:hover,
-        .control-button-container:focus {
-            background: rgba(0,0,0,0);
         }
         
         .control-button {
@@ -149,12 +145,19 @@ class Hypervideo {
         .progress-container {
             flex-grow: 1;
             margin-right: 2px;
-            height: 10px;
-            background: red;
+            height: 3px;
+            background: rgba(210,210,210,0.68);
             align-self: center;
             position: relative;
-            cursor: pointer;
+            cursor: pointer; 
+            transition: height 0.2s;
         }        
+
+        .progress-container:focus,
+        .progress-container:hover {
+            height: 5px;
+        }
+
         
         /* ICONS */
         
@@ -267,48 +270,6 @@ class Hypervideo {
             right: -3px;
         }
         
-        .gg-volume {
-            box-sizing: border-box;
-            position: relative;
-            display: block;
-            transform: scale(var(--ggs,1));
-            width: 8px;
-            height: 8px;
-            border: 2px solid;
-            border-right: 0;
-            -webkit-perspective: 12px;
-            perspective: 12px;
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-            margin: 0;
-        }
-        .gg-volume::after,
-        .gg-volume::before {
-            content: "";
-            display: block;
-            box-sizing: border-box;
-            position: absolute;
-        }
-        .gg-volume::before {
-            left: 2px;
-            transform: rotateY(-90deg);
-            width: 10px;
-            height: 10px;
-            border: 2px solid;
-            border-left: 0;
-            top: -3px;
-        }
-        .gg-volume::after {
-            width: 8px;
-            height: 16px;
-            border: 6px double;
-            border-left: 0;
-            border-top-right-radius: 100px;
-            border-bottom-right-radius: 100px;
-            right: -14px;
-            top: -6px;
-        }
-        
         .gg-play-pause {
             box-sizing: border-box;
             position: relative;
@@ -320,6 +281,7 @@ class Hypervideo {
             border-right: 3px solid;
             margin: auto;
         }
+        
         `;
 
         return style;
@@ -366,7 +328,7 @@ class HypervideoControlls {
 
     toggleFullScreen() {
         this.videoManager.toggleFullScreen();
-        const iconName = this.videoManager.isFullScreen() ? "gg-minimize" : "gg-maximize";
+        const iconName = this.videoManager.isFullScreen ? "gg-minimize" : "gg-maximize";
         this.changeButtonIcon("control-full-screen-button", iconName);
     }
 
@@ -443,13 +405,13 @@ class HypervideoControlls {
         const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
         const replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
         const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
-        const volumeButton = this.createControlButton("control-volume-button", "gg-volume");
         const progressBar = this.createProgressBar();
+        const volumeBar = this.createVolumeBar();
         bottomController.appendChild(playButton);
         bottomController.appendChild(replayButton);
         bottomController.appendChild(fullScreenButton);
         bottomController.appendChild(progressBar);
-        bottomController.appendChild(volumeButton);
+        bottomController.appendChild(volumeBar);
     }
 
     createControlButton(buttonClass, buttonIcon, eventHandler) {
@@ -475,6 +437,11 @@ class HypervideoControlls {
 
     __progressBarChanged(progress) {
         this.videoManager.loadProgress(progress);
+    }
+
+    createVolumeBar() {
+        const progressBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
+        return progressBar;
     }
 
 }
@@ -516,6 +483,7 @@ class VideoManager {
         this.currentTime = 0;
         this.containerID = containerID;
         this.videoStateChanged = null;
+        this.isFullScreen = false;
         //Convertim la classe en "abstract"
         if (new.target === VideoManager) {
             throw new TypeError("Cannot construct VideoManager instances directly");
@@ -543,7 +511,7 @@ class VideoManager {
     
     toggleFullScreen() {
         const container = document.getElementById(this.containerID);
-        if (this.isFullScreen()) {
+        if (this.isFullScreen) {
             this.requestExitFullScreen(container);
         } else {
             this.requestFullScreen(container);
@@ -557,22 +525,29 @@ class VideoManager {
     requestFullScreen(container) {
         if (container.requestFullscreen) {
             container.requestFullscreen();
+            this.isFullScreen = true;
         } else if (container.mozRequestFullScreen) {
             container.mozRequestFullScreen();
+            this.isFullScreen = true;
         } else if (container.webkitRequestFullscreen) {
             container.webkitRequestFullscreen();
+            this.isFullScreen = true;
         } else if (container.msRequestFullscreen) {
             container.msRequestFullscreen();
+            this.isFullScreen = true;
         }
     }
 
     requestExitFullScreen(container) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
+            this.isFullScreen = false;
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
+            this.isFullScreen = false;
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
+            this.isFullScreen = false;
         }
     }
 }
@@ -725,14 +700,14 @@ class XProgressBar extends HTMLElement {
         const style = document.createElement("style");
         style.textContent = `
             .progress-bar {
-                background: blue;
+                background: rgb(97, 87, 245);
                 position: absolute;
                 height: 100%;
                 width: 0%;
             }
 
             .progress-bar-marker {
-                width: 10px;
+                width: 7px;
                 height: 100%;
                 top: 0;
                 background: yellow;
@@ -745,6 +720,138 @@ class XProgressBar extends HTMLElement {
 }
 
 customElements.define('x-progress-bar', XProgressBar);
+class XVolumeBar extends HTMLElement {
+
+    constructor() {
+        super();
+        this.htmlManager = new HTMLManager();
+        
+        let shadow = this.attachShadow({mode: 'open'});
+        
+        const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
+        const volumeButton = this.createVolumeButton();
+        const volumeBar = this.htmlManager.createElement("div", ["volume-bar-rect"]);
+
+        container.appendChild(volumeButton);
+        container.appendChild(volumeBar);
+        shadow.appendChild(container);
+        shadow.appendChild(this.getStyle());
+
+    }
+
+    createVolumeButton() {
+        const buttonContainer = this.htmlManager.createElement("div", ["volume-icon-container"]);
+        const button = this.htmlManager.createElement("button", ["volume-button"]);
+        const icon = this.htmlManager.createElement("i", ["gg-volume"]);
+        buttonContainer.appendChild(button);
+        button.appendChild(icon);
+        return buttonContainer;
+    }
+
+    getStyle() {
+        const style = document.createElement("style");
+        style.textContent = `
+            .volume-bar-container {
+                margin-right: 0.5px;
+                cursor: pointer;
+                display: flex;
+            }
+
+            .volume-bar-container:hover > .volume-bar-rect,
+            .volume-bar-container:focus > .volume-bar-rect {
+                display: block;
+            }
+
+            .volume-bar-container:hover,
+            .volume-bar-container:focus {
+                color: rgb(97, 87, 245);
+            }
+
+            .volume-bar-rect {
+                display: none;
+                height: 3px;
+                background:white;
+                width: 50px;
+                margin: auto;
+                cursor: pointer;
+            }
+
+            .volume-icon-container {
+                background: rgba(0,0,0,0);
+                height: 2em;
+                padding-left: 0.4em;
+                padding-right: 0.4em;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .volume-button {
+                color: white;  
+                border: none;
+                outline: none;
+                background-color: rgba(0,0,0,0);
+                height: 100%; 
+                width: 2em;
+                margin: auto;
+                padding: 0;
+                cursor: pointer;
+            }
+            
+            .volume-button:hover,
+            .volume-button:focus {
+                color: rgb(97, 87, 245);
+            }
+
+            /* ICON */
+            /* ICON */
+            .gg-volume {
+                box-sizing: border-box;
+                position: relative;
+                display: block;
+                transform: scale(var(--ggs,1));
+                width: 8px;
+                height: 8px;
+                border: 2px solid;
+                border-right: 0;
+                -webkit-perspective: 12px;
+                perspective: 12px;
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+                margin: 0;
+            }
+            .gg-volume::after,
+            .gg-volume::before {
+                content: "";
+                display: block;
+                box-sizing: border-box;
+                position: absolute;
+            }
+            .gg-volume::before {
+                left: 2px;
+                transform: rotateY(-90deg);
+                width: 10px;
+                height: 10px;
+                border: 2px solid;
+                border-left: 0;
+                top: -3px;
+            }
+            .gg-volume::after {
+                width: 8px;
+                height: 16px;
+                border: 6px double;
+                border-left: 0;
+                border-top-right-radius: 100px;
+                border-bottom-right-radius: 100px;
+                right: -14px;
+                top: -6px;
+            }    
+        `;
+        return style;
+    }
+
+}
+
+customElements.define('x-volume-bar', XVolumeBar);
 class YoutubeVideoManager extends VideoManager {
 
     constructor(containerID) {

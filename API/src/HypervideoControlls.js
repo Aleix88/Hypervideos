@@ -37,7 +37,7 @@ class HypervideoControlls {
 
     toggleFullScreen() {
         this.videoManager.toggleFullScreen();
-        const iconName = this.videoManager.isFullScreen() ? "gg-minimize" : "gg-maximize";
+        const iconName = this.videoManager.isFullScreen ? "gg-minimize" : "gg-maximize";
         this.changeButtonIcon("control-full-screen-button", iconName);
     }
 
@@ -114,13 +114,13 @@ class HypervideoControlls {
         const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
         const replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
         const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
-        const volumeButton = this.createControlButton("control-volume-button", "gg-volume");
         const progressBar = this.createProgressBar();
+        const volumeBar = this.createVolumeBar();
         bottomController.appendChild(playButton);
         bottomController.appendChild(replayButton);
         bottomController.appendChild(fullScreenButton);
         bottomController.appendChild(progressBar);
-        bottomController.appendChild(volumeButton);
+        bottomController.appendChild(volumeBar);
     }
 
     createControlButton(buttonClass, buttonIcon, eventHandler) {
@@ -146,6 +146,11 @@ class HypervideoControlls {
 
     __progressBarChanged(progress) {
         this.videoManager.loadProgress(progress);
+    }
+
+    createVolumeBar() {
+        const progressBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
+        return progressBar;
     }
 
 }
