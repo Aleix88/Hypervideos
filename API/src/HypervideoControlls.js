@@ -6,6 +6,19 @@ class HypervideoControlls {
         this.containerID = containerID;
         this.videoManager = videoManager;
         this.htmlManager = new HTMLManager(); 
+        this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
+    }
+
+    __videoStateChanged(state) {
+        switch (state) {
+            case VideoManager.PLAYING:
+                this.changeButtonIcon("control-play-button", "gg-play-pause");
+                break;
+            case VideoManager.PAUSED:
+                this.changeButtonIcon("control-play-button", "gg-play-button");
+                break;
+            default:
+        }
     }
 
     restartVideo() {
@@ -19,12 +32,10 @@ class HypervideoControlls {
     }
 
     playButtonClicked() {
-        if (this.videoManager.isPaused) {
+        if (!this.videoManager.isVideoPlaying()) {
             this.videoManager.play();
-            this.changeButtonIcon("control-play-button", "gg-play-pause");
         } else {
             this.videoManager.pause();
-            this.changeButtonIcon("control-play-button", "gg-play-button");
         }
     }
 
@@ -60,16 +71,10 @@ class HypervideoControlls {
         const video = this.htmlManager.createElement("video", "", this.videoElementID);
         video.src = this.videoSRC;
         container.appendChild(video);
+        this.videoManager.setupVideo();
     }
 
     addVideoFromYotube(container) {
-        //TODO: L'enables API segurament ho necessesitare per implementar alguna cosa dels tags.
-       /* const frame = this.htmlManager.createElement("iframe", ["youtube-frame"]);
-        let src = this.videoSRC;
-        src += "?autoplay=0&controls=0&showinfo=0&disablekb=1&fs=0&playsinline=1&wmode=opaque&iv_load_policy=3&modestbranding=1&rel=0";
-        frame.src = src;
-        frame.id = "player";
-        frame.frameBorder = 0;*/
         this.videoElementID = "video-" + this.containerID;
         const div = this.htmlManager.createElement("div", ["youtube-frame"]);
         div.id = this.videoElementID;
@@ -122,8 +127,12 @@ class HypervideoControlls {
 
     createProgressBar() {
         const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
-        
+        progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
         return progressBar;
+    }
+
+    __progressBarChanged(progress) {
+        this.videoManager.loadProgress(progress);
     }
 
 }

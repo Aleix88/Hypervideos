@@ -2,22 +2,29 @@ class VideoManager {
     constructor(containerID) {
         this.currentTime = 0;
         this.containerID = containerID;
-        this.isPaused = true;
+        this.videoStateChanged = null;
         //Convertim la classe en "abstract"
         if (new.target === VideoManager) {
             throw new TypeError("Cannot construct VideoManager instances directly");
         }
     }
 
+    static PLAYING = 0;
+    static PAUSED = 1;
+
     play() {}
 
     pause() {}
 
     restartVideo() {}
-    
-    loadTime(seconds) {}
 
-    setVolume() {}
+    isVideoPlaying(){}
+    
+    //0-100
+    loadProgress(progress) {}
+
+    //0-1
+    setVolume(volume) {}
 
     
     toggleFullScreen() {

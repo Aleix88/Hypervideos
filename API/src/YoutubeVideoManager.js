@@ -7,19 +7,35 @@ class YoutubeVideoManager extends VideoManager {
 
     play() {
         this.player.playVideo();
-        this.isPaused = false;
     }
 
     pause() {
         this.player.pauseVideo();
-        this.isPaused = true;
     }
 
-    restartVideo() {}
+    restartVideo() {
+        this.__loadTime(0);
+    }
     
-    loadTime(seconds) {}
+    isVideoPlaying() {
+        return this.player.getPlayerState() == YT.PlayerState.PLAYING;
+    }
 
-    setVolume() {}
+    //0-100
+    loadProgress(progress) {
+        const videoDuration = this.player.getDuration();
+        this.__loadTime(videoDuration * (progress/100));
+    }
+
+    __loadTime(seconds) {
+        this.player.seekTo(seconds, true);
+    }
+
+    setVolume(volume) {
+        volume = volume > 1 ? 1 : volume;
+        volume = volume < 0 ? 0 : volume;
+        this.player.setVolume(volume * 100);
+    }
 
     addYoutubeScript(iframeContainerID) {
         this.iframeContainerID = iframeContainerID;
@@ -36,8 +52,8 @@ class YoutubeVideoManager extends VideoManager {
             width: '640', 
             videoId: 'jLHW8V462jo',
             events: {
-                'onReady': this.__onPlayerReady,
-                'onStateChange': this.__onPlayerStateChange
+                'onReady': this.__onPlayerReady.bind(this),
+                'onStateChange': this.__onPlayerStateChange.bind(this)
             },
             playerVars: { 
                 'autoplay': 0, 
@@ -59,7 +75,11 @@ class YoutubeVideoManager extends VideoManager {
         console.log("READY");
     }
     __onPlayerStateChange(event) {
-        console.log("STATE");    
+        if (event.data == YT.PlayerState.PLAYING) {
+            this.videoStateChanged(VideoManager.PLAYING)
+        } else if (event.data == YT.PlayerState.PAUSED) {
+            this.videoStateChanged(VideoManager.PAUSED)
+        }
     }
      
 }

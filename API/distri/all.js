@@ -328,6 +328,19 @@ class HypervideoControlls {
         this.containerID = containerID;
         this.videoManager = videoManager;
         this.htmlManager = new HTMLManager(); 
+        this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
+    }
+
+    __videoStateChanged(state) {
+        switch (state) {
+            case VideoManager.PLAYING:
+                this.changeButtonIcon("control-play-button", "gg-play-pause");
+                break;
+            case VideoManager.PAUSED:
+                this.changeButtonIcon("control-play-button", "gg-play-button");
+                break;
+            default:
+        }
     }
 
     restartVideo() {
@@ -341,12 +354,10 @@ class HypervideoControlls {
     }
 
     playButtonClicked() {
-        if (this.videoManager.isPaused) {
+        if (!this.videoManager.isVideoPlaying()) {
             this.videoManager.play();
-            this.changeButtonIcon("control-play-button", "gg-play-pause");
         } else {
             this.videoManager.pause();
-            this.changeButtonIcon("control-play-button", "gg-play-button");
         }
     }
 
@@ -382,16 +393,10 @@ class HypervideoControlls {
         const video = this.htmlManager.createElement("video", "", this.videoElementID);
         video.src = this.videoSRC;
         container.appendChild(video);
+        this.videoManager.setupVideo();
     }
 
     addVideoFromYotube(container) {
-        //TODO: L'enables API segurament ho necessesitare per implementar alguna cosa dels tags.
-       /* const frame = this.htmlManager.createElement("iframe", ["youtube-frame"]);
-        let src = this.videoSRC;
-        src += "?autoplay=0&controls=0&showinfo=0&disablekb=1&fs=0&playsinline=1&wmode=opaque&iv_load_policy=3&modestbranding=1&rel=0";
-        frame.src = src;
-        frame.id = "player";
-        frame.frameBorder = 0;*/
         this.videoElementID = "video-" + this.containerID;
         const div = this.htmlManager.createElement("div", ["youtube-frame"]);
         div.id = this.videoElementID;
@@ -444,8 +449,12 @@ class HypervideoControlls {
 
     createProgressBar() {
         const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
-        
+        progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
         return progressBar;
+    }
+
+    __progressBarChanged(progress) {
+        this.videoManager.loadProgress(progress);
     }
 
 }
@@ -486,22 +495,29 @@ class VideoManager {
     constructor(containerID) {
         this.currentTime = 0;
         this.containerID = containerID;
-        this.isPaused = true;
+        this.videoStateChanged = null;
         //Convertim la classe en "abstract"
         if (new.target === VideoManager) {
             throw new TypeError("Cannot construct VideoManager instances directly");
         }
     }
 
+    static PLAYING = 0;
+    static PAUSED = 1;
+
     play() {}
 
     pause() {}
 
     restartVideo() {}
-    
-    loadTime(seconds) {}
 
-    setVolume() {}
+    isVideoPlaying(){}
+    
+    //0-100
+    loadProgress(progress) {}
+
+    //0-1
+    setVolume(volume) {}
 
     
     toggleFullScreen() {
@@ -556,25 +572,44 @@ class VideoTagManager extends VideoManager {
     play() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.play();
-        this.isPaused = false;
     }
 
     pause() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.pause();
-        this.isPaused = true;
     }
 
     restartVideo() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.currentTime = 0;
     }
-    
-    loadTime(seconds) {
+
+    isVideoPlaying() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
-        video.currentTime = seconds;
+        return !video.paused;
+    }
+    
+    //0-100
+    loadProgress(progress) {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.currentTime = video.duration * (progress/100);
     }
 
+    setupVideo() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.addEventListener('pause', this.__videoIsPaused.bind(this));
+        video.addEventListener('play', this.__videoIsPlaying.bind(this))
+    }
+
+    __videoIsPlaying() {
+        this.videoStateChanged(VideoManager.PLAYING);
+    }
+
+    __videoIsPaused() {
+        this.videoStateChanged(VideoManager.PAUSED);
+    }
+
+    //0-1
     setVolume(volume) {
         volume = volume > 1 ? 1 : volume;
         volume = volume < 0 ? 0 : volume;
@@ -631,6 +666,7 @@ class XProgressBar extends HTMLElement {
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
         const progress = this.convertLengthToProgress(length);
         progressBar.style.width = progress + "%";
+        this.progressBarChanged(progress);
     }
 
     setMaxLength(length) {
@@ -678,19 +714,35 @@ class YoutubeVideoManager extends VideoManager {
 
     play() {
         this.player.playVideo();
-        this.isPaused = false;
     }
 
     pause() {
         this.player.pauseVideo();
-        this.isPaused = true;
     }
 
-    restartVideo() {}
+    restartVideo() {
+        this.__loadTime(0);
+    }
     
-    loadTime(seconds) {}
+    isVideoPlaying() {
+        return this.player.getPlayerState() == YT.PlayerState.PLAYING;
+    }
 
-    setVolume() {}
+    //0-100
+    loadProgress(progress) {
+        const videoDuration = this.player.getDuration();
+        this.__loadTime(videoDuration * (progress/100));
+    }
+
+    __loadTime(seconds) {
+        this.player.seekTo(seconds, true);
+    }
+
+    setVolume(volume) {
+        volume = volume > 1 ? 1 : volume;
+        volume = volume < 0 ? 0 : volume;
+        this.player.setVolume(volume * 100);
+    }
 
     addYoutubeScript(iframeContainerID) {
         this.iframeContainerID = iframeContainerID;
@@ -707,8 +759,8 @@ class YoutubeVideoManager extends VideoManager {
             width: '640', 
             videoId: 'jLHW8V462jo',
             events: {
-                'onReady': this.__onPlayerReady,
-                'onStateChange': this.__onPlayerStateChange
+                'onReady': this.__onPlayerReady.bind(this),
+                'onStateChange': this.__onPlayerStateChange.bind(this)
             },
             playerVars: { 
                 'autoplay': 0, 
@@ -730,7 +782,11 @@ class YoutubeVideoManager extends VideoManager {
         console.log("READY");
     }
     __onPlayerStateChange(event) {
-        console.log("STATE");    
+        if (event.data == YT.PlayerState.PLAYING) {
+            this.videoStateChanged(VideoManager.PLAYING)
+        } else if (event.data == YT.PlayerState.PAUSED) {
+            this.videoStateChanged(VideoManager.PAUSED)
+        }
     }
      
 }

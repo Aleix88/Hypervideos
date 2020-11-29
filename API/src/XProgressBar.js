@@ -39,6 +39,7 @@ class XProgressBar extends HTMLElement {
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
         const progress = this.convertLengthToProgress(length);
         progressBar.style.width = progress + "%";
+        this.progressBarChanged(progress);
     }
 
     setMaxLength(length) {
