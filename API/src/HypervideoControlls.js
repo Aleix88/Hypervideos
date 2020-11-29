@@ -1,6 +1,7 @@
 class HypervideoControlls {
 
     constructor(videoSRC, videoType, containerID, videoManager){
+        this.videoLength = null;
         this.videoSRC = videoSRC;
         this.videoType = videoType;
         this.containerID = containerID;
@@ -9,19 +10,28 @@ class HypervideoControlls {
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
 
-    __videoStateChanged(state) {
+    __videoStateChanged(state, target) {
+        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
         switch (state) {
             case VideoManager.PLAYING:
+                progressBar.startMoving();
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
+                progressBar.stopMoving();
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
+            case VideoManager.LOADED:
+                this.videoLength = target.duration;
+                if (progressBar === null) break;
+                progressBar.setMaxLength(target.duration);
             default:
         }
     }
 
     restartVideo() {
+        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
+        progressBar.setCurrentLength(0);
         this.videoManager.restartVideo();
     }
 
@@ -62,8 +72,8 @@ class HypervideoControlls {
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
             this.addTopBarControlls(container);
         }
-        container.appendChild(tagsContainer);
         this.addBottomBarControlls(container);
+        container.appendChild(tagsContainer);
     }
 
     addVideoTag(container) {
@@ -128,6 +138,9 @@ class HypervideoControlls {
     createProgressBar() {
         const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
         progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
+        if (this.videoLength !== null) {
+            progressBar.setMaxLength(this.videoLength);
+        }
         return progressBar;
     }
 

@@ -21,10 +21,10 @@ class YoutubeVideoManager extends VideoManager {
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
-    //0-100
+    //0-1
     loadProgress(progress) {
         const videoDuration = this.player.getDuration();
-        this.__loadTime(videoDuration * (progress/100));
+        this.__loadTime(videoDuration * progress);
     }
 
     __loadTime(seconds) {
@@ -72,7 +72,7 @@ class YoutubeVideoManager extends VideoManager {
     }
     
     __onPlayerReady(event) {
-        console.log("READY");
+        this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {

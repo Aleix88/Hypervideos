@@ -323,6 +323,7 @@ class Hypervideo {
 class HypervideoControlls {
 
     constructor(videoSRC, videoType, containerID, videoManager){
+        this.videoLength = null;
         this.videoSRC = videoSRC;
         this.videoType = videoType;
         this.containerID = containerID;
@@ -331,19 +332,28 @@ class HypervideoControlls {
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
 
-    __videoStateChanged(state) {
+    __videoStateChanged(state, target) {
+        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
         switch (state) {
             case VideoManager.PLAYING:
+                progressBar.startMoving();
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
+                progressBar.stopMoving();
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
+            case VideoManager.LOADED:
+                this.videoLength = target.duration;
+                if (progressBar === null) break;
+                progressBar.setMaxLength(target.duration);
             default:
         }
     }
 
     restartVideo() {
+        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
+        progressBar.setCurrentLength(0);
         this.videoManager.restartVideo();
     }
 
@@ -384,8 +394,8 @@ class HypervideoControlls {
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
             this.addTopBarControlls(container);
         }
-        container.appendChild(tagsContainer);
         this.addBottomBarControlls(container);
+        container.appendChild(tagsContainer);
     }
 
     addVideoTag(container) {
@@ -450,6 +460,9 @@ class HypervideoControlls {
     createProgressBar() {
         const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
         progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
+        if (this.videoLength !== null) {
+            progressBar.setMaxLength(this.videoLength);
+        }
         return progressBar;
     }
 
@@ -504,6 +517,7 @@ class VideoManager {
 
     static PLAYING = 0;
     static PAUSED = 1;
+    static LOADED = 2;
 
     play() {}
 
@@ -513,7 +527,7 @@ class VideoManager {
 
     isVideoPlaying(){}
     
-    //0-100
+    //0-1
     loadProgress(progress) {}
 
     //0-1
@@ -589,16 +603,17 @@ class VideoTagManager extends VideoManager {
         return !video.paused;
     }
     
-    //0-100
+    //0-1
     loadProgress(progress) {
         const video = document.getElementById(this.containerID).querySelector("video"); 
-        video.currentTime = video.duration * (progress/100);
+        video.currentTime = video.duration * progress;
     }
 
     setupVideo() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.addEventListener('pause', this.__videoIsPaused.bind(this));
-        video.addEventListener('play', this.__videoIsPlaying.bind(this))
+        video.addEventListener('play', this.__videoIsPlaying.bind(this));
+        video.addEventListener('loadeddata', this.__videoLoaded.bind(this));
     }
 
     __videoIsPlaying() {
@@ -607,6 +622,11 @@ class VideoTagManager extends VideoManager {
 
     __videoIsPaused() {
         this.videoStateChanged(VideoManager.PAUSED);
+    }
+
+    __videoLoaded() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        this.videoStateChanged(VideoManager.LOADED, {duration: video.duration});
     }
 
     //0-1
@@ -655,6 +675,20 @@ class XProgressBar extends HTMLElement {
         const posX = event.clientX - rect.left;
         const progress = posX / rect.width;
         this.setCurrentLength(progress * this.maxLength);
+        this.progressBarChanged(progress);
+    }
+
+    startMoving() {
+        const progressBar = this;
+        this.__timeInterval = setInterval(() => {
+            progressBar.increment(1);
+        }, 1000);
+    }
+
+    stopMoving() {
+        if (this.__timeInterval !== undefined && this.__timeInterval !== null) {
+            clearInterval(this.__timeInterval);
+        }
     }
 
     convertLengthToProgress(length) {
@@ -666,7 +700,6 @@ class XProgressBar extends HTMLElement {
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
         const progress = this.convertLengthToProgress(length);
         progressBar.style.width = progress + "%";
-        this.progressBarChanged(progress);
     }
 
     setMaxLength(length) {
@@ -688,7 +721,7 @@ class XProgressBar extends HTMLElement {
                 background: blue;
                 position: absolute;
                 height: 100%;
-                width: 50%;
+                width: 0%;
             }
 
             .progress-bar-marker {
@@ -728,10 +761,10 @@ class YoutubeVideoManager extends VideoManager {
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
-    //0-100
+    //0-1
     loadProgress(progress) {
         const videoDuration = this.player.getDuration();
-        this.__loadTime(videoDuration * (progress/100));
+        this.__loadTime(videoDuration * progress);
     }
 
     __loadTime(seconds) {
@@ -779,7 +812,7 @@ class YoutubeVideoManager extends VideoManager {
     }
     
     __onPlayerReady(event) {
-        console.log("READY");
+        this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {

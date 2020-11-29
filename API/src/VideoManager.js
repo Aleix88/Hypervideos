@@ -11,6 +11,7 @@ class VideoManager {
 
     static PLAYING = 0;
     static PAUSED = 1;
+    static LOADED = 2;
 
     play() {}
 
@@ -20,7 +21,7 @@ class VideoManager {
 
     isVideoPlaying(){}
     
-    //0-100
+    //0-1
     loadProgress(progress) {}
 
     //0-1
