@@ -96,21 +96,28 @@ class Hypervideo {
         /*  Bottom control bar  */
         .bottom-controller {
             display: flex;
+            opacity: 0;
             justify-content: flex-start;
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: rgba(255, 255, 255, 0.521);
+            background: rgb(2,0,36);
+            background: linear-gradient(0deg, rgba(2,0,36,1) 30%, rgba(0,212,255,0) 100%);
             padding: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .hypervideo-container:hover > .bottom-controller {
+            opacity: 1;
         }
         
         .control-button-container {
-            background: white;
+            background: rgba(0,0,0,0);
             height: 2em;
             padding-left: 0.4em;
             padding-right: 0.4em;
-            border: 0.3px solid black;
+            border: none;
             cursor: pointer;
         }
         
@@ -120,11 +127,11 @@ class Hypervideo {
         
         .control-button-container:hover,
         .control-button-container:focus {
-            background: lightgray;
+            background: rgba(0,0,0,0);
         }
         
         .control-button {
-            color: black;  
+            color: white;  
             border: none;
             outline: none;
             background-color: rgba(0,0,0,0);
