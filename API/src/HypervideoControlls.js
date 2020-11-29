@@ -1,95 +1,35 @@
 class HypervideoControlls {
 
-    constructor(videoSRC, videoType, containerID){
+    constructor(videoSRC, videoType, containerID, videoManager){
         this.videoSRC = videoSRC;
         this.videoType = videoType;
         this.containerID = containerID;
-        this.isVideoPaused = true;
+        this.videoManager = videoManager;
         this.htmlManager = new HTMLManager(); 
     }
 
-    setVolume(volume) {
-        volume = volume > 1 ? 1 : volume;
-        volume = volume < 0 ? 0 : volume;
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.volume = volume;
-    }
-
-    pauseVideo() {
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.pause();
-        this.changeButtonIcon("control-play-button", "gg-play-button");
-        this.isVideoPaused = true;
-    }
-
-    playVideo() {
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.play();
-        this.changeButtonIcon("control-play-button", "gg-play-pause");
-        this.isVideoPaused = false;
-    }
-
-    setVideoCurrentTime(seconds) {
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.currentTime = seconds;
-    }
-
     restartVideo() {
-        this.setVideoCurrentTime(0);
-    }
-
-    isFullScreen() {
-        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-    }
-
-    requestFullScreen(container) {
-        if (container.requestFullscreen) {
-            container.requestFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        } else if (container.mozRequestFullScreen) {
-            container.mozRequestFullScreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        } else if (container.webkitRequestFullscreen) {
-            container.webkitRequestFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        } else if (container.msRequestFullscreen) {
-            container.msRequestFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        }
-    }
-
-    requestExitFullScreen(container) {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
-        }
+        this.videoManager.restartVideo();
     }
 
     toggleFullScreen() {
-        const container = document.getElementById(this.containerID);
-        if (this.isFullScreen()) {
-            this.requestExitFullScreen(container);
-        } else {
-            this.requestFullScreen(container);
-        }
+        this.videoManager.toggleFullScreen();
+        const iconName = this.videoManager.isFullScreen() ? "gg-minimize" : "gg-maximize";
+        this.changeButtonIcon("control-full-screen-button", iconName);
     }
 
     playButtonClicked() {
-        if (this.isVideoPaused) {
-            this.playVideo();
+        if (this.videoManager.isPaused) {
+            this.videoManager.play();
+            this.changeButtonIcon("control-play-button", "gg-play-pause");
         } else {
-            this.pauseVideo();
+            this.videoManager.pause();
+            this.changeButtonIcon("control-play-button", "gg-play-button");
         }
     }
 
     changeButtonIcon(buttonClass, iconName) {
-        let button = this.htmlManager.getShadowElementByClassName(this.containerID, buttonClass);
+        let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
         if (button.length <= 0) {
             return;
         }
@@ -101,7 +41,7 @@ class HypervideoControlls {
     }
 
     createSkeleton() {
-        const hypervideo = document.getElementById(this.containerID).shadowRoot;
+        const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
         const tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
 
@@ -124,12 +64,17 @@ class HypervideoControlls {
 
     addVideoFromYotube(container) {
         //TODO: L'enables API segurament ho necessesitare per implementar alguna cosa dels tags.
-        const frame = this.htmlManager.createElement("iframe", ["youtube-frame"]);
+       /* const frame = this.htmlManager.createElement("iframe", ["youtube-frame"]);
         let src = this.videoSRC;
         src += "?autoplay=0&controls=0&showinfo=0&disablekb=1&fs=0&playsinline=1&wmode=opaque&iv_load_policy=3&modestbranding=1&rel=0";
         frame.src = src;
-        frame.frameBorder = 0;
-        container.appendChild(frame);
+        frame.id = "player";
+        frame.frameBorder = 0;*/
+        this.videoElementID = "video-" + this.containerID;
+        const div = this.htmlManager.createElement("div", ["youtube-frame"]);
+        div.id = this.videoElementID;
+        container.appendChild(div);
+        this.videoManager.addYoutubeScript(this.videoElementID);
     }
 
     addVideoElement(container) {

@@ -14,10 +14,9 @@ class Hypervideo {
     }
 
     setupHypervideo(tagsJSON) {
-
+        
         const container = document.getElementById(this.containerID);
-        container.attachShadow({mode: 'open'});
-        container.shadowRoot.appendChild(this.getStyle());
+        container.appendChild(this.getStyle());
 
         if (!this.isDOMLoaded()) {
             //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
@@ -27,7 +26,8 @@ class Hypervideo {
         //TODO: Pensar si això ho necessitare guardar o no
         this.tagsJSON = tagsJSON;
 
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID);
+        const videoManagerFactory = new VideoManagerFactory();
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManagerFactory.create(this.videoType, this.containerID));
         hypervideoControlls.createSkeleton();
     }
 
@@ -116,6 +116,7 @@ class Hypervideo {
             background: red;
             align-self: center;
             position: relative;
+            cursor: pointer;
         }        
         
         /* ICONS */

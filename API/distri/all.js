@@ -44,10 +44,9 @@ class Hypervideo {
     }
 
     setupHypervideo(tagsJSON) {
-
+        
         const container = document.getElementById(this.containerID);
-        container.attachShadow({mode: 'open'});
-        container.shadowRoot.appendChild(this.getStyle());
+        container.appendChild(this.getStyle());
 
         if (!this.isDOMLoaded()) {
             //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
@@ -57,7 +56,8 @@ class Hypervideo {
         //TODO: Pensar si això ho necessitare guardar o no
         this.tagsJSON = tagsJSON;
 
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID);
+        const videoManagerFactory = new VideoManagerFactory();
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManagerFactory.create(this.videoType, this.containerID));
         hypervideoControlls.createSkeleton();
     }
 
@@ -146,6 +146,7 @@ class Hypervideo {
             background: red;
             align-self: center;
             position: relative;
+            cursor: pointer;
         }        
         
         /* ICONS */
@@ -321,96 +322,36 @@ class Hypervideo {
 }
 class HypervideoControlls {
 
-    constructor(videoSRC, videoType, containerID){
+    constructor(videoSRC, videoType, containerID, videoManager){
         this.videoSRC = videoSRC;
         this.videoType = videoType;
         this.containerID = containerID;
-        this.isVideoPaused = true;
+        this.videoManager = videoManager;
         this.htmlManager = new HTMLManager(); 
     }
 
-    setVolume(volume) {
-        volume = volume > 1 ? 1 : volume;
-        volume = volume < 0 ? 0 : volume;
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.volume = volume;
-    }
-
-    pauseVideo() {
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.pause();
-        this.changeButtonIcon("control-play-button", "gg-play-button");
-        this.isVideoPaused = true;
-    }
-
-    playVideo() {
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.play();
-        this.changeButtonIcon("control-play-button", "gg-play-pause");
-        this.isVideoPaused = false;
-    }
-
-    setVideoCurrentTime(seconds) {
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
-        video.currentTime = seconds;
-    }
-
     restartVideo() {
-        this.setVideoCurrentTime(0);
-    }
-
-    isFullScreen() {
-        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-    }
-
-    requestFullScreen(container) {
-        if (container.requestFullscreen) {
-            container.requestFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        } else if (container.mozRequestFullScreen) {
-            container.mozRequestFullScreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        } else if (container.webkitRequestFullscreen) {
-            container.webkitRequestFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        } else if (container.msRequestFullscreen) {
-            container.msRequestFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-        }
-    }
-
-    requestExitFullScreen(container) {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-            this.changeButtonIcon("control-full-screen-button", "gg-maximize");
-        }
+        this.videoManager.restartVideo();
     }
 
     toggleFullScreen() {
-        const container = document.getElementById(this.containerID);
-        if (this.isFullScreen()) {
-            this.requestExitFullScreen(container);
-        } else {
-            this.requestFullScreen(container);
-        }
+        this.videoManager.toggleFullScreen();
+        const iconName = this.videoManager.isFullScreen() ? "gg-minimize" : "gg-maximize";
+        this.changeButtonIcon("control-full-screen-button", iconName);
     }
 
     playButtonClicked() {
-        if (this.isVideoPaused) {
-            this.playVideo();
+        if (this.videoManager.isPaused) {
+            this.videoManager.play();
+            this.changeButtonIcon("control-play-button", "gg-play-pause");
         } else {
-            this.pauseVideo();
+            this.videoManager.pause();
+            this.changeButtonIcon("control-play-button", "gg-play-button");
         }
     }
 
     changeButtonIcon(buttonClass, iconName) {
-        let button = this.htmlManager.getShadowElementByClassName(this.containerID, buttonClass);
+        let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
         if (button.length <= 0) {
             return;
         }
@@ -422,7 +363,7 @@ class HypervideoControlls {
     }
 
     createSkeleton() {
-        const hypervideo = document.getElementById(this.containerID).shadowRoot;
+        const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
         const tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
 
@@ -445,12 +386,17 @@ class HypervideoControlls {
 
     addVideoFromYotube(container) {
         //TODO: L'enables API segurament ho necessesitare per implementar alguna cosa dels tags.
-        const frame = this.htmlManager.createElement("iframe", ["youtube-frame"]);
+       /* const frame = this.htmlManager.createElement("iframe", ["youtube-frame"]);
         let src = this.videoSRC;
         src += "?autoplay=0&controls=0&showinfo=0&disablekb=1&fs=0&playsinline=1&wmode=opaque&iv_load_policy=3&modestbranding=1&rel=0";
         frame.src = src;
-        frame.frameBorder = 0;
-        container.appendChild(frame);
+        frame.id = "player";
+        frame.frameBorder = 0;*/
+        this.videoElementID = "video-" + this.containerID;
+        const div = this.htmlManager.createElement("div", ["youtube-frame"]);
+        div.id = this.videoElementID;
+        container.appendChild(div);
+        this.videoManager.addYoutubeScript(this.videoElementID);
     }
 
     addVideoElement(container) {
@@ -536,6 +482,114 @@ function importHypervideoAPI(callback) {
 }
 
    
+class VideoManager {
+    constructor(containerID) {
+        this.currentTime = 0;
+        this.containerID = containerID;
+        this.isPaused = true;
+        //Convertim la classe en "abstract"
+        if (new.target === VideoManager) {
+            throw new TypeError("Cannot construct VideoManager instances directly");
+        }
+    }
+
+    play() {}
+
+    pause() {}
+
+    restartVideo() {}
+    
+    loadTime(seconds) {}
+
+    setVolume() {}
+
+    
+    toggleFullScreen() {
+        const container = document.getElementById(this.containerID);
+        if (this.isFullScreen()) {
+            this.requestExitFullScreen(container);
+        } else {
+            this.requestFullScreen(container);
+        }
+    }
+    
+    isFullScreen() {
+        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    }
+
+    requestFullScreen(container) {
+        if (container.requestFullscreen) {
+            container.requestFullscreen();
+        } else if (container.mozRequestFullScreen) {
+            container.mozRequestFullScreen();
+        } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+        } else if (container.msRequestFullscreen) {
+            container.msRequestFullscreen();
+        }
+    }
+
+    requestExitFullScreen(container) {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+}
+class VideoManagerFactory {
+
+    create(hypervideoType, containerID) {
+        switch(hypervideoType) {
+            case Hypervideo.YOUTUBE_TYPE:
+                return new YoutubeVideoManager(containerID);
+            default:
+                return new VideoTagManager(containerID);    
+        }
+    }
+
+}
+class VideoTagManager extends VideoManager {
+
+    play() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.play();
+        this.isPaused = false;
+    }
+
+    pause() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.pause();
+        this.isPaused = true;
+    }
+
+    restartVideo() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.currentTime = 0;
+    }
+    
+    loadTime(seconds) {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.currentTime = seconds;
+    }
+
+    setVolume(volume) {
+        volume = volume > 1 ? 1 : volume;
+        volume = volume < 0 ? 0 : volume;
+        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
+        video.volume = volume;
+    }
+
+    setVolume(volume) {
+        volume = volume > 1 ? 1 : volume;
+        volume = volume < 0 ? 0 : volume;
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.volume = volume;
+    }
+
+}
 class XProgressBar extends HTMLElement {
 
     constructor() {
@@ -615,3 +669,68 @@ class XProgressBar extends HTMLElement {
 }
 
 customElements.define('x-progress-bar', XProgressBar);
+class YoutubeVideoManager extends VideoManager {
+
+    constructor(containerID) {
+        super(containerID);
+        this.player = null;
+    }
+
+    play() {
+        this.player.playVideo();
+        this.isPaused = false;
+    }
+
+    pause() {
+        this.player.pauseVideo();
+        this.isPaused = true;
+    }
+
+    restartVideo() {}
+    
+    loadTime(seconds) {}
+
+    setVolume() {}
+
+    addYoutubeScript(iframeContainerID) {
+        this.iframeContainerID = iframeContainerID;
+        let tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        let firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.appendChild(tag);
+        window.onYouTubeIframeAPIReady = this.__onYouTubeIframeAPIReady.bind(this);
+    }
+
+    __onYouTubeIframeAPIReady() {
+        const player = new YT.Player(this.iframeContainerID, {
+            height: '360',
+            width: '640', 
+            videoId: 'jLHW8V462jo',
+            events: {
+                'onReady': this.__onPlayerReady,
+                'onStateChange': this.__onPlayerStateChange
+            },
+            playerVars: { 
+                'autoplay': 0, 
+                'controls': 0,
+                'disablekb': 1,
+                'fs': 0,
+                'modestbranding': 1,
+                'rel': 0,
+                'iv_load_policy': 3,
+                'autohide':1,
+                'wmode':'opaque' 
+            },
+
+        });
+        this.player = player;
+    }
+    
+    __onPlayerReady(event) {
+        console.log("READY");
+    }
+    __onPlayerStateChange(event) {
+        console.log("STATE");    
+    }
+     
+}
