@@ -725,17 +725,23 @@ class XVolumeBar extends HTMLElement {
     constructor() {
         super();
         this.htmlManager = new HTMLManager();
-        
+        this.maxVolume = 100;
+        this.volume = 0;
+
         let shadow = this.attachShadow({mode: 'open'});
         
         const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
         const volumeButton = this.createVolumeButton();
         const volumeBar = this.htmlManager.createElement("div", ["volume-bar-rect"]);
+        const volumeLevelBar = this.htmlManager.createElement("div", ["volume-bar-level"]);
 
         container.appendChild(volumeButton);
         container.appendChild(volumeBar);
+        volumeBar.appendChild(volumeLevelBar);
         shadow.appendChild(container);
         shadow.appendChild(this.getStyle());
+
+        this.__setupOnClickEventListener(volumeBar);
 
     }
 
@@ -748,6 +754,26 @@ class XVolumeBar extends HTMLElement {
         return buttonContainer;
     }
 
+    __setupOnClickEventListener(volumeBar) {
+        volumeBar.addEventListener('click', this.__onClick.bind(this));
+    }
+    
+    __onClick(event) {
+        const volumeBarRect = this.shadowRoot.querySelector(".volume-bar-rect");
+        const rect = volumeBarRect.getBoundingClientRect();
+        const posX = event.clientX - rect.left;
+        const progress = posX / rect.width;
+        this.setVolume(progress * this.maxVolume);
+    }
+
+    setVolume(volume) {
+        volume = volume < 0 ? 0 : volume;
+        volume = volume > 100 ? 100 : volume;
+        this.volume = volume;
+        const volumeLevelBar = this.shadowRoot.querySelector(".volume-bar-level");
+        volumeLevelBar.style.width = volume + "%";
+    }
+
     getStyle() {
         const style = document.createElement("style");
         style.textContent = `
@@ -757,16 +783,11 @@ class XVolumeBar extends HTMLElement {
                 display: flex;
             }
 
-            .volume-bar-container:hover > .volume-bar-rect,
-            .volume-bar-container:focus > .volume-bar-rect {
-                display: block;
-            }
-
             .volume-bar-container:hover,
             .volume-bar-container:focus {
                 color: rgb(97, 87, 245);
             }
-
+            
             .volume-bar-rect {
                 display: none;
                 height: 3px;
@@ -774,8 +795,25 @@ class XVolumeBar extends HTMLElement {
                 width: 50px;
                 margin: auto;
                 cursor: pointer;
+                transition: height 0.2s;
             }
 
+            .volume-bar-rect:hover,
+            .volume-bar-rect:focus {
+                height: 7px;
+            }
+            
+            .volume-bar-container:hover > .volume-bar-rect,
+            .volume-bar-container:focus > .volume-bar-rect {
+                display: block;
+            }
+
+            .volume-bar-level {
+                height: 100%;
+                width: 0%;
+                background: rgb(97, 87, 245);
+            }
+            
             .volume-icon-container {
                 background: rgba(0,0,0,0);
                 height: 2em;
