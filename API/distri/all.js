@@ -440,8 +440,13 @@ class HypervideoControlls {
     }
 
     createVolumeBar() {
-        const progressBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
-        return progressBar;
+        const volumeBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
+        volumeBar.volumeChanged = this.__volumeChanged.bind(this);
+        return volumeBar;
+    }
+
+    __volumeChanged(volume) {
+        this.videoManager.setVolume(volume/100);
     }
 
 }
@@ -631,12 +636,13 @@ class XProgressBar extends HTMLElement {
 
     constructor() {
         super();
+        this.isMoving = false;
         this.htmlManager = new HTMLManager();
         this.maxLength = 100;
         this.currentLength = 0;
         let shadow = this.attachShadow({mode: 'open'});
 
-        this.addEventListener('click', this.onClickBar);
+        this.__setupEventsListeners();
         const bar = this.htmlManager.createElement("div", ["progress-bar"]);
         shadow.appendChild(this.getStyle());
         shadow.appendChild(bar);
@@ -652,12 +658,39 @@ class XProgressBar extends HTMLElement {
         marker.style.left = progress + "%";
     }
 
-    onClickBar(event) {
-        const rect = event.target.getBoundingClientRect();
-        const posX = event.clientX - rect.left;
-        const progress = posX / rect.width;
+    __setupEventsListeners() {
+        this.onmousedown = this.__mouseDown.bind(this);
+        document.addEventListener('mouseup', this.__mouseUp.bind(this));
+        document.addEventListener('mouseleave', this.__mouseLeave.bind(this));
+        document.addEventListener('mousemove', this.__mouseMoving.bind(this));
+    }
+    
+    __recalculatePosition(clientX) {
+        const rect = this.getBoundingClientRect();
+        const posX = clientX - rect.left;
+        let progress = posX / rect.width;
+        progress = progress > 1 ? 1 : progress;
+        progress = progress < 0 ? 0 : progress;
         this.setCurrentLength(progress * this.maxLength);
         this.progressBarChanged(progress);
+    }
+
+    __mouseLeave() {
+        this.isMoving = false;
+    }
+
+    __mouseUp() {
+        this.isMoving = false;
+    }
+
+    __mouseMoving(event) {
+        if (!this.isMoving) {return;}
+        this.__recalculatePosition(event.clientX);
+    }
+
+    __mouseDown(event) {
+        this.isMoving = true;
+        this.__recalculatePosition(event.clientX);
     }
 
     startMoving() {
@@ -679,6 +712,8 @@ class XProgressBar extends HTMLElement {
 
     setCurrentLength(length) {
         this.currentLength = length;
+        this.currentLength = this.currentLength > this.maxLength ? this.maxLength : this.currentLength;
+        this.currentLength = this.currentLength < 0 ? 0 : this.currentLength;
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
         const progress = this.convertLengthToProgress(length);
         progressBar.style.width = progress + "%";
@@ -728,7 +763,7 @@ class XVolumeBar extends HTMLElement {
         this.maxVolume = 100;
         this.volume = 0;
         this.isVolMoving = false;
-        this.foo = 0;
+        this.volumeChanged = (()=>{});
         let shadow = this.attachShadow({mode: 'open'});
         
         const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
@@ -742,7 +777,7 @@ class XVolumeBar extends HTMLElement {
         shadow.appendChild(container);
         shadow.appendChild(this.getStyle());
 
-        this.__setupEventsListeners(volumeBar);
+        this.__setupEventsListeners(volumeBar, container);
 
     }
 
@@ -755,15 +790,28 @@ class XVolumeBar extends HTMLElement {
         return buttonContainer;
     }
 
-    __setupEventsListeners(volumeBar) {
+    __setupEventsListeners(volumeBar,container) {
         volumeBar.onmousedown = this.__mouseDown.bind(this);
-        volumeBar.onmousemove = (this.__mouseMoving.bind(this));
-        volumeBar.onmouseup = (this.__mouseUp.bind(this));
-        this.onmouseleave = (this.__mouseLeave.bind(this));
+        container.onmouseenter = this.__mouseEnter.bind(this);
+        container.onmouseleave = (this.__mouseLeaveElement.bind(this));
+        document.addEventListener('mouseup', this.__mouseUp.bind(this));
+        document.addEventListener('mouseleave', this.__mouseLeaveDocument.bind(this));
+        document.addEventListener('mousemove', this.__mouseMoving.bind(this));
     }
 
-    __mouseLeave() {
+    __mouseEnter() {
+        const volumeBar = this.shadowRoot.querySelector(".volume-bar-rect");
+        volumeBar.classList.add("volume-bar-rect-focus");
+    }
+
+    __mouseLeaveDocument() {
         this.isVolMoving = false;
+    }
+
+    __mouseLeaveElement() {
+        if (this.isVolMoving) {return;}
+        const volumeBar = this.shadowRoot.querySelector(".volume-bar-rect");
+        volumeBar.classList.remove('volume-bar-rect-focus');
     }
     
     __mouseUp() {
@@ -777,8 +825,6 @@ class XVolumeBar extends HTMLElement {
 
     __mouseDown(event) {
         this.isVolMoving = true;
-        this.foo++;
-        console.log(this.isVolMoving);
         this.__calculateVolumePosition(event.clientX);
     }
     
@@ -794,6 +840,7 @@ class XVolumeBar extends HTMLElement {
         volume = volume < 0 ? 0 : volume;
         volume = volume > 100 ? 100 : volume;
         this.volume = volume;
+        this.volumeChanged(volume);
         const volumeLevelBar = this.shadowRoot.querySelector(".volume-bar-level");
         volumeLevelBar.style.width = volume + "%";
     }
@@ -827,8 +874,7 @@ class XVolumeBar extends HTMLElement {
                 height: 7px;
             }
             
-            .volume-bar-container:hover > .volume-bar-rect,
-            .volume-bar-container:focus > .volume-bar-rect {
+             .volume-bar-rect-focus {
                 display: block;
             }
 
@@ -980,7 +1026,8 @@ class YoutubeVideoManager extends VideoManager {
                 'rel': 0,
                 'iv_load_policy': 3,
                 'autohide':1,
-                'wmode':'opaque' 
+                'wmode':'opaque',
+                'start': 1
             },
 
         });
@@ -989,6 +1036,7 @@ class YoutubeVideoManager extends VideoManager {
     
     __onPlayerReady(event) {
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
+        this.__loadTime(0);
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {

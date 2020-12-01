@@ -6,7 +6,7 @@ class XVolumeBar extends HTMLElement {
         this.maxVolume = 100;
         this.volume = 0;
         this.isVolMoving = false;
-        this.foo = 0;
+        this.volumeChanged = (()=>{});
         let shadow = this.attachShadow({mode: 'open'});
         
         const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
@@ -20,7 +20,7 @@ class XVolumeBar extends HTMLElement {
         shadow.appendChild(container);
         shadow.appendChild(this.getStyle());
 
-        this.__setupEventsListeners(volumeBar);
+        this.__setupEventsListeners(volumeBar, container);
 
     }
 
@@ -33,15 +33,28 @@ class XVolumeBar extends HTMLElement {
         return buttonContainer;
     }
 
-    __setupEventsListeners(volumeBar) {
+    __setupEventsListeners(volumeBar,container) {
         volumeBar.onmousedown = this.__mouseDown.bind(this);
-        volumeBar.onmousemove = (this.__mouseMoving.bind(this));
-        volumeBar.onmouseup = (this.__mouseUp.bind(this));
-        this.onmouseleave = (this.__mouseLeave.bind(this));
+        container.onmouseenter = this.__mouseEnter.bind(this);
+        container.onmouseleave = (this.__mouseLeaveElement.bind(this));
+        document.addEventListener('mouseup', this.__mouseUp.bind(this));
+        document.addEventListener('mouseleave', this.__mouseLeaveDocument.bind(this));
+        document.addEventListener('mousemove', this.__mouseMoving.bind(this));
     }
 
-    __mouseLeave() {
+    __mouseEnter() {
+        const volumeBar = this.shadowRoot.querySelector(".volume-bar-rect");
+        volumeBar.classList.add("volume-bar-rect-focus");
+    }
+
+    __mouseLeaveDocument() {
         this.isVolMoving = false;
+    }
+
+    __mouseLeaveElement() {
+        if (this.isVolMoving) {return;}
+        const volumeBar = this.shadowRoot.querySelector(".volume-bar-rect");
+        volumeBar.classList.remove('volume-bar-rect-focus');
     }
     
     __mouseUp() {
@@ -55,8 +68,6 @@ class XVolumeBar extends HTMLElement {
 
     __mouseDown(event) {
         this.isVolMoving = true;
-        this.foo++;
-        console.log(this.isVolMoving);
         this.__calculateVolumePosition(event.clientX);
     }
     
@@ -72,6 +83,7 @@ class XVolumeBar extends HTMLElement {
         volume = volume < 0 ? 0 : volume;
         volume = volume > 100 ? 100 : volume;
         this.volume = volume;
+        this.volumeChanged(volume);
         const volumeLevelBar = this.shadowRoot.querySelector(".volume-bar-level");
         volumeLevelBar.style.width = volume + "%";
     }
@@ -105,8 +117,7 @@ class XVolumeBar extends HTMLElement {
                 height: 7px;
             }
             
-            .volume-bar-container:hover > .volume-bar-rect,
-            .volume-bar-container:focus > .volume-bar-rect {
+             .volume-bar-rect-focus {
                 display: block;
             }
 

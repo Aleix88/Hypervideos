@@ -64,7 +64,8 @@ class YoutubeVideoManager extends VideoManager {
                 'rel': 0,
                 'iv_load_policy': 3,
                 'autohide':1,
-                'wmode':'opaque' 
+                'wmode':'opaque',
+                'start': 1
             },
 
         });
@@ -73,6 +74,7 @@ class YoutubeVideoManager extends VideoManager {
     
     __onPlayerReady(event) {
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
+        this.__loadTime(0);
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {

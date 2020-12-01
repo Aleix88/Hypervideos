@@ -149,8 +149,13 @@ class HypervideoControlls {
     }
 
     createVolumeBar() {
-        const progressBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
-        return progressBar;
+        const volumeBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
+        volumeBar.volumeChanged = this.__volumeChanged.bind(this);
+        return volumeBar;
+    }
+
+    __volumeChanged(volume) {
+        this.videoManager.setVolume(volume/100);
     }
 
 }
