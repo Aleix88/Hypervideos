@@ -5,7 +5,8 @@ class XVolumeBar extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.maxVolume = 100;
         this.volume = 0;
-
+        this.isVolMoving = false;
+        this.foo = 0;
         let shadow = this.attachShadow({mode: 'open'});
         
         const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
@@ -19,7 +20,7 @@ class XVolumeBar extends HTMLElement {
         shadow.appendChild(container);
         shadow.appendChild(this.getStyle());
 
-        this.__setupOnClickEventListener(volumeBar);
+        this.__setupEventsListeners(volumeBar);
 
     }
 
@@ -32,14 +33,37 @@ class XVolumeBar extends HTMLElement {
         return buttonContainer;
     }
 
-    __setupOnClickEventListener(volumeBar) {
-        volumeBar.addEventListener('click', this.__onClick.bind(this));
+    __setupEventsListeners(volumeBar) {
+        volumeBar.onmousedown = this.__mouseDown.bind(this);
+        volumeBar.onmousemove = (this.__mouseMoving.bind(this));
+        volumeBar.onmouseup = (this.__mouseUp.bind(this));
+        this.onmouseleave = (this.__mouseLeave.bind(this));
+    }
+
+    __mouseLeave() {
+        this.isVolMoving = false;
     }
     
-    __onClick(event) {
+    __mouseUp() {
+        this.isVolMoving = false;
+    }
+
+    __mouseMoving(event) {
+        if (!this.isVolMoving) {return;}
+        this.__calculateVolumePosition(event.clientX);
+    }
+
+    __mouseDown(event) {
+        this.isVolMoving = true;
+        this.foo++;
+        console.log(this.isVolMoving);
+        this.__calculateVolumePosition(event.clientX);
+    }
+    
+    __calculateVolumePosition(clientX) {
         const volumeBarRect = this.shadowRoot.querySelector(".volume-bar-rect");
         const rect = volumeBarRect.getBoundingClientRect();
-        const posX = event.clientX - rect.left;
+        const posX = clientX - rect.left;
         const progress = posX / rect.width;
         this.setVolume(progress * this.maxVolume);
     }
