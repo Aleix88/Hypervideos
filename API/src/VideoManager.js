@@ -13,6 +13,8 @@ class VideoManager {
     static PLAYING = 0;
     static PAUSED = 1;
     static LOADED = 2;
+    static ENTER_FULL_SCREEN = 3;
+    static EXIT_FULL_SCREEN = 4;
 
     play() {}
 
@@ -28,7 +30,23 @@ class VideoManager {
     //0-1
     setVolume(volume) {}
 
-    
+    __exitFullScreenEventListeners() {
+        document.addEventListener('fullscreenchange', this._exitFSHandler.bind(this), false);
+        document.addEventListener('mozfullscreenchange', this._exitFSHandler.bind(this), false);
+        document.addEventListener('MSFullscreenChange', this._exitFSHandler.bind(this), false);
+        document.addEventListener('webkitfullscreenchange', this._exitFSHandler.bind(this), false);
+    }
+
+    _exitFSHandler() {
+        this.isFullScreen = false;
+        this.videoStateChanged(VideoManager.EXIT_FULL_SCREEN);
+    }
+
+    _enterFSHandler() {
+        this.isFullScreen = true;
+        this.videoStateChanged(VideoManager.ENTER_FULL_SCREEN);
+    }
+
     toggleFullScreen() {
         const container = document.getElementById(this.containerID);
         if (this.isFullScreen) {
@@ -45,29 +63,29 @@ class VideoManager {
     requestFullScreen(container) {
         if (container.requestFullscreen) {
             container.requestFullscreen();
-            this.isFullScreen = true;
+            this._enterFSHandler();
         } else if (container.mozRequestFullScreen) {
             container.mozRequestFullScreen();
-            this.isFullScreen = true;
+            this._enterFSHandler();
         } else if (container.webkitRequestFullscreen) {
             container.webkitRequestFullscreen();
-            this.isFullScreen = true;
+            this._enterFSHandler();
         } else if (container.msRequestFullscreen) {
             container.msRequestFullscreen();
-            this.isFullScreen = true;
+            this._enterFSHandler();
         }
     }
 
     requestExitFullScreen(container) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
-            this.isFullScreen = false;
+            this._exitFSHandler();
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
-            this.isFullScreen = false;
+            this._exitFSHandler();
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
-            this.isFullScreen = false;
+            this._exitFSHandler();
         }
     }
 }

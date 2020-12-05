@@ -32,6 +32,13 @@ class HypervideoControlls {
                 this.videoLength = target.duration;
                 if (progressBar === null) break;
                 progressBar.setMaxLength(target.duration);
+                break;
+            case VideoManager.ENTER_FULL_SCREEN:
+                this.changeButtonIcon("control-full-screen-button", "gg-minimize");
+                break;
+            case VideoManager.EXIT_FULL_SCREEN:
+                this.changeButtonIcon("control-full-screen-button", "gg-maximize");
+                break;
             default:
         }
     }
@@ -44,8 +51,6 @@ class HypervideoControlls {
 
     toggleFullScreen() {
         this.videoManager.toggleFullScreen();
-        const iconName = this.videoManager.isFullScreen ? "gg-minimize" : "gg-maximize";
-        this.changeButtonIcon("control-full-screen-button", iconName);
     }
 
     playButtonClicked() {
