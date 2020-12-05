@@ -321,6 +321,8 @@ class HypervideoControlls {
     __videoStateChanged(state, target) {
         const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
+        const volumeBar = document.getElementById(this.containerID).querySelector("x-volume-bar");
+
         switch (state) {
             case VideoManager.PLAYING:
                 progressBar.startMoving();
@@ -333,6 +335,8 @@ class HypervideoControlls {
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case VideoManager.LOADED:
+                volumeBar.setVolume(50);
+                this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
                 if (progressBar === null) break;
                 progressBar.setMaxLength(target.duration);
