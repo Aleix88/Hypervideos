@@ -6,10 +6,12 @@ class YoutubeVideoManager extends VideoManager {
     }
 
     play() {
+        if (this.player === null) {return;}
         this.player.playVideo();
     }
 
     pause() {
+        if (this.player === null) {return;}
         this.player.pauseVideo();
     }
 
@@ -28,10 +30,12 @@ class YoutubeVideoManager extends VideoManager {
     }
 
     __loadTime(seconds) {
+        if (this.player === null) {return;}
         this.player.seekTo(seconds, true);
     }
 
     setVolume(volume) {
+        if (this.player === null) {return;}
         volume = volume > 1 ? 1 : volume;
         volume = volume < 0 ? 0 : volume;
         this.player.setVolume(volume * 100);

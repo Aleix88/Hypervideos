@@ -68,6 +68,7 @@ class Hypervideo {
         video {
             width: 100%;
             height: 100%;
+            background: black;
         }
         
         button {
@@ -163,6 +164,15 @@ class Hypervideo {
         .progress-container:focus,
         .progress-container:hover {
             height: 5px;
+        }
+
+        x-pause-screen {
+            width: 100%;
+            height: 100%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         
@@ -310,13 +320,16 @@ class HypervideoControlls {
 
     __videoStateChanged(state, target) {
         const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
+        const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
             case VideoManager.PLAYING:
                 progressBar.startMoving();
+                pauseScreen.hide();
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
                 progressBar.stopMoving();
+                pauseScreen.show();
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case VideoManager.LOADED:
@@ -370,6 +383,7 @@ class HypervideoControlls {
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
             this.addTopBarControlls(container);
         }
+        this.__addPauseScreen(container);
         this.addBottomBarControlls(container);
         container.appendChild(tagsContainer);
     }
@@ -404,6 +418,19 @@ class HypervideoControlls {
     addTopBarControlls(container) {
         const topContainer = this.htmlManager.createElement("div", ["top-controller"]);
         container.appendChild(topContainer);
+    }
+
+    __addPauseScreen(container) {
+        const pauseScreen = this.htmlManager.createElement("x-pause-screen");
+        const thisReference = this;
+        pauseScreen.didClick = (() => {
+            if (thisReference.videoManager.isVideoPlaying()) {
+                thisReference.videoManager.pause();
+            } else {
+                thisReference.videoManager.play();
+            }
+        });
+        container.appendChild(pauseScreen);
     }
 
     addBottomBarControlls(container) {
@@ -639,6 +666,71 @@ class VideoTagManager extends VideoManager {
     }
 
 }
+class XPauseScreen extends HTMLElement {
+
+    constructor() {
+        super();
+        this.htmlManager = new HTMLManager();
+        this.didClick = null;
+
+        let shadow = this.attachShadow({mode: 'open'});
+        const container = this.htmlManager.createElement('div', ["pause-container"]);
+        container.addEventListener('click', this.__onClick.bind(this));
+        //this.__addPlayIcon(container);
+        shadow.appendChild(container);
+        shadow.appendChild(this.__getStyle());
+    }
+
+    hide() {
+        const container = this.shadowRoot.querySelector(".pause-container");
+        container.classList.add("hide");
+    }
+
+    show() {
+        const container = this.shadowRoot.querySelector(".pause-container");
+        container.classList.remove("hide");
+    }
+
+    __onClick() {
+        this.didClick();
+    }
+
+    __addPlayIcon(container) {
+        const img = this.htmlManager.createElement("img", ["play-image"]);
+        img.src = "./../../API/assets/play-button.svg";
+        container.appendChild(img);
+    }
+
+    __getStyle () {
+        const style = document.createElement("style");
+        style.textContent = `
+
+            .pause-container {
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.1);
+                cursor: pointer;
+                display: flex;
+                margin: 0;
+            }
+
+            .hide {
+                opacity: 0;
+            }
+
+            .play-image {
+                width: 100px;
+                height: 100px;
+                margin: auto;
+            }
+        `;
+
+        return style;
+    }
+
+}
+
+customElements.define('x-pause-screen', XPauseScreen);
 class XProgressBar extends HTMLElement {
 
     constructor() {
@@ -985,10 +1077,12 @@ class YoutubeVideoManager extends VideoManager {
     }
 
     play() {
+        if (this.player === null) {return;}
         this.player.playVideo();
     }
 
     pause() {
+        if (this.player === null) {return;}
         this.player.pauseVideo();
     }
 
@@ -1007,10 +1101,12 @@ class YoutubeVideoManager extends VideoManager {
     }
 
     __loadTime(seconds) {
+        if (this.player === null) {return;}
         this.player.seekTo(seconds, true);
     }
 
     setVolume(volume) {
+        if (this.player === null) {return;}
         volume = volume > 1 ? 1 : volume;
         volume = volume < 0 ? 0 : volume;
         this.player.setVolume(volume * 100);

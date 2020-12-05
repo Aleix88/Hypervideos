@@ -38,6 +38,7 @@ class Hypervideo {
         video {
             width: 100%;
             height: 100%;
+            background: black;
         }
         
         button {
@@ -133,6 +134,15 @@ class Hypervideo {
         .progress-container:focus,
         .progress-container:hover {
             height: 5px;
+        }
+
+        x-pause-screen {
+            width: 100%;
+            height: 100%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         

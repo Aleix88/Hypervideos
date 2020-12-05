@@ -12,13 +12,16 @@ class HypervideoControlls {
 
     __videoStateChanged(state, target) {
         const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
+        const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
             case VideoManager.PLAYING:
                 progressBar.startMoving();
+                pauseScreen.hide();
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
                 progressBar.stopMoving();
+                pauseScreen.show();
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case VideoManager.LOADED:
@@ -72,6 +75,7 @@ class HypervideoControlls {
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
             this.addTopBarControlls(container);
         }
+        this.__addPauseScreen(container);
         this.addBottomBarControlls(container);
         container.appendChild(tagsContainer);
     }
@@ -106,6 +110,19 @@ class HypervideoControlls {
     addTopBarControlls(container) {
         const topContainer = this.htmlManager.createElement("div", ["top-controller"]);
         container.appendChild(topContainer);
+    }
+
+    __addPauseScreen(container) {
+        const pauseScreen = this.htmlManager.createElement("x-pause-screen");
+        const thisReference = this;
+        pauseScreen.didClick = (() => {
+            if (thisReference.videoManager.isVideoPlaying()) {
+                thisReference.videoManager.pause();
+            } else {
+                thisReference.videoManager.play();
+            }
+        });
+        container.appendChild(pauseScreen);
     }
 
     addBottomBarControlls(container) {
