@@ -6,6 +6,8 @@ class XProgressBar extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.maxLength = 100;
         this.currentLength = 0;
+        this.currentProgress = 0;
+        this.progressBarChanged = null;
         let shadow = this.attachShadow({mode: 'open'});
 
         this.__setupEventsListeners();
@@ -16,6 +18,8 @@ class XProgressBar extends HTMLElement {
         this.addMarkerAt(10);
         this.addMarkerAt(40);
     }
+
+    static POSITION_SET = "POSITION_SET";
 
     addMarkerAt(length) {
         const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
@@ -38,15 +42,20 @@ class XProgressBar extends HTMLElement {
         progress = progress > 1 ? 1 : progress;
         progress = progress < 0 ? 0 : progress;
         this.setCurrentLength(progress * this.maxLength);
-        this.progressBarChanged(progress);
     }
 
-    __mouseLeave() {
+    __mouseLeave(event) {
+        if (!this.isMoving) {return;}
         this.isMoving = false;
+        this.__recalculatePosition(event.clientX);
+        this.progressBarChanged(this.currentProgress);
     }
 
-    __mouseUp() {
+    __mouseUp(event) {
+        if (!this.isMoving) {return;}
         this.isMoving = false;
+        this.__recalculatePosition(event.clientX);
+        this.progressBarChanged(this.currentProgress);
     }
 
     __mouseMoving(event) {
@@ -82,6 +91,7 @@ class XProgressBar extends HTMLElement {
         this.currentLength = this.currentLength < 0 ? 0 : this.currentLength;
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
         const progress = this.convertLengthToProgress(length);
+        this.currentProgress = progress/100;
         progressBar.style.width = progress + "%";
     }
 

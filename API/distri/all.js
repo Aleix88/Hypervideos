@@ -64,6 +64,7 @@ class Hypervideo {
     getStyle() {
         let style = document.createElement('style');
         style.textContent = `
+
         video {
             width: 100%;
             height: 100%;
@@ -82,6 +83,12 @@ class Hypervideo {
             position: relative;
             width: 100%;
             height: 100%;
+            user-drag: none; 
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
         }
         
         /* Top control bar */
@@ -640,6 +647,8 @@ class XProgressBar extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.maxLength = 100;
         this.currentLength = 0;
+        this.currentProgress = 0;
+        this.progressBarChanged = null;
         let shadow = this.attachShadow({mode: 'open'});
 
         this.__setupEventsListeners();
@@ -650,6 +659,8 @@ class XProgressBar extends HTMLElement {
         this.addMarkerAt(10);
         this.addMarkerAt(40);
     }
+
+    static POSITION_SET = "POSITION_SET";
 
     addMarkerAt(length) {
         const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
@@ -672,15 +683,20 @@ class XProgressBar extends HTMLElement {
         progress = progress > 1 ? 1 : progress;
         progress = progress < 0 ? 0 : progress;
         this.setCurrentLength(progress * this.maxLength);
-        this.progressBarChanged(progress);
     }
 
-    __mouseLeave() {
+    __mouseLeave(event) {
+        if (!this.isMoving) {return;}
         this.isMoving = false;
+        this.__recalculatePosition(event.clientX);
+        this.progressBarChanged(this.currentProgress);
     }
 
-    __mouseUp() {
+    __mouseUp(event) {
+        if (!this.isMoving) {return;}
         this.isMoving = false;
+        this.__recalculatePosition(event.clientX);
+        this.progressBarChanged(this.currentProgress);
     }
 
     __mouseMoving(event) {
@@ -716,6 +732,7 @@ class XProgressBar extends HTMLElement {
         this.currentLength = this.currentLength < 0 ? 0 : this.currentLength;
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
         const progress = this.convertLengthToProgress(length);
+        this.currentProgress = progress/100;
         progressBar.style.width = progress + "%";
     }
 
@@ -1035,6 +1052,8 @@ class YoutubeVideoManager extends VideoManager {
     }
     
     __onPlayerReady(event) {
+        const iFrame = document.querySelector("#"+this.iframeContainerID);
+        iFrame.style.pointerEvents = "none";
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
         this.__loadTime(0);
     }

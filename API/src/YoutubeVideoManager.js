@@ -73,6 +73,8 @@ class YoutubeVideoManager extends VideoManager {
     }
     
     __onPlayerReady(event) {
+        const iFrame = document.querySelector("#"+this.iframeContainerID);
+        iFrame.style.pointerEvents = "none";
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
         this.__loadTime(0);
     }

@@ -34,6 +34,7 @@ class Hypervideo {
     getStyle() {
         let style = document.createElement('style');
         style.textContent = `
+
         video {
             width: 100%;
             height: 100%;
@@ -52,6 +53,12 @@ class Hypervideo {
             position: relative;
             width: 100%;
             height: 100%;
+            user-drag: none; 
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
         }
         
         /* Top control bar */
