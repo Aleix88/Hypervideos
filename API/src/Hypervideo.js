@@ -29,6 +29,9 @@ class Hypervideo {
         const videoManagerFactory = new VideoManagerFactory();
         const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManagerFactory.create(this.videoType, this.containerID));
         hypervideoControlls.createSkeleton();
+
+        const tagsController = new TagsController(this.containerID);
+        tagsController.addTagButton(50,50);
     }
 
     getStyle() {
@@ -71,6 +74,26 @@ class Hypervideo {
             right: 0;
         }
         
+
+        /* Tags */
+
+        x-tag-button {
+            pointer-events: all;
+            position: absolute;
+            width: 7%;
+            top: 50px;
+            left: 50px;
+        }
+
+        .tags-container {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         /*  Bottom control bar  */
         .bottom-controller {
             display: flex;

@@ -85,8 +85,8 @@ class HypervideoControlls {
             this.addTopBarControlls(container);
         }
         this.__addPauseScreen(container);
-        this.addBottomBarControlls(container);
         container.appendChild(tagsContainer);
+        this.addBottomBarControlls(container);
     }
 
     addVideoTag(container) {

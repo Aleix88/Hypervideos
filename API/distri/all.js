@@ -59,6 +59,9 @@ class Hypervideo {
         const videoManagerFactory = new VideoManagerFactory();
         const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManagerFactory.create(this.videoType, this.containerID));
         hypervideoControlls.createSkeleton();
+
+        const tagsController = new TagsController(this.containerID);
+        tagsController.addTagButton(50,50);
     }
 
     getStyle() {
@@ -101,6 +104,26 @@ class Hypervideo {
             right: 0;
         }
         
+
+        /* Tags */
+
+        x-tag-button {
+            pointer-events: all;
+            position: absolute;
+            width: 7%;
+            top: 50px;
+            left: 50px;
+        }
+
+        .tags-container {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         /*  Bottom control bar  */
         .bottom-controller {
             display: flex;
@@ -393,8 +416,8 @@ class HypervideoControlls {
             this.addTopBarControlls(container);
         }
         this.__addPauseScreen(container);
-        this.addBottomBarControlls(container);
         container.appendChild(tagsContainer);
+        this.addBottomBarControlls(container);
     }
 
     addVideoTag(container) {
@@ -526,6 +549,23 @@ function importHypervideoAPI(callback) {
 }
 
    
+class TagsController {
+
+    constructor(containerID) {
+        this.containerID = containerID;
+        this.tagsContainer = document.getElementById(containerID).querySelector(".tags-container");
+    }
+
+    addTagButton(x,y) {
+        const tag = document.createElement('x-tag-button');
+        tag.color = "#FF5733";
+        tag.style.top = "50%";
+        tag.style.left = "50%";
+        tag.style.transform = "translate(-50%, -50%)";
+        this.tagsContainer.appendChild(tag);
+    }
+
+}
 class VideoManager {
     constructor(containerID) {
         this.currentTime = 0;
@@ -536,6 +576,8 @@ class VideoManager {
         if (new.target === VideoManager) {
             throw new TypeError("Cannot construct VideoManager instances directly");
         }
+
+        this.__exitFullScreenEventListeners();
     }
 
     static PLAYING = 0;
@@ -565,7 +607,8 @@ class VideoManager {
         document.addEventListener('webkitfullscreenchange', this._exitFSHandler.bind(this), false);
     }
 
-    _exitFSHandler() {
+    _exitFSHandler(event) {
+        if (document.fullscreenElement) return; //If is entering fullscreen mode return
         this.isFullScreen = false;
         this.videoStateChanged(VideoManager.EXIT_FULL_SCREEN);
     }
@@ -891,6 +934,82 @@ class XProgressBar extends HTMLElement {
 }
 
 customElements.define('x-progress-bar', XProgressBar);
+class XTagButton extends HTMLElement {
+
+    constructor() {
+        super();
+        this.htmlManager = new HTMLManager();
+        this.attachShadow({mode: 'open'});
+
+        const anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
+        const aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
+        this.shadowRoot.appendChild(aspectRatioDiv);
+        this.shadowRoot.appendChild(anchor);
+        this.shadowRoot.appendChild(this.getStyle());
+        this.__setupEventListeners(anchor);
+    }
+
+    set color(newValue) {
+        const anchor = this.shadowRoot.querySelector(".tag-anchor");
+        anchor.style.background = newValue;
+    }
+
+    get color() {return this.color;}
+
+    __setupEventListeners(element) {
+        element.addEventListener('mousedown', this.__onMouseDown.bind(this));
+        element.addEventListener('click', this.__onClick.bind(this));
+        element.addEventListener('mouseenter', this.__onHover.bind(this));
+        element.addEventListener('mouseleave', this.__onMouseUp.bind(this));
+        document.addEventListener('mouseup', this.__onMouseUp.bind(this));
+    }
+
+    __onClick() {
+        console.log("Click");
+    }
+
+    __onHover() {
+        console.log("Hover");
+    }
+
+    __onMouseDown() {
+        console.log("Hold");
+    }
+
+    __onMouseUp() {
+        console.log("Up");
+    }
+
+    getStyle() {
+
+        let style = document.createElement("style");
+        style.textContent = `
+
+            .aspect-ratio-div {
+                margin-top: 100%;
+            }
+
+            .tag-anchor {
+                display:block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+        `;
+
+        return style;
+
+    }
+
+
+
+}
+
+customElements.define('x-tag-button', XTagButton);
 class XVolumeBar extends HTMLElement {
 
     constructor() {

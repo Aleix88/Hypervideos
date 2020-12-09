@@ -8,6 +8,8 @@ class VideoManager {
         if (new.target === VideoManager) {
             throw new TypeError("Cannot construct VideoManager instances directly");
         }
+
+        this.__exitFullScreenEventListeners();
     }
 
     static PLAYING = 0;
@@ -37,7 +39,8 @@ class VideoManager {
         document.addEventListener('webkitfullscreenchange', this._exitFSHandler.bind(this), false);
     }
 
-    _exitFSHandler() {
+    _exitFSHandler(event) {
+        if (document.fullscreenElement) return; //If is entering fullscreen mode return
         this.isFullScreen = false;
         this.videoStateChanged(VideoManager.EXIT_FULL_SCREEN);
     }
