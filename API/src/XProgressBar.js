@@ -68,7 +68,7 @@ class XProgressBar extends HTMLElement {
         this.__recalculatePosition(event.clientX);
     }
 
-    startMoving() {
+    /*startMoving() {
         const progressBar = this;
         this.__timeInterval = setInterval(() => {
             progressBar.increment(1);
@@ -80,7 +80,7 @@ class XProgressBar extends HTMLElement {
             clearInterval(this.__timeInterval);
         }
     }
-
+*/
     convertLengthToProgress(length) {
         return (length / this.maxLength) * 100;
     }

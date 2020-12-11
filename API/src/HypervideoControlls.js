@@ -17,12 +17,10 @@ class HypervideoControlls {
 
         switch (state) {
             case VideoManager.PLAYING:
-                progressBar.startMoving();
                 pauseScreen.hide();
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
-                progressBar.stopMoving();
                 pauseScreen.show();
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
@@ -167,8 +165,17 @@ class HypervideoControlls {
         if (this.videoLength !== null) {
             progressBar.setMaxLength(this.videoLength);
         }
+        this.__setupProgressBarTimer(progressBar);
         return progressBar;
     }
+
+    __setupProgressBarTimer(progressBar) {
+        const observer = new Observer(() => {
+            progressBar.increment();
+        })
+        this.videoManager.addObserver(observer);
+    }
+
 
     __progressBarChanged(progress) {
         this.videoManager.loadProgress(progress);

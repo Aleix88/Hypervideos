@@ -350,12 +350,10 @@ class HypervideoControlls {
 
         switch (state) {
             case VideoManager.PLAYING:
-                progressBar.startMoving();
                 pauseScreen.hide();
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
-                progressBar.stopMoving();
                 pauseScreen.show();
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
@@ -500,8 +498,17 @@ class HypervideoControlls {
         if (this.videoLength !== null) {
             progressBar.setMaxLength(this.videoLength);
         }
+        this.__setupProgressBarTimer(progressBar);
         return progressBar;
     }
+
+    __setupProgressBarTimer(progressBar) {
+        const observer = new Observer(() => {
+            progressBar.increment();
+        })
+        this.videoManager.addObserver(observer);
+    }
+
 
     __progressBarChanged(progress) {
         this.videoManager.loadProgress(progress);
@@ -871,6 +878,7 @@ class XPauseScreen extends HTMLElement {
     }
 
     __onClick() {
+        console.log("Click pause");
         this.didClick();
     }
 
@@ -980,7 +988,7 @@ class XProgressBar extends HTMLElement {
         this.__recalculatePosition(event.clientX);
     }
 
-    startMoving() {
+    /*startMoving() {
         const progressBar = this;
         this.__timeInterval = setInterval(() => {
             progressBar.increment(1);
@@ -992,7 +1000,7 @@ class XProgressBar extends HTMLElement {
             clearInterval(this.__timeInterval);
         }
     }
-
+*/
     convertLengthToProgress(length) {
         return (length / this.maxLength) * 100;
     }
