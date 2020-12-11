@@ -20,6 +20,21 @@ class XTagButton extends HTMLElement {
 
     get color() {return this.color;}
 
+    set position(newValue) {
+        this.style.top = newValue.x + "%";
+        this.style.left = newValue.y + "%";
+        this.style.transform = "translate(-50%, -50%)";
+    }
+
+    set isVisible(newValue) {
+        const anchor = this.shadowRoot.querySelector(".tag-anchor");
+        if (newValue === true) {
+            anchor.style.display = "block";
+        } else if (newValue === false) {
+            anchor.style.display = "none";
+        }
+    }
+
     __setupEventListeners(element) {
         element.addEventListener('mousedown', this.__onMouseDown.bind(this));
         element.addEventListener('click', this.__onClick.bind(this));
@@ -54,7 +69,7 @@ class XTagButton extends HTMLElement {
             }
 
             .tag-anchor {
-                display:block;
+                display:none;
                 position: absolute;
                 top: 0;
                 left: 0;

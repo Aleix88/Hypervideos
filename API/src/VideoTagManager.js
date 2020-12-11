@@ -1,5 +1,10 @@
 class VideoTagManager extends VideoManager {
 
+    constructor (containerID) {
+        super(containerID);
+        this.videoTimer = new VideoTimer(this.__timeHandler.bind(this));
+    }
+
     play() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.play();
@@ -19,11 +24,19 @@ class VideoTagManager extends VideoManager {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         return !video.paused;
     }
+
+    get currentTime() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        return video.currentTime;
+    }
+
     
     //0-1
     loadProgress(progress) {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.currentTime = video.duration * progress;
+        this.videoTimer.loadOffset(video.currentTime - Math.floor(video.currentTime));
+        this.notify(video.currentTime);
     }
 
     setupVideo() {
@@ -35,15 +48,22 @@ class VideoTagManager extends VideoManager {
 
     __videoIsPlaying() {
         this.videoStateChanged(VideoManager.PLAYING);
+        this.videoTimer.play();
     }
 
     __videoIsPaused() {
         this.videoStateChanged(VideoManager.PAUSED);
+        this.videoTimer.pause();
     }
 
     __videoLoaded() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         this.videoStateChanged(VideoManager.LOADED, {duration: video.duration});
+    }
+
+    __timeHandler() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        this.notify(video.currentTime);
     }
 
     //0-1

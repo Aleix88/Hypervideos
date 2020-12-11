@@ -1,6 +1,7 @@
-class VideoManager {
+class VideoManager extends Subject {
+
     constructor(containerID) {
-        this.currentTime = 0;
+        super();
         this.containerID = containerID;
         this.videoStateChanged = null;
         this.isFullScreen = false;
@@ -25,6 +26,8 @@ class VideoManager {
     restartVideo() {}
 
     isVideoPlaying(){}
+
+    get currentTime() {return 0;}
     
     //0-1
     loadProgress(progress) {}

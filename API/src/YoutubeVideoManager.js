@@ -3,6 +3,7 @@ class YoutubeVideoManager extends VideoManager {
     constructor(containerID) {
         super(containerID);
         this.player = null;
+        this.videoTimer = new VideoTimer(this.__timeHandler.bind(this));
     }
 
     play() {
@@ -23,6 +24,10 @@ class YoutubeVideoManager extends VideoManager {
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
+    get currentTime() {
+        return this.player.getCurrentTime();
+    }
+
     //0-1
     loadProgress(progress) {
         const videoDuration = this.player.getDuration();
@@ -32,6 +37,9 @@ class YoutubeVideoManager extends VideoManager {
     __loadTime(seconds) {
         if (this.player === null) {return;}
         this.player.seekTo(seconds, true);
+        const currentTime = this.player.getCurrentTime();
+        this.videoTimer.loadOffset(currentTime - Math.floor(currentTime));
+        this.notify(currentTime);
     }
 
     setVolume(volume) {
@@ -84,10 +92,15 @@ class YoutubeVideoManager extends VideoManager {
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
-            this.videoStateChanged(VideoManager.PLAYING)
+            this.videoStateChanged(VideoManager.PLAYING);
+            this.videoTimer.play();
         } else if (event.data == YT.PlayerState.PAUSED) {
-            this.videoStateChanged(VideoManager.PAUSED)
+            this.videoStateChanged(VideoManager.PAUSED);
+            this.videoTimer.pause();
         }
     }
      
+    __timeHandler() {
+        this.notify(this.player.getCurrentTime());
+    }
 }

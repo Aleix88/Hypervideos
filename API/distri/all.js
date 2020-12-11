@@ -57,11 +57,13 @@ class Hypervideo {
         this.tagsJSON = tagsJSON;
 
         const videoManagerFactory = new VideoManagerFactory();
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManagerFactory.create(this.videoType, this.containerID));
+        const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
+
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager);
         hypervideoControlls.createSkeleton();
 
-        const tagsController = new TagsController(this.containerID);
-        tagsController.addTagButton(50,50);
+        const tagsController = new TagsController(this.containerID, videoManager);
+        tagsController.addTags(tagsJSON);
     }
 
     getStyle() {
@@ -549,26 +551,79 @@ function importHypervideoAPI(callback) {
 }
 
    
-class TagsController {
+class Observer {
 
-    constructor(containerID) {
-        this.containerID = containerID;
-        this.tagsContainer = document.getElementById(containerID).querySelector(".tags-container");
+    constructor(onChange) {
+        this.onChange = onChange;
     }
 
-    addTagButton(x,y) {
-        const tag = document.createElement('x-tag-button');
-        tag.color = "#FF5733";
-        tag.style.top = "50%";
-        tag.style.left = "50%";
-        tag.style.transform = "translate(-50%, -50%)";
-        this.tagsContainer.appendChild(tag);
+    update(newValue) {
+        this.onChange(newValue);
     }
 
 }
-class VideoManager {
+class Subject {
+
+    constructor() {
+        this.observers = [];
+    }
+
+    addObserver(observer) {
+        this.observers.push(observer);
+    }
+
+    removeObserver(observer) {
+        const index = this.observers.findIndex(obs => {
+            return observer === obs;
+        });
+        if (index !== -1) {
+            this.observers = this.observers.slice(index, 1);
+        }
+    }
+
+    notify(newValue) {
+        this.observers.forEach(obs => obs.update(newValue));
+    }
+
+}
+class TagsController {
+
+    constructor(containerID, videoManager) {
+        this.containerID = containerID;
+        this.videoManager = videoManager;
+        this.tagsContainer = document.getElementById(containerID).querySelector(".tags-container");
+    }
+
+    addTags(tagsJSON) {
+        try {
+            const tagsConfig = JSON.parse(tagsJSON).tags;
+            for (const tag of tagsConfig) {
+                this.__addTagButton(tag);
+            }
+        } catch(error) {
+            throw "Error: Not valid JSON";
+        }
+    }
+
+    __addTagButton(tag) {
+        const tagElement = document.createElement('x-tag-button');
+        this.tagsContainer.appendChild(tagElement);
+        const observer = new Observer((timeStamp) => {
+            const tagTimestamp = tag.timeConfig.timestamp;
+            const tagDuration = tag.timeConfig.duration;
+            const isVisible = timeStamp >= tagTimestamp && timeStamp < tagTimestamp + tagDuration;
+            tagElement.isVisible = isVisible;
+        });
+        this.videoManager.addObserver(observer);
+        tagElement.color = "#FF5733";
+        tagElement.position = tag.position;
+    }
+
+}
+class VideoManager extends Subject {
+
     constructor(containerID) {
-        this.currentTime = 0;
+        super();
         this.containerID = containerID;
         this.videoStateChanged = null;
         this.isFullScreen = false;
@@ -593,6 +648,8 @@ class VideoManager {
     restartVideo() {}
 
     isVideoPlaying(){}
+
+    get currentTime() {return 0;}
     
     //0-1
     loadProgress(progress) {}
@@ -674,6 +731,11 @@ class VideoManagerFactory {
 }
 class VideoTagManager extends VideoManager {
 
+    constructor (containerID) {
+        super(containerID);
+        this.videoTimer = new VideoTimer(this.__timeHandler.bind(this));
+    }
+
     play() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.play();
@@ -693,11 +755,19 @@ class VideoTagManager extends VideoManager {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         return !video.paused;
     }
+
+    get currentTime() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        return video.currentTime;
+    }
+
     
     //0-1
     loadProgress(progress) {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.currentTime = video.duration * progress;
+        this.videoTimer.loadOffset(video.currentTime - Math.floor(video.currentTime));
+        this.notify(video.currentTime);
     }
 
     setupVideo() {
@@ -709,15 +779,22 @@ class VideoTagManager extends VideoManager {
 
     __videoIsPlaying() {
         this.videoStateChanged(VideoManager.PLAYING);
+        this.videoTimer.play();
     }
 
     __videoIsPaused() {
         this.videoStateChanged(VideoManager.PAUSED);
+        this.videoTimer.pause();
     }
 
     __videoLoaded() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         this.videoStateChanged(VideoManager.LOADED, {duration: video.duration});
+    }
+
+    __timeHandler() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        this.notify(video.currentTime);
     }
 
     //0-1
@@ -733,6 +810,38 @@ class VideoTagManager extends VideoManager {
         volume = volume < 0 ? 0 : volume;
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.volume = volume;
+    }
+
+}
+class VideoTimer {
+
+    constructor (timeHandler) {
+        this.loopCounter = 0;
+        this.timeHandler = timeHandler;
+    }
+    
+    static get LOOP_TIME() {
+        return 100;
+    }
+
+    play() {
+        this.timer = setInterval(this.__handleTime.bind(this), VideoTimer.LOOP_TIME);
+    }
+
+    pause() {
+        clearInterval(this.timer);
+    }
+
+    loadOffset(offset) {
+        this.loopCounter = parseInt(offset/ VideoTimer.LOOP_TIME);
+    }
+
+    __handleTime() {
+        this.loopCounter++;
+        if (this.loopCounter >= 10) {
+            this.timeHandler();
+            this.loopCounter = 0;
+        }
     }
 
 }
@@ -956,6 +1065,21 @@ class XTagButton extends HTMLElement {
 
     get color() {return this.color;}
 
+    set position(newValue) {
+        this.style.top = newValue.x + "%";
+        this.style.left = newValue.y + "%";
+        this.style.transform = "translate(-50%, -50%)";
+    }
+
+    set isVisible(newValue) {
+        const anchor = this.shadowRoot.querySelector(".tag-anchor");
+        if (newValue === true) {
+            anchor.style.display = "block";
+        } else if (newValue === false) {
+            anchor.style.display = "none";
+        }
+    }
+
     __setupEventListeners(element) {
         element.addEventListener('mousedown', this.__onMouseDown.bind(this));
         element.addEventListener('click', this.__onClick.bind(this));
@@ -990,7 +1114,7 @@ class XTagButton extends HTMLElement {
             }
 
             .tag-anchor {
-                display:block;
+                display:none;
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -1220,6 +1344,7 @@ class YoutubeVideoManager extends VideoManager {
     constructor(containerID) {
         super(containerID);
         this.player = null;
+        this.videoTimer = new VideoTimer(this.__timeHandler.bind(this));
     }
 
     play() {
@@ -1240,6 +1365,10 @@ class YoutubeVideoManager extends VideoManager {
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
+    get currentTime() {
+        return this.player.getCurrentTime();
+    }
+
     //0-1
     loadProgress(progress) {
         const videoDuration = this.player.getDuration();
@@ -1249,6 +1378,9 @@ class YoutubeVideoManager extends VideoManager {
     __loadTime(seconds) {
         if (this.player === null) {return;}
         this.player.seekTo(seconds, true);
+        const currentTime = this.player.getCurrentTime();
+        this.videoTimer.loadOffset(currentTime - Math.floor(currentTime));
+        this.notify(currentTime);
     }
 
     setVolume(volume) {
@@ -1301,10 +1433,15 @@ class YoutubeVideoManager extends VideoManager {
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
-            this.videoStateChanged(VideoManager.PLAYING)
+            this.videoStateChanged(VideoManager.PLAYING);
+            this.videoTimer.play();
         } else if (event.data == YT.PlayerState.PAUSED) {
-            this.videoStateChanged(VideoManager.PAUSED)
+            this.videoStateChanged(VideoManager.PAUSED);
+            this.videoTimer.pause();
         }
     }
      
+    __timeHandler() {
+        this.notify(this.player.getCurrentTime());
+    }
 }

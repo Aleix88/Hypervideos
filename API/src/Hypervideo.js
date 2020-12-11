@@ -27,11 +27,13 @@ class Hypervideo {
         this.tagsJSON = tagsJSON;
 
         const videoManagerFactory = new VideoManagerFactory();
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManagerFactory.create(this.videoType, this.containerID));
+        const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
+
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager);
         hypervideoControlls.createSkeleton();
 
-        const tagsController = new TagsController(this.containerID);
-        tagsController.addTagButton(50,50);
+        const tagsController = new TagsController(this.containerID, videoManager);
+        tagsController.addTags(tagsJSON);
     }
 
     getStyle() {
