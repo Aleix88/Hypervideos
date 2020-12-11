@@ -27,11 +27,10 @@ class XTagButton extends HTMLElement {
     }
 
     set isVisible(newValue) {
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
         if (newValue === true) {
-            anchor.style.display = "block";
+            this.style.display = "block";
         } else if (newValue === false) {
-            anchor.style.display = "none";
+            this.style.display = "none";
         }
     }
 
@@ -69,7 +68,7 @@ class XTagButton extends HTMLElement {
             }
 
             .tag-anchor {
-                display:none;
+                display:block;
                 position: absolute;
                 top: 0;
                 left: 0;

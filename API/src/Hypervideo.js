@@ -85,6 +85,7 @@ class Hypervideo {
             width: 7%;
             top: 50px;
             left: 50px;
+            display: none;
         }
 
         .tags-container {

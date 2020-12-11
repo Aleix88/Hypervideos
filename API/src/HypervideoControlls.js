@@ -52,6 +52,7 @@ class HypervideoControlls {
     }
 
     playButtonClicked() {
+        console.log("Click play");
         if (!this.videoManager.isVideoPlaying()) {
             this.videoManager.play();
         } else {
