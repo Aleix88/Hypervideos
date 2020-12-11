@@ -1411,7 +1411,7 @@ class YoutubeVideoManager extends VideoManager {
         const player = new YT.Player(this.iframeContainerID, {
             height: '360',
             width: '640', 
-            videoId: 'jLHW8V462jo',
+            videoId: 'bcqdgepq7ws',
             events: {
                 'onReady': this.__onPlayerReady.bind(this),
                 'onStateChange': this.__onPlayerStateChange.bind(this)
@@ -1426,7 +1426,7 @@ class YoutubeVideoManager extends VideoManager {
                 'iv_load_policy': 3,
                 'autohide':1,
                 'wmode':'opaque',
-                'start': 1
+                'start': 0
             },
 
         });
@@ -1438,6 +1438,7 @@ class YoutubeVideoManager extends VideoManager {
         iFrame.style.pointerEvents = "none";
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
         this.__loadTime(0);
+        this.pause();
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
