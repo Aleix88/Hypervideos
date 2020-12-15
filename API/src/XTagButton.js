@@ -72,12 +72,14 @@ class XTagButton extends HTMLElement {
         const anchor = this.shadowRoot.querySelector(".tag-anchor");
         anchor.classList.add("defaultScale");
         anchor.classList.remove("focusScale");
+        anchor.classList.remove("appear");
     }
 
     __animateFocusScale() {
         const anchor = this.shadowRoot.querySelector(".tag-anchor");
         anchor.classList.add("focusScale");
         anchor.classList.remove("defaultScale");
+        anchor.classList.remove("appear");
     }
 
     __animateAppear() {
