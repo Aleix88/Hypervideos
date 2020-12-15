@@ -82,10 +82,11 @@ class Hypervideo {
         x-tag-button {
             pointer-events: all;
             position: absolute;
-            width: 7%;
+            width: 5%;
             top: 50px;
             left: 50px;
-            display: none;
+            display: block;
+            visibility: hidden;
         }
 
         .tags-container {

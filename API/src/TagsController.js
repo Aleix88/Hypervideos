@@ -27,7 +27,7 @@ class TagsController {
             tagElement.isVisible = isVisible;
         });
         this.videoManager.addObserver(observer);
-        tagElement.color = "#FF5733";
+        tagElement.hexColor = tag.color ? tag.color : "#FFFFFF";
         tagElement.position = tag.position;
     }
 

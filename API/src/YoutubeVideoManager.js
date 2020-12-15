@@ -89,7 +89,6 @@ class YoutubeVideoManager extends VideoManager {
         iFrame.style.pointerEvents = "none";
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
         this.__loadTime(0);
-        this.pause();
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
