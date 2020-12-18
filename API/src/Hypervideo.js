@@ -22,20 +22,28 @@ class Hypervideo {
 
         if (!this.isDOMLoaded()) {
             //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
-            console.log("Error: Can't setup an hypervideo if DOM is not loaded.");
+            throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
 
-        //TODO: Pensar si això ho necessitare guardar o no
-        this.tagsJSON = tagsJSON;
+        this.tags = this.__tagsJSONToObject(tagsJSON);
 
         const videoManagerFactory = new VideoManagerFactory();
         const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
 
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager);
+        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
         hypervideoControlls.createSkeleton();
 
         const tagsController = new TagsController(this.containerID, videoManager);
-        tagsController.addTags(tagsJSON);
+        tagsController.addTags(this.tags);
+    }
+
+    __tagsJSONToObject(tagsJSON) {
+        try {
+            const tagsConfig = JSON.parse(tagsJSON).tags;
+            return tagsConfig;
+        } catch(error) {
+            throw "Error: Not valid JSON";
+        }
     }
 
     __addGlobalStyle() {

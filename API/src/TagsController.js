@@ -6,14 +6,9 @@ class TagsController {
         this.tagsContainer = document.getElementById(containerID).querySelector(".tags-container");
     }
 
-    addTags(tagsJSON) {
-        try {
-            const tagsConfig = JSON.parse(tagsJSON).tags;
-            for (const tag of tagsConfig) {
-                this.__addTagButton(tag);
-            }
-        } catch(error) {
-            throw "Error: Not valid JSON";
+    addTags(tags) {
+        for (const tag of tags) {
+            this.__addTagButton(tag);
         }
     }
 

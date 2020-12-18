@@ -86,17 +86,26 @@ var Hypervideo = /*#__PURE__*/function () {
 
       if (!this.isDOMLoaded()) {
         //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
-        console.log("Error: Can't setup an hypervideo if DOM is not loaded.");
-      } //TODO: Pensar si això ho necessitare guardar o no
+        throw "Error: Can't setup an hypervideo if DOM is not loaded.";
+      }
 
-
-      this.tagsJSON = tagsJSON;
+      this.tags = this.__tagsJSONToObject(tagsJSON);
       var videoManagerFactory = new VideoManagerFactory();
       var videoManager = videoManagerFactory.create(this.videoType, this.containerID);
-      var hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager);
+      var hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
       hypervideoControlls.createSkeleton();
       var tagsController = new TagsController(this.containerID, videoManager);
-      tagsController.addTags(tagsJSON);
+      tagsController.addTags(this.tags);
+    }
+  }, {
+    key: "__tagsJSONToObject",
+    value: function __tagsJSONToObject(tagsJSON) {
+      try {
+        var tagsConfig = JSON.parse(tagsJSON).tags;
+        return tagsConfig;
+      } catch (error) {
+        throw "Error: Not valid JSON";
+      }
     }
   }, {
     key: "__addGlobalStyle",
@@ -122,6 +131,12 @@ _defineProperty(Hypervideo, "YOUTUBE_TYPE", "YOUTUBE");
 _defineProperty(Hypervideo, "VIDEO_TYPE", "VIDEO");
 "use strict";
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -129,14 +144,15 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var HypervideoControlls = /*#__PURE__*/function () {
-  function HypervideoControlls(videoSRC, videoType, containerID, videoManager) {
+  function HypervideoControlls(videoSRC, videoType, containerID, videoManager, tags) {
     _classCallCheck(this, HypervideoControlls);
 
     this.videoLength = null;
-    this.videoSRC = videoSRC;
-    this.videoType = videoType;
     this.containerID = containerID;
+    this.videoSRC = videoSRC;
     this.videoManager = videoManager;
+    this.videoType = videoType;
+    this.tags = tags;
     this.htmlManager = new HTMLManager();
     this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
   }
@@ -165,6 +181,9 @@ var HypervideoControlls = /*#__PURE__*/function () {
           this.videoLength = target.duration;
           if (progressBar === null) break;
           progressBar.setMaxLength(target.duration);
+
+          this.__setProgressBarTimestamps();
+
           break;
 
         case VideoManager.ENTER_FULL_SCREEN:
@@ -348,6 +367,26 @@ var HypervideoControlls = /*#__PURE__*/function () {
       this.videoManager.loadProgress(progress);
     }
   }, {
+    key: "__setProgressBarTimestamps",
+    value: function __setProgressBarTimestamps() {
+      var progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
+
+      var _iterator = _createForOfIteratorHelper(this.tags),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var t = _step.value;
+          var timestamp = t.timeConfig.timestamp;
+          progressBar.addMarkerAt(timestamp);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+    }
+  }, {
     key: "createVolumeBar",
     value: function createVolumeBar() {
       var volumeBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
@@ -479,26 +518,20 @@ var TagsController = /*#__PURE__*/function () {
 
   _createClass(TagsController, [{
     key: "addTags",
-    value: function addTags(tagsJSON) {
+    value: function addTags(tags) {
+      var _iterator = _createForOfIteratorHelper(tags),
+          _step;
+
       try {
-        var tagsConfig = JSON.parse(tagsJSON).tags;
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var tag = _step.value;
 
-        var _iterator = _createForOfIteratorHelper(tagsConfig),
-            _step;
-
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var tag = _step.value;
-
-            this.__addTagButton(tag);
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
+          this.__addTagButton(tag);
         }
-      } catch (error) {
-        throw "Error: Not valid JSON";
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
       }
     }
   }, {
@@ -1032,7 +1065,8 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement) {
     _this = _super.call(this);
     _this.isMoving = false;
     _this.htmlManager = new HTMLManager();
-    _this.maxLength = 100;
+    _this.maxLength = 100; //Max lenghts represents the video duration in seconds. Default value: 100s
+
     _this.currentLength = 0;
     _this.currentProgress = 0;
     _this.progressBarChanged = null;
@@ -1047,11 +1081,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement) {
 
     shadow.appendChild(_this.getStyle());
     shadow.appendChild(bar);
-
-    _this.addMarkerAt(10);
-
-    _this.addMarkerAt(40);
-
     return _this;
   }
 
@@ -1061,6 +1090,7 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement) {
       var marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
       var progress = this.convertLengthToProgress(length);
       this.shadowRoot.appendChild(marker);
+      console.log(progress);
       marker.style.left = progress + "%";
     }
   }, {
@@ -1123,23 +1153,11 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement) {
 
       this.__recalculatePosition(event.clientX);
     }
-    /*startMoving() {
-        const progressBar = this;
-        this.__timeInterval = setInterval(() => {
-            progressBar.increment(1);
-        }, 1000);
-    }
-     stopMoving() {
-        if (this.__timeInterval !== undefined && this.__timeInterval !== null) {
-            clearInterval(this.__timeInterval);
-        }
-    }
-    */
-
   }, {
     key: "convertLengthToProgress",
     value: function convertLengthToProgress(length) {
-      return length / this.maxLength * 100;
+      console.log(parseFloat(length) + "/" + parseFloat(this.maxLength) + "=" + parseFloat(length) / parseFloat(this.maxLength) + "* 100 = " + parseFloat(length) / parseFloat(this.maxLength) * 100) + "Round = " + Math.round(parseFloat(length) / parseFloat(this.maxLength) * 100);
+      return Math.round(parseFloat(length) / parseFloat(this.maxLength) * 100);
     }
   }, {
     key: "setCurrentLength",

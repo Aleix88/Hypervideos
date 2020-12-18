@@ -4,7 +4,7 @@ class XProgressBar extends HTMLElement {
         super();
         this.isMoving = false;
         this.htmlManager = new HTMLManager();
-        this.maxLength = 100;
+        this.maxLength = 100; //Max lenghts represents the video duration in seconds. Default value: 100s
         this.currentLength = 0;
         this.currentProgress = 0;
         this.progressBarChanged = null;
@@ -14,9 +14,6 @@ class XProgressBar extends HTMLElement {
         const bar = this.htmlManager.createElement("div", ["progress-bar"]);
         shadow.appendChild(this.getStyle());
         shadow.appendChild(bar);
-
-        this.addMarkerAt(10);
-        this.addMarkerAt(40);
     }
 
     static POSITION_SET = "POSITION_SET";
@@ -25,6 +22,7 @@ class XProgressBar extends HTMLElement {
         const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
         const progress = this.convertLengthToProgress(length);
         this.shadowRoot.appendChild(marker);
+        console.log(progress);
         marker.style.left = progress + "%";
     }
 
@@ -68,21 +66,8 @@ class XProgressBar extends HTMLElement {
         this.__recalculatePosition(event.clientX);
     }
 
-    /*startMoving() {
-        const progressBar = this;
-        this.__timeInterval = setInterval(() => {
-            progressBar.increment(1);
-        }, 1000);
-    }
-
-    stopMoving() {
-        if (this.__timeInterval !== undefined && this.__timeInterval !== null) {
-            clearInterval(this.__timeInterval);
-        }
-    }
-*/
     convertLengthToProgress(length) {
-        return (length / this.maxLength) * 100;
+        return Math.round((parseFloat(length) / parseFloat(this.maxLength)) * 100); 
     }
 
     setCurrentLength(length) {

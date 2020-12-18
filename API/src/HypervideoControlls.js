@@ -1,11 +1,12 @@
 class HypervideoControlls {
 
-    constructor(videoSRC, videoType, containerID, videoManager){
+    constructor(videoSRC, videoType, containerID, videoManager, tags){
         this.videoLength = null;
-        this.videoSRC = videoSRC;
-        this.videoType = videoType;
         this.containerID = containerID;
+        this.videoSRC = videoSRC;
         this.videoManager = videoManager;
+        this.videoType = videoType;
+        this.tags = tags;
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
@@ -30,6 +31,7 @@ class HypervideoControlls {
                 this.videoLength = target.duration;
                 if (progressBar === null) break;
                 progressBar.setMaxLength(target.duration);
+                this.__setProgressBarTimestamps();
                 break;
             case VideoManager.ENTER_FULL_SCREEN:
                 this.changeButtonIcon("control-full-screen-button", "gg-minimize");
@@ -180,6 +182,14 @@ class HypervideoControlls {
 
     __progressBarChanged(progress) {
         this.videoManager.loadProgress(progress);
+    }
+
+    __setProgressBarTimestamps() {
+        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
+        for (let t of this.tags) {
+            const timestamp = t.timeConfig.timestamp;
+            progressBar.addMarkerAt(timestamp);
+        }
     }
 
     createVolumeBar() {
