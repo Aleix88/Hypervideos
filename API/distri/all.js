@@ -1090,7 +1090,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement) {
       var marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
       var progress = this.convertLengthToProgress(length);
       this.shadowRoot.appendChild(marker);
-      console.log(progress);
       marker.style.left = progress + "%";
     }
   }, {
@@ -1156,7 +1155,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement) {
   }, {
     key: "convertLengthToProgress",
     value: function convertLengthToProgress(length) {
-      console.log(parseFloat(length) + "/" + parseFloat(this.maxLength) + "=" + parseFloat(length) / parseFloat(this.maxLength) + "* 100 = " + parseFloat(length) / parseFloat(this.maxLength) * 100) + "Round = " + Math.round(parseFloat(length) / parseFloat(this.maxLength) * 100);
       return Math.round(parseFloat(length) / parseFloat(this.maxLength) * 100);
     }
   }, {

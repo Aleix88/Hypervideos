@@ -22,7 +22,6 @@ class XProgressBar extends HTMLElement {
         const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
         const progress = this.convertLengthToProgress(length);
         this.shadowRoot.appendChild(marker);
-        console.log(progress);
         marker.style.left = progress + "%";
     }
 
