@@ -3,6 +3,7 @@ class YoutubeVideoManager extends VideoManager {
     constructor(containerID) {
         super(containerID);
         this.player = null;
+        this.firstTimePlaying = true;
         this.videoTimer = new VideoTimer(this.__timeHandler.bind(this));
     }
 
@@ -88,12 +89,16 @@ class YoutubeVideoManager extends VideoManager {
         const iFrame = document.querySelector("#"+this.iframeContainerID);
         iFrame.style.pointerEvents = "none";
         this.videoStateChanged(VideoManager.LOADED, {duration: this.player.getDuration()});
-        this.__loadTime(0);
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
+            console.log();
+            if (this.firstTimePlaying === true && this.player.getCurrentTime() >= 0.1) {
+                this.__loadTime(0);
+            }
             this.videoStateChanged(VideoManager.PLAYING);
             this.videoTimer.play();
+            this.firstTimePlaying = false;
         } else if (event.data == YT.PlayerState.PAUSED) {
             this.videoStateChanged(VideoManager.PAUSED);
             this.videoTimer.pause();
