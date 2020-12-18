@@ -14,6 +14,8 @@ class Hypervideo {
     }
 
     setupHypervideo(tagsJSON) {
+
+        this.__addGlobalStyle();
         
         const container = document.getElementById(this.containerID);
         container.appendChild(this.getStyle());
@@ -34,6 +36,28 @@ class Hypervideo {
 
         const tagsController = new TagsController(this.containerID, videoManager);
         tagsController.addTags(tagsJSON);
+    }
+
+    __addGlobalStyle() {
+        let style = document.createElement('style');
+        style.textContent = `
+            .hypervideo:-moz-full-screen {
+                width: 100%;
+                height: 100%;
+            }
+            
+            .hypervideo:-webkit-full-screen {
+                width: 100%;
+                height: 100%;
+            }
+            
+            .hypervideo:fullscreen {
+                width: 100%;
+                height: 100%;
+            }
+        `;
+
+        document.querySelector("head").appendChild(style);
     }
 
     getStyle() {
@@ -65,6 +89,10 @@ class Hypervideo {
             -webkit-user-drag: none;
             -webkit-user-select: none;
             -ms-user-select: none;
+        }
+
+        .hypervideo-container-fullscreen {
+
         }
         
         /* Top control bar */

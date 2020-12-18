@@ -43,12 +43,15 @@ class VideoManager extends Subject {
     }
 
     _exitFSHandler(event) {
-        if (document.fullscreenElement) return; //If is entering fullscreen mode return
-        this.isFullScreen = false;
-        this.videoStateChanged(VideoManager.EXIT_FULL_SCREEN);
+        if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+            console.log("Exit full screen!");
+            this.isFullScreen = false;
+            this.videoStateChanged(VideoManager.EXIT_FULL_SCREEN);
+        }
     }
 
     _enterFSHandler() {
+        console.log("Enter full screen!");
         this.isFullScreen = true;
         this.videoStateChanged(VideoManager.ENTER_FULL_SCREEN);
     }
@@ -62,9 +65,6 @@ class VideoManager extends Subject {
         }
     }
     
-    isFullScreen() {
-        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-    }
 
     requestFullScreen(container) {
         if (container.requestFullscreen) {
