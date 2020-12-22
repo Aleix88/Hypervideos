@@ -199,6 +199,12 @@ class Hypervideo {
             height: 5px;
         }
 
+        x-time-counter {
+            display: flex;
+            margin-right: 1em;
+            align-items: center;
+        }
+
         x-pause-screen {
             width: 100%;
             height: 100%;

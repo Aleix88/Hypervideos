@@ -40,7 +40,7 @@ class YoutubeVideoManager extends VideoManager {
         this.player.seekTo(seconds, true);
         const currentTime = this.player.getCurrentTime();
         this.videoTimer.loadOffset(currentTime - Math.floor(currentTime));
-        this.notify(currentTime);
+        this.notify(seconds);
     }
 
     setVolume(volume) {
@@ -50,8 +50,9 @@ class YoutubeVideoManager extends VideoManager {
         this.player.setVolume(volume * 100);
     }
 
-    addYoutubeScript(iframeContainerID) {
+    addYoutubeScript(iframeContainerID, videoID) {
         this.iframeContainerID = iframeContainerID;
+        this.videoID = videoID;
         let tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         let firstScriptTag = document.getElementsByTagName('script')[0];
@@ -63,7 +64,7 @@ class YoutubeVideoManager extends VideoManager {
         const player = new YT.Player(this.iframeContainerID, {
             height: '360',
             width: '640', 
-            videoId: 'bcqdgepq7ws',
+            videoId: this.videoID,
             events: {
                 'onReady': this.__onPlayerReady.bind(this),
                 'onStateChange': this.__onPlayerStateChange.bind(this)

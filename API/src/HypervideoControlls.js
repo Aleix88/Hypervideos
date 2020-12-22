@@ -103,7 +103,7 @@ class HypervideoControlls {
         const div = this.htmlManager.createElement("div", ["youtube-frame"]);
         div.id = this.videoElementID;
         container.appendChild(div);
-        this.videoManager.addYoutubeScript(this.videoElementID);
+        this.videoManager.addYoutubeScript(this.videoElementID, this.videoSRC);
     }
 
     addVideoElement(container) {
@@ -141,13 +141,22 @@ class HypervideoControlls {
         const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
         const replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
         const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
+        const timeCounter = this.createTimeCounter();
         const progressBar = this.createProgressBar();
         const volumeBar = this.createVolumeBar();
         bottomController.appendChild(playButton);
         bottomController.appendChild(replayButton);
         bottomController.appendChild(fullScreenButton);
+        bottomController.appendChild(timeCounter);
         bottomController.appendChild(progressBar);
         bottomController.appendChild(volumeBar);
+
+        this.__addVideoTimeObserver(progressBar, timeCounter);
+    }
+
+    createTimeCounter() {
+        const timeCounter = this.htmlManager.createElement("x-time-counter", ["time-counter"]);
+        return timeCounter;
     }
 
     createControlButton(buttonClass, buttonIcon, eventHandler) {
@@ -168,13 +177,13 @@ class HypervideoControlls {
         if (this.videoLength !== null) {
             progressBar.setMaxLength(this.videoLength);
         }
-        this.__setupProgressBarTimer(progressBar);
         return progressBar;
     }
 
-    __setupProgressBarTimer(progressBar) {
-        const observer = new Observer(() => {
-            progressBar.increment();
+    __addVideoTimeObserver(progressBar, timeCounter) {
+        const observer = new Observer((time) => {
+            progressBar.setCurrentLength(time);
+            timeCounter.currentTime = time;
         })
         this.videoManager.addObserver(observer);
     }
