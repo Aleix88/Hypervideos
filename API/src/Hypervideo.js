@@ -30,16 +30,18 @@ class Hypervideo {
         const videoManagerFactory = new VideoManagerFactory();
         const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
 
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
-        hypervideoControlls.createSkeleton();
-
-        const tagsController = new TagsController(this.containerID, videoManager);
-        tagsController.addTags(this.tags);
+        const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
+        hypervideoController.createSkeleton();
     }
 
     __tagsJSONToObject(tagsJSON) {
         try {
-            const tagsConfig = JSON.parse(tagsJSON).tags;
+            let tagsConfig = JSON.parse(tagsJSON).tags;
+            let i = 0;
+            tagsConfig = tagsConfig.map((t) => {
+                t.id = this.containerID + "-tag-" + i++;
+                return t;
+            })
             return tagsConfig;
         } catch(error) {
             throw "Error: Not valid JSON";

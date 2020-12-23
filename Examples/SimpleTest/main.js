@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const tagsJSON = `{
     "tags": [
       {
-        "id": "tag_1",
         "position": {
           "x": 50,
           "y": 20
@@ -15,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "color": "#fcba03"
       },
       {
-        "id": "tag_2",
         "position": {
           "x": 80,
           "y": 10
@@ -27,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "color": "#cc5a45"
       },
       {
-        "id": "tag_1",
         "position": {
           "x": 10,
           "y": 30
@@ -38,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       },
       {
-        "id": "tag_1",
         "position": {
           "x": 50,
           "y": 50

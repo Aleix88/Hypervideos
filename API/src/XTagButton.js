@@ -6,15 +6,15 @@ class XTagButton extends HTMLElement {
         this.attachShadow({mode: 'open'});
         this.oldIsVisible = false;
 
-        const tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
-        const anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
-        const aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
+        this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
+        this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
+        this.aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
 
-        this.shadowRoot.appendChild(tagCircleContainer);
-        this.shadowRoot.appendChild(anchor);
-        this.shadowRoot.appendChild(aspectRatioDiv);
+        this.shadowRoot.appendChild(this.tagCircleContainer);
+        this.shadowRoot.appendChild(this.anchor);
+        this.shadowRoot.appendChild(this.aspectRatioDiv);
         this.shadowRoot.appendChild(this.getStyle());
-        this.__setupEventListeners(anchor);
+        this.__setupEventListeners(this.anchor);
     }
 
     set hexColor(newValue) {
@@ -69,28 +69,23 @@ class XTagButton extends HTMLElement {
     
     __animateDefaultScale() {
         console.log("Default scale");
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.add("defaultScale");
-        anchor.classList.remove("focusScale");
-        anchor.classList.remove("appear");
+        this.anchor.classList.add("defaultScale");
+        this.anchor.classList.remove("focusScale");
+        this.anchor.classList.remove("appear");
     }
 
     __animateFocusScale() {
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.add("focusScale");
-        anchor.classList.remove("defaultScale");
-        anchor.classList.remove("appear");
+        this.anchor.classList.add("focusScale");
+        this.anchor.classList.remove("defaultScale");
+        this.anchor.classList.remove("appear");
     }
 
     __animateAppear() {
         this.style.visibility = "visible";
-
-        const circleContainer = this.shadowRoot.querySelector(".tag-circle-container");
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.remove("disappear");
-        circleContainer.classList.remove("effectDissapear");
-        anchor.classList.add("appear");
-        circleContainer.classList.add("effectAppear");
+        this.anchor.classList.remove("disappear");
+        this.tagCircleContainer.classList.remove("effectDissapear");
+        this.anchor.classList.add("appear");
+        this.tagCircleContainer.classList.add("effectAppear");
     }
 
     __animateDisppear() {
@@ -101,12 +96,10 @@ class XTagButton extends HTMLElement {
             clearTimeout(timer);
         }, 350);
 
-        const circleContainer = this.shadowRoot.querySelector(".tag-circle-container");
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.remove("appear");
-        circleContainer.classList.remove("effectAppear");
-        anchor.classList.add("disappear");
-        circleContainer.classList.add("effectDissapear");
+        this.anchor.classList.remove("appear");
+        this.tagCircleContainer.classList.remove("effectAppear");
+        this.anchor.classList.add("disappear");
+        this.tagCircleContainer.classList.add("effectDissapear");
     }
 
     getStyle() {

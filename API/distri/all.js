@@ -1,3 +1,131 @@
+class BottomBarController {
+
+    constructor (hypervideoController, containerID, tags) {
+        this.hypervideoController = hypervideoController;
+        this.htmlManager = new HTMLManager();
+        this.containerID = containerID;
+        this.tags = tags;
+    }
+
+    addBottomBar(container) {
+        const bottomController = this.htmlManager.createElement("div",["bottom-controller"]);
+        container.appendChild(bottomController);
+        this.playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
+        this.replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
+        this.fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
+        this.timeCounter = this.createTimeCounter();
+        this.progressBar = this.createProgressBar();
+        this.volumeBar = this.createVolumeBar();
+        bottomController.appendChild(this.playButton);
+        bottomController.appendChild(this.replayButton);
+        bottomController.appendChild(this.fullScreenButton);
+        bottomController.appendChild(this.timeCounter);
+        bottomController.appendChild(this.progressBar);
+        bottomController.appendChild(this.volumeBar);
+    }
+
+    videoStateChanged(state, target) {
+        switch (state) {
+            case VideoManager.PLAYING:
+                this.changeButtonIcon("control-play-button", "gg-play-pause");
+                break;
+            case VideoManager.PAUSED:
+                this.changeButtonIcon("control-play-button", "gg-play-button");
+                break;
+            case VideoManager.LOADED:
+                this.volumeBar.setVolume(50);
+                this.videoLength = target.duration;
+                this.progressBar.setMaxLength(target.duration);
+                this.__setProgressBarTimestamps();
+                break;
+            case VideoManager.ENTER_FULL_SCREEN:
+                this.changeButtonIcon("control-full-screen-button", "gg-minimize");
+                break;
+            case VideoManager.EXIT_FULL_SCREEN:
+                this.changeButtonIcon("control-full-screen-button", "gg-maximize");
+                break;
+            default:
+        }
+    }
+
+    videoTimeChange(time) {
+        this.progressBar.setCurrentLength(time);
+        this.timeCounter.currentTime = time;
+    }
+
+    restartVideo() {
+        this.progressBar.setCurrentLength(0);
+        this.hypervideoController.restartVideo();
+    }
+
+    toggleFullScreen() {
+        this.hypervideoController.toggleFullScreen();
+    }
+
+    playButtonClicked() {
+        this.hypervideoController.play();
+    }
+
+    changeButtonIcon(buttonClass, iconName) {
+        let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
+        if (button.length <= 0) {
+            return;
+        }
+        let icon = button.getElementsByTagName("i");
+        if (icon.length <= 0) {
+            return;
+        }
+        icon[0].className = iconName;
+    }
+
+    createTimeCounter() {
+        const timeCounter = this.htmlManager.createElement("x-time-counter", ["time-counter"]);
+        return timeCounter;
+    }
+
+    createControlButton(buttonClass, buttonIcon, eventHandler) {
+        const buttonContainer = this.htmlManager.createElement("div", ["control-button-container"]);
+        const button = this.htmlManager.createElement("button", ["control-button",buttonClass]);
+        const icon = this.htmlManager.createElement("i", [buttonIcon]);
+        buttonContainer.appendChild(button);
+        button.appendChild(icon);
+        if (eventHandler !== null && eventHandler !== undefined) {
+            buttonContainer.addEventListener("click", eventHandler.bind(this));
+        }
+        return buttonContainer;
+    }
+
+    createProgressBar() {
+        const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
+        progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
+        if (this.videoLength !== null) {
+            progressBar.setMaxLength(this.videoLength);
+        }
+        return progressBar;
+    }
+
+    __progressBarChanged(progress) {
+        this.hypervideoController.loadVideoProgress(progress);
+    }
+
+    __setProgressBarTimestamps() {
+        for (let t of this.tags) {
+            const timestamp = t.timeConfig.timestamp;
+            this.progressBar.addMarkerAt(timestamp);
+        }
+    }
+
+    createVolumeBar() {
+        const volumeBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
+        volumeBar.volumeChanged = this.__volumeChanged.bind(this);
+        return volumeBar;
+    }
+
+    __volumeChanged(volume) {
+        this.hypervideoController.setVolume(volume/100);
+    }
+
+}
 class HTMLManager {
 
     constructor(){}
@@ -68,16 +196,18 @@ class Hypervideo {
         const videoManagerFactory = new VideoManagerFactory();
         const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
 
-        const hypervideoControlls = new HypervideoControlls(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
-        hypervideoControlls.createSkeleton();
-
-        const tagsController = new TagsController(this.containerID, videoManager);
-        tagsController.addTags(this.tags);
+        const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
+        hypervideoController.createSkeleton();
     }
 
     __tagsJSONToObject(tagsJSON) {
         try {
-            const tagsConfig = JSON.parse(tagsJSON).tags;
+            let tagsConfig = JSON.parse(tagsJSON).tags;
+            let i = 0;
+            tagsConfig = tagsConfig.map((t) => {
+                t.id = this.containerID + "-tag-" + i++;
+                return t;
+            })
             return tagsConfig;
         } catch(error) {
             throw "Error: Not valid JSON";
@@ -383,7 +513,7 @@ class Hypervideo {
     
 
 }
-class HypervideoControlls {
+class HypervideoController {
 
     constructor(videoSRC, videoType, containerID, videoManager, tags){
         this.videoLength = null;
@@ -394,43 +524,32 @@ class HypervideoControlls {
         this.tags = tags;
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
+        this.bottomBarController = new BottomBarController(this, containerID, tags);
+        this.tagController = new TagsController(this.containerID, videoManager);
     }
 
     __videoStateChanged(state, target) {
-        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
-        const volumeBar = document.getElementById(this.containerID).querySelector("x-volume-bar");
-
         switch (state) {
             case VideoManager.PLAYING:
                 pauseScreen.hide();
-                this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case VideoManager.PAUSED:
                 pauseScreen.show();
-                this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case VideoManager.LOADED:
-                volumeBar.setVolume(50);
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
-                if (progressBar === null) break;
-                progressBar.setMaxLength(target.duration);
-                this.__setProgressBarTimestamps();
-                break;
-            case VideoManager.ENTER_FULL_SCREEN:
-                this.changeButtonIcon("control-full-screen-button", "gg-minimize");
-                break;
-            case VideoManager.EXIT_FULL_SCREEN:
-                this.changeButtonIcon("control-full-screen-button", "gg-maximize");
+                this.__addVideoTimeObserver();
+                this.__addTags();
                 break;
             default:
         }
+
+        this.bottomBarController.videoStateChanged(state, target);
     }
 
     restartVideo() {
-        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
-        progressBar.setCurrentLength(0);
         this.videoManager.restartVideo();
     }
 
@@ -438,8 +557,15 @@ class HypervideoControlls {
         this.videoManager.toggleFullScreen();
     }
 
-    playButtonClicked() {
-        console.log("Click play");
+    setVolume(volume) {
+        this.videoManager.setVolume(volume);
+    }
+
+    loadVideoProgress(progress) {
+        this.videoManager.loadProgress(progress);
+    }
+
+    play() {
         if (!this.videoManager.isVideoPlaying()) {
             this.videoManager.play();
         } else {
@@ -462,7 +588,6 @@ class HypervideoControlls {
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
-        const tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
 
         hypervideo.appendChild(container);
 
@@ -471,8 +596,8 @@ class HypervideoControlls {
             this.addTopBarControlls(container);
         }
         this.__addPauseScreen(container);
-        container.appendChild(tagsContainer);
-        this.addBottomBarControlls(container);
+        this.tagController.addTagContainer(container);
+        this.bottomBarController.addBottomBar(container);
     }
 
     addVideoTag(container) {
@@ -520,80 +645,26 @@ class HypervideoControlls {
         container.appendChild(pauseScreen);
     }
 
-    addBottomBarControlls(container) {
-        const bottomController = this.htmlManager.createElement("div",["bottom-controller"]);
-        container.appendChild(bottomController);
-        const playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
-        const replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
-        const fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
-        const timeCounter = this.createTimeCounter();
-        const progressBar = this.createProgressBar();
-        const volumeBar = this.createVolumeBar();
-        bottomController.appendChild(playButton);
-        bottomController.appendChild(replayButton);
-        bottomController.appendChild(fullScreenButton);
-        bottomController.appendChild(timeCounter);
-        bottomController.appendChild(progressBar);
-        bottomController.appendChild(volumeBar);
-
-        this.__addVideoTimeObserver(progressBar, timeCounter);
-    }
-
-    createTimeCounter() {
-        const timeCounter = this.htmlManager.createElement("x-time-counter", ["time-counter"]);
-        return timeCounter;
-    }
-
-    createControlButton(buttonClass, buttonIcon, eventHandler) {
-        const buttonContainer = this.htmlManager.createElement("div", ["control-button-container"]);
-        const button = this.htmlManager.createElement("button", ["control-button",buttonClass]);
-        const icon = this.htmlManager.createElement("i", [buttonIcon]);
-        buttonContainer.appendChild(button);
-        button.appendChild(icon);
-        if (eventHandler !== null && eventHandler !== undefined) {
-            buttonContainer.addEventListener("click", eventHandler.bind(this));
-        }
-        return buttonContainer;
-    }
-
-    createProgressBar() {
-        const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
-        progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
-        if (this.videoLength !== null) {
-            progressBar.setMaxLength(this.videoLength);
-        }
-        return progressBar;
-    }
-
-    __addVideoTimeObserver(progressBar, timeCounter) {
+    __addVideoTimeObserver() {
+        const thisReference = this;
         const observer = new Observer((time) => {
-            progressBar.setCurrentLength(time);
-            timeCounter.currentTime = time;
-        })
+            thisReference.bottomBarController.videoTimeChange(time);
+            thisReference.__manageTags(time);
+        });
         this.videoManager.addObserver(observer);
     }
 
-
-    __progressBarChanged(progress) {
-        this.videoManager.loadProgress(progress);
+    __addTags() {
+        this.tagController.addTags(this.tags, false);
     }
 
-    __setProgressBarTimestamps() {
-        const progressBar = document.getElementById(this.containerID).querySelector("x-progress-bar");
-        for (let t of this.tags) {
-            const timestamp = t.timeConfig.timestamp;
-            progressBar.addMarkerAt(timestamp);
+    __manageTags(time) {
+        for (const tag of this.tags) {
+            const tagTimestamp = tag.timeConfig.timestamp;
+            const tagDuration = tag.timeConfig.duration;
+            const isVisible = time >= tagTimestamp && time < tagTimestamp + tagDuration;
+            this.tagController.setTagVisible(tag.id, isVisible);
         }
-    }
-
-    createVolumeBar() {
-        const volumeBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
-        volumeBar.volumeChanged = this.__volumeChanged.bind(this);
-        return volumeBar;
-    }
-
-    __volumeChanged(volume) {
-        this.videoManager.setVolume(volume/100);
     }
 
 }
@@ -670,29 +741,34 @@ class TagsController {
     constructor(containerID, videoManager) {
         this.containerID = containerID;
         this.videoManager = videoManager;
-        this.tagsContainer = document.getElementById(containerID).querySelector(".tags-container");
+        this.htmlManager = new HTMLManager();
     }
 
-    addTags(tags) {
-        for (const tag of tags) {
+    addTagContainer(container) {
+        this.tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
+        container.appendChild(this.tagsContainer);
+    }
+
+    addTags(tags, isVisible) {
+        this.tags = tags;
+        for (const tag of this.tags) {
             this.__addTagButton(tag);
         }
     }
 
-    __addTagButton(tag) {
+    __addTagButton(tag, isVisible) {
         const tagElement = document.createElement('x-tag-button');
         this.tagsContainer.appendChild(tagElement);
-        const observer = new Observer((timeStamp) => {
-            const tagTimestamp = tag.timeConfig.timestamp;
-            const tagDuration = tag.timeConfig.duration;
-            const isVisible = timeStamp >= tagTimestamp && timeStamp < tagTimestamp + tagDuration;
-            tagElement.isVisible = isVisible;
-        });
-        this.videoManager.addObserver(observer);
         tagElement.hexColor = tag.color ? tag.color : "#FFFFFF";
         tagElement.position = tag.position;
+        tagElement.isVisible = isVisible;
+        tagElement.id = tag.id;
     }
-
+    
+    setTagVisible(id, isVisible) {
+        const tagElement = document.querySelector("#" + this.containerID).querySelector("#"+id);
+        tagElement.isVisible = isVisible;
+    }
 }
 class VideoManager extends Subject {
 
@@ -1114,15 +1190,15 @@ class XTagButton extends HTMLElement {
         this.attachShadow({mode: 'open'});
         this.oldIsVisible = false;
 
-        const tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
-        const anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
-        const aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
+        this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
+        this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
+        this.aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
 
-        this.shadowRoot.appendChild(tagCircleContainer);
-        this.shadowRoot.appendChild(anchor);
-        this.shadowRoot.appendChild(aspectRatioDiv);
+        this.shadowRoot.appendChild(this.tagCircleContainer);
+        this.shadowRoot.appendChild(this.anchor);
+        this.shadowRoot.appendChild(this.aspectRatioDiv);
         this.shadowRoot.appendChild(this.getStyle());
-        this.__setupEventListeners(anchor);
+        this.__setupEventListeners(this.anchor);
     }
 
     set hexColor(newValue) {
@@ -1177,28 +1253,23 @@ class XTagButton extends HTMLElement {
     
     __animateDefaultScale() {
         console.log("Default scale");
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.add("defaultScale");
-        anchor.classList.remove("focusScale");
-        anchor.classList.remove("appear");
+        this.anchor.classList.add("defaultScale");
+        this.anchor.classList.remove("focusScale");
+        this.anchor.classList.remove("appear");
     }
 
     __animateFocusScale() {
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.add("focusScale");
-        anchor.classList.remove("defaultScale");
-        anchor.classList.remove("appear");
+        this.anchor.classList.add("focusScale");
+        this.anchor.classList.remove("defaultScale");
+        this.anchor.classList.remove("appear");
     }
 
     __animateAppear() {
         this.style.visibility = "visible";
-
-        const circleContainer = this.shadowRoot.querySelector(".tag-circle-container");
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.remove("disappear");
-        circleContainer.classList.remove("effectDissapear");
-        anchor.classList.add("appear");
-        circleContainer.classList.add("effectAppear");
+        this.anchor.classList.remove("disappear");
+        this.tagCircleContainer.classList.remove("effectDissapear");
+        this.anchor.classList.add("appear");
+        this.tagCircleContainer.classList.add("effectAppear");
     }
 
     __animateDisppear() {
@@ -1209,12 +1280,10 @@ class XTagButton extends HTMLElement {
             clearTimeout(timer);
         }, 350);
 
-        const circleContainer = this.shadowRoot.querySelector(".tag-circle-container");
-        const anchor = this.shadowRoot.querySelector(".tag-anchor");
-        anchor.classList.remove("appear");
-        circleContainer.classList.remove("effectAppear");
-        anchor.classList.add("disappear");
-        circleContainer.classList.add("effectDissapear");
+        this.anchor.classList.remove("appear");
+        this.tagCircleContainer.classList.remove("effectAppear");
+        this.anchor.classList.add("disappear");
+        this.tagCircleContainer.classList.add("effectDissapear");
     }
 
     getStyle() {
