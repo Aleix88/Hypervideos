@@ -43,7 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
           "timestamp": 2,
           "duration": 10
         },
-        "color": "#45ccbe"
+        "color": "#45ccbe",
+        "plugin": {
+            "name": "SimpleLabel",
+            "config": {
+                "text": "This is a text for the label"
+            }
+        }
       }
     ]
   }`;

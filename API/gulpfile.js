@@ -37,7 +37,7 @@ function clean(cb) {
 }
 
 function concatTask(cb) {
-    return src('./src/*.js')
+    return src('./src/**/*.js')
     //Unifiquem tots els fitxers en un que es dira all.js
     .pipe(concat("all.js"))
     .pipe(dest('./distri'));

@@ -669,38 +669,6 @@ class HypervideoController {
 
 }
 
-function includeJs(jsFilePath, callback) {
-    var script = document.createElement("script");
-
-    script.type = "text/javascript";
-    script.src = jsFilePath;
-
-    script.onreadystatechange = callback;
-    script.onload = callback;
-
-    document.body.appendChild(script);
-}
-
-let files = [
-    "../../API/src/HTMLManager.js",
-    "../../API/src/HypervideoControlls.js",
-    "../../API/src/Hypervideo.js"
-];
-
-let scriptsLoaded = 0;
-
-function importHypervideoAPI(callback) {
-    files.forEach(file => {
-        includeJs(file, ()=> {
-            scriptsLoaded++;
-            if (scriptsLoaded === files.length) {
-                callback();
-            }
-        });
-    });
-}
-
-   
 class Observer {
 
     constructor(onChange) {
@@ -752,10 +720,40 @@ class TagsController {
     addTags(tags, isVisible) {
         this.tags = tags;
         for (const tag of this.tags) {
-            this.__addTagButton(tag);
+            this.__addTagButton(tag, isVisible);
         }
     }
 
+    setTagVisible(id, isVisible) {
+        const tagElement = document.querySelector("#" + this.containerID).querySelector("#"+id);
+        tagElement.isVisible = isVisible;
+    }
+
+    __onClickTag(target) {
+        let tag = this.__getTagFromElement(target);
+        if (tag == null) {return;}
+        if (tag.plugin == null) {return;}
+        this.__createTagPlugin(tag.plugin)
+    }
+
+    __onHoverTag(target) {
+        let tag = this.__getTagFromElement(target);
+        if (tag == null) {return;}
+
+    }
+
+    __getTagFromElement(element) {
+        let tag = this.tags.filter((t) => {return t.id === element.id;});
+        if (tag == null || tag.length <= 0) {return null;}
+        return tag[0];
+    }
+
+    __createTagPlugin(plugin) {
+        const pluginName = plugin.name;
+        const classInstance = eval(`new ${pluginName}(${plugin.config})`);
+        return classInstance;
+    }
+    
     __addTagButton(tag, isVisible) {
         const tagElement = document.createElement('x-tag-button');
         this.tagsContainer.appendChild(tagElement);
@@ -763,11 +761,8 @@ class TagsController {
         tagElement.position = tag.position;
         tagElement.isVisible = isVisible;
         tagElement.id = tag.id;
-    }
-    
-    setTagVisible(id, isVisible) {
-        const tagElement = document.querySelector("#" + this.containerID).querySelector("#"+id);
-        tagElement.isVisible = isVisible;
+        tagElement.clickHandler = this.__onClickTag.bind(this);
+        tagElement.hoverHandler = this.__onHoverTag.bind(this);
     }
 }
 class VideoManager extends Subject {
@@ -1189,6 +1184,8 @@ class XTagButton extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.attachShadow({mode: 'open'});
         this.oldIsVisible = false;
+        this.hoverHandler = null;
+        this.clickHandler = null;
 
         this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
         this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
@@ -1235,16 +1232,15 @@ class XTagButton extends HTMLElement {
     }
 
     __onClick() {
-        console.log("Click");
+        this.clickHandler(this);
     }
 
     __onHover() {
-        console.log("Hover");
         this.__animateFocusScale();
     }
 
     __onMouseDown() {
-        console.log("Hold");
+        this.hoverHandler(this);
     }
 
     __onMouseLeave() {
@@ -1252,7 +1248,6 @@ class XTagButton extends HTMLElement {
     }
     
     __animateDefaultScale() {
-        console.log("Default scale");
         this.anchor.classList.add("defaultScale");
         this.anchor.classList.remove("focusScale");
         this.anchor.classList.remove("appear");

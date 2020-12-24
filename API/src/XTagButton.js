@@ -5,6 +5,8 @@ class XTagButton extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.attachShadow({mode: 'open'});
         this.oldIsVisible = false;
+        this.hoverHandler = null;
+        this.clickHandler = null;
 
         this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
         this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
@@ -51,16 +53,15 @@ class XTagButton extends HTMLElement {
     }
 
     __onClick() {
-        console.log("Click");
+        this.clickHandler(this);
     }
 
     __onHover() {
-        console.log("Hover");
         this.__animateFocusScale();
     }
 
     __onMouseDown() {
-        console.log("Hold");
+        this.hoverHandler(this);
     }
 
     __onMouseLeave() {
@@ -68,7 +69,6 @@ class XTagButton extends HTMLElement {
     }
     
     __animateDefaultScale() {
-        console.log("Default scale");
         this.anchor.classList.add("defaultScale");
         this.anchor.classList.remove("focusScale");
         this.anchor.classList.remove("appear");
