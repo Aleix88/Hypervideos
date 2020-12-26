@@ -17,7 +17,7 @@ class XTagButton extends HTMLElement {
         this.shadowRoot.appendChild(this.anchor);
         this.shadowRoot.appendChild(this.aspectRatioDiv);
         this.shadowRoot.appendChild(this.getStyle());
-        this.__setupEventListeners(this.anchor);
+        this.__setupEventListeners(this);
     }
 
     set hexColor(newValue) {
@@ -52,18 +52,18 @@ class XTagButton extends HTMLElement {
         element.addEventListener('mouseleave', this.__onMouseLeave.bind(this));
     }
 
-    __onClick() {
-        this.clickHandler(this);
+    __onClick(event) {
+        this.clickHandler(event);
     }
 
-    __onHover() {
+    __onHover(event) {
         this.__animateFocusScale();
-        this.hoverHandler(this);
+        this.hoverHandler(event);
     }
 
-    __onMouseLeave() {
+    __onMouseLeave(event) {
         this.__animateDefaultScale();
-        this.leaveHandler(this);
+        this.leaveHandler(event);
     }
     
     __animateDefaultScale() {

@@ -6,18 +6,29 @@ class SimpleLabel {
         this.config = config;
         this.container = container;
         this.videoManager = videoManager;
+        this.focus = false;
         this.__createLabel();
+        document.addEventListener("click", this.__documentClicked.bind(this));
     }
 
-    onTagClick(target) {
+    onTagClick(event) {
+        this.focus = true;
+        event.stopPropagation();
     }
 
-    onTagHover(target) {
+    onTagHover(event) {
+        const target = event.target;
         this.__showLabel();
         this.__repositionLabel(target);
     }
 
-    onTagLeave(target) {
+    onTagLeave(event) {
+        if (this.focus === true) {return;}
+        this.__hideLabel();
+    }
+
+    __documentClicked(event) {
+        const target = event.target;
         this.__hideLabel();
     }
 
@@ -65,8 +76,9 @@ class SimpleLabel {
         this.labelContainer.style.borderRadius = "5px";
         this.labelContainer.style.maxHeight = "30%";
         this.labelContainer.style.maxWidth = "30%";
+        this.labelContainer.style.pointerEvents = "all";
 
-        this.textElement.textContent = this.config.text;
+        this.textElement.innerHTML = this.config.text;
         this.textElement.style.color = "white";
         this.textElement.style.margin = "1.3em .7em";
 

@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "plugin": {
             "name": "SimpleLabel",
             "config": {
-                "text": "Això es un text de prova per mirar si funciona!"
+                "text": "Això es un  <strong>text </strong> de prova per mirar si funciona!"
             }
         }
       },
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "plugin": {
             "name": "SimpleLabel",
             "config": {
-                "text": "This is a text for the label"
+                "text": "This is a text for the <a href=\\\"www.google.es\\\">label</a>"
             }
         }
       },

@@ -29,25 +29,28 @@ class TagsController {
         tagElement.isVisible = isVisible;
     }
 
-    __onClickTag(target) {
+    __onClickTag(event) {
+        const target = event.target;
         let tag = this.__getTagFromElement(target);
         if (tag == null) {return;}
         if (this.plugins[tag.id] == null) {return;}
-        this.plugins[tag.id].onTagClick(target);
+        this.plugins[tag.id].onTagClick(event);
     }
 
-    __onHoverTag(target) {
+    __onHoverTag(event) {
+        const target = event.target;
         let tag = this.__getTagFromElement(target);
         if (tag == null) {return;}
         if (this.plugins[tag.id] == null) {return;}
-        this.plugins[tag.id].onTagHover(target);
+        this.plugins[tag.id].onTagHover(event);
     }
 
-    __onLeaveTag(target) {
+    __onLeaveTag(event) {
+        const target = event.target;
         let tag = this.__getTagFromElement(target);
         if (tag == null) {return;}
         if (this.plugins[tag.id] == null) {return;}
-        this.plugins[tag.id].onTagLeave(target);
+        this.plugins[tag.id].onTagLeave(event);
     }
 
     __getTagFromElement(element) {
