@@ -10,7 +10,7 @@ class HypervideoController {
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
         this.bottomBarController = new BottomBarController(this, containerID, tags);
-        this.tagController = new TagsController(this.containerID, videoManager);
+        this.tagController = new TagsController(this.containerID, this.containerID + "-elements",videoManager);
     }
 
     __videoStateChanged(state, target) {
@@ -89,6 +89,7 @@ class HypervideoController {
         this.__addPauseScreen(container);
         this.tagController.addTagContainer(container);
         this.bottomBarController.addBottomBar(container);
+        this.__addElementsContainer();
     }
 
     addVideoTag(container) {
@@ -156,6 +157,25 @@ class HypervideoController {
             const isVisible = time >= tagTimestamp && time < tagTimestamp + tagDuration;
             this.tagController.setTagVisible(tag.id, isVisible);
         }
+    }
+
+    __addElementsContainer() {
+        const elementsContainer = document.createElement("div");
+        elementsContainer.id = this.containerID + "-elements";
+
+        elementsContainer.style.display = "none";
+        elementsContainer.style.position = "absolute";
+        elementsContainer.style.width = "100%";
+        elementsContainer.style.height = "100%";
+        elementsContainer.style.background = "rgba(0,0,0,0.5)";
+        elementsContainer.style.top = "0px";
+        elementsContainer.style.left = "0px";
+        elementsContainer.style.pointerEvents = "all";
+        elementsContainer.addEventListener('click', () => {
+            elementsContainer.style.display = "none";
+        });
+
+        document.body.appendChild(elementsContainer);
     }
 
 }

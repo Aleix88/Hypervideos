@@ -525,7 +525,7 @@ class HypervideoController {
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
         this.bottomBarController = new BottomBarController(this, containerID, tags);
-        this.tagController = new TagsController(this.containerID, videoManager);
+        this.tagController = new TagsController(this.containerID, this.containerID + "-elements",videoManager);
     }
 
     __videoStateChanged(state, target) {
@@ -604,6 +604,7 @@ class HypervideoController {
         this.__addPauseScreen(container);
         this.tagController.addTagContainer(container);
         this.bottomBarController.addBottomBar(container);
+        this.__addElementsContainer();
     }
 
     addVideoTag(container) {
@@ -673,6 +674,25 @@ class HypervideoController {
         }
     }
 
+    __addElementsContainer() {
+        const elementsContainer = document.createElement("div");
+        elementsContainer.id = this.containerID + "-elements";
+
+        elementsContainer.style.display = "none";
+        elementsContainer.style.position = "absolute";
+        elementsContainer.style.width = "100%";
+        elementsContainer.style.height = "100%";
+        elementsContainer.style.background = "rgba(0,0,0,0.5)";
+        elementsContainer.style.top = "0px";
+        elementsContainer.style.left = "0px";
+        elementsContainer.style.pointerEvents = "all";
+        elementsContainer.addEventListener('click', () => {
+            elementsContainer.style.display = "none";
+        });
+
+        document.body.appendChild(elementsContainer);
+    }
+
 }
 
 class Observer {
@@ -712,8 +732,9 @@ class Subject {
 }
 class TagsController {
 
-    constructor(containerID, videoManager) {
+    constructor(containerID, elementsContainerID, videoManager) {
         this.containerID = containerID;
+        this.elementsContainerID = elementsContainerID;
         this.videoManager = videoManager;
         this.htmlManager = new HTMLManager();
         this.plugins = [];
@@ -746,6 +767,12 @@ class TagsController {
             const plugin = this.plugins[key];
             plugin.fullScreenStateChanged(isFullScreen);
         }
+        this.__moveElementsContainer(isFullScreen ? this.tagsContainer :  document.body);
+    }
+
+    __moveElementsContainer(parent) {
+        const elementsContainer = document.getElementById(this.elementsContainerID);
+        parent.appendChild(elementsContainer);
     }
 
     __onClickTag(event) {
@@ -786,7 +813,7 @@ class TagsController {
         }
         const pluginName = plugin.name;
         const classInstance = eval(`new ${pluginName}()`);
-        classInstance.onLoad(plugin.config, this.tagsContainer, this.videoManager);
+        classInstance.onLoad(plugin.config, this.tagsContainer, this.elementsContainerID, this.videoManager);
         this.plugins[tagID] = classInstance;
     }
     

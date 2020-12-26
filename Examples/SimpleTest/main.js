@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
           "duration": 10
         },
         "plugin": {
-            "name": "SimpleLabel",
+            "name": "Questionary",
             "config": {
                 "text": "Hola soc una etiqueta en un vídeo!"
             }

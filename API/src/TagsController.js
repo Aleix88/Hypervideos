@@ -1,7 +1,8 @@
 class TagsController {
 
-    constructor(containerID, videoManager) {
+    constructor(containerID, elementsContainerID, videoManager) {
         this.containerID = containerID;
+        this.elementsContainerID = elementsContainerID;
         this.videoManager = videoManager;
         this.htmlManager = new HTMLManager();
         this.plugins = [];
@@ -34,6 +35,12 @@ class TagsController {
             const plugin = this.plugins[key];
             plugin.fullScreenStateChanged(isFullScreen);
         }
+        this.__moveElementsContainer(isFullScreen ? this.tagsContainer :  document.body);
+    }
+
+    __moveElementsContainer(parent) {
+        const elementsContainer = document.getElementById(this.elementsContainerID);
+        parent.appendChild(elementsContainer);
     }
 
     __onClickTag(event) {
@@ -74,7 +81,7 @@ class TagsController {
         }
         const pluginName = plugin.name;
         const classInstance = eval(`new ${pluginName}()`);
-        classInstance.onLoad(plugin.config, this.tagsContainer, this.videoManager);
+        classInstance.onLoad(plugin.config, this.tagsContainer, this.elementsContainerID, this.videoManager);
         this.plugins[tagID] = classInstance;
     }
     

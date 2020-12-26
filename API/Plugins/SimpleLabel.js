@@ -2,9 +2,10 @@ class SimpleLabel {
 
     constructor() {}
 
-    onLoad(config, container, videoManager) {
+    onLoad(config, container, elementsContainerID, videoManager) {
         this.config = config;
         this.container = container;
+        this.elementsContainerID = elementsContainerID;
         this.videoManager = videoManager;
         this.focus = false;
         this.__createLabel();
