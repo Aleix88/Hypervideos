@@ -11,7 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
           "timestamp": 1,
           "duration": 10
         },
-        "color": "#fcba03"
+        "color": "#fcba03",
+        "plugin": {
+            "name": "SimpleLabel",
+            "config": {
+                "text": "Això es un text de prova per mirar si funciona!"
+            }
+        }
       },
       {
         "position": {
@@ -22,7 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
           "timestamp": 2,
           "duration": 4
         },
-        "color": "#cc5a45"
+        "color": "#cc5a45",
+        "plugin": {
+            "name": "SimpleLabel",
+            "config": {
+                "text": "This is a text for the label"
+            }
+        }
       },
       {
         "position": {
@@ -32,6 +44,12 @@ document.addEventListener("DOMContentLoaded", () => {
         "timeConfig": {
           "timestamp": 4,
           "duration": 10
+        },
+        "plugin": {
+            "name": "SimpleLabel",
+            "config": {
+                "text": "Hola soc una etiqueta en un vídeo!"
+            }
         }
       },
       {

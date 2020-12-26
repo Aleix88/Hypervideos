@@ -7,6 +7,7 @@ class XTagButton extends HTMLElement {
         this.oldIsVisible = false;
         this.hoverHandler = null;
         this.clickHandler = null;
+        this.leaveHandler = null;
 
         this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
         this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
@@ -62,6 +63,7 @@ class XTagButton extends HTMLElement {
 
     __onMouseLeave() {
         this.__animateDefaultScale();
+        this.leaveHandler(this);
     }
     
     __animateDefaultScale() {

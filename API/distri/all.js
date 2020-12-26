@@ -749,6 +749,13 @@ class TagsController {
         this.plugins[tag.id].onTagHover(target);
     }
 
+    __onLeaveTag(target) {
+        let tag = this.__getTagFromElement(target);
+        if (tag == null) {return;}
+        if (this.plugins[tag.id] == null) {return;}
+        this.plugins[tag.id].onTagLeave(target);
+    }
+
     __getTagFromElement(element) {
         let tag = this.tags.filter((t) => {return t.id === element.id;});
         if (tag == null || tag.length <= 0) {return null;}
@@ -776,6 +783,7 @@ class TagsController {
         tagElement.id = tag.id;
         tagElement.clickHandler = this.__onClickTag.bind(this);
         tagElement.hoverHandler = this.__onHoverTag.bind(this);
+        tagElement.leaveHandler = this.__onLeaveTag.bind(this);
     }
 }
 class VideoManager extends Subject {
@@ -1199,6 +1207,7 @@ class XTagButton extends HTMLElement {
         this.oldIsVisible = false;
         this.hoverHandler = null;
         this.clickHandler = null;
+        this.leaveHandler = null;
 
         this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
         this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
@@ -1254,6 +1263,7 @@ class XTagButton extends HTMLElement {
 
     __onMouseLeave() {
         this.__animateDefaultScale();
+        this.leaveHandler(this);
     }
     
     __animateDefaultScale() {
