@@ -710,6 +710,7 @@ class TagsController {
         this.containerID = containerID;
         this.videoManager = videoManager;
         this.htmlManager = new HTMLManager();
+        this.plugins = [];
     }
 
     addTagContainer(container) {
@@ -721,6 +722,11 @@ class TagsController {
         this.tags = tags;
         for (const tag of this.tags) {
             this.__addTagButton(tag, isVisible);
+            let plugin = null;
+            if (tag.plugin != null) {
+                plugin = tag.plugin;
+            }
+            this.__createTagPluginForTagIfNeeded(tag.id, plugin)
         }
     }
 
@@ -732,14 +738,15 @@ class TagsController {
     __onClickTag(target) {
         let tag = this.__getTagFromElement(target);
         if (tag == null) {return;}
-        if (tag.plugin == null) {return;}
-        this.__createTagPlugin(tag.plugin)
+        if (this.plugins[tag.id] == null) {return;}
+        this.plugins[tag.id].onTagClick(target);
     }
 
     __onHoverTag(target) {
         let tag = this.__getTagFromElement(target);
         if (tag == null) {return;}
-
+        if (this.plugins[tag.id] == null) {return;}
+        this.plugins[tag.id].onTagHover(target);
     }
 
     __getTagFromElement(element) {
@@ -748,10 +755,16 @@ class TagsController {
         return tag[0];
     }
 
-    __createTagPlugin(plugin) {
+    __createTagPluginForTagIfNeeded(tagID, plugin) {
+        if (this.plugins.hasOwnProperty(tagID) && this.plugins[tagID] != null) {return;} 
+        if (plugin == null) {
+            this.plugins[tagID] = plugin;
+            return;
+        }
         const pluginName = plugin.name;
-        const classInstance = eval(`new ${pluginName}(${plugin.config})`);
-        return classInstance;
+        const classInstance = eval(`new ${pluginName}()`);
+        classInstance.onLoad(plugin.config, this.tagsContainer, this.videoManager);
+        this.plugins[tagID] = classInstance;
     }
     
     __addTagButton(tag, isVisible) {
@@ -1225,7 +1238,6 @@ class XTagButton extends HTMLElement {
     }
 
     __setupEventListeners(element) {
-        element.addEventListener('mousedown', this.__onMouseDown.bind(this));
         element.addEventListener('click', this.__onClick.bind(this));
         element.addEventListener('mouseenter', this.__onHover.bind(this));
         element.addEventListener('mouseleave', this.__onMouseLeave.bind(this));
@@ -1237,9 +1249,6 @@ class XTagButton extends HTMLElement {
 
     __onHover() {
         this.__animateFocusScale();
-    }
-
-    __onMouseDown() {
         this.hoverHandler(this);
     }
 

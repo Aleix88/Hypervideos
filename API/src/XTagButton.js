@@ -46,7 +46,6 @@ class XTagButton extends HTMLElement {
     }
 
     __setupEventListeners(element) {
-        element.addEventListener('mousedown', this.__onMouseDown.bind(this));
         element.addEventListener('click', this.__onClick.bind(this));
         element.addEventListener('mouseenter', this.__onHover.bind(this));
         element.addEventListener('mouseleave', this.__onMouseLeave.bind(this));
@@ -58,9 +57,6 @@ class XTagButton extends HTMLElement {
 
     __onHover() {
         this.__animateFocusScale();
-    }
-
-    __onMouseDown() {
         this.hoverHandler(this);
     }
 
