@@ -9,7 +9,8 @@ class SimpleLabel {
         this.__createLabel();
     }
 
-    onTagClick(target) {}
+    onTagClick(target) {
+    }
 
     onTagHover(target) {
         this.__showLabel();
@@ -33,10 +34,8 @@ class SimpleLabel {
         const containerLeft = this.container.getBoundingClientRect().left;
         const containerHeight = this.container.getBoundingClientRect().height;
         const containerWidth = this.container.getBoundingClientRect().width;
-        const scrollTop = window.pageYOffset || document.documentElement || document.body.scrollTop;
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
-        const targetTop = target.getBoundingClientRect().top + scrollTop;
-        const targetLeft = target.getBoundingClientRect().left + scrollLeft;
+        const targetTop = target.getBoundingClientRect().top;
+        const targetLeft = target.getBoundingClientRect().left;
         const targetRelTop = targetTop - containerTop;
         const targetRelLeft = targetLeft - containerLeft;
         const targetWidth = target.getBoundingClientRect().width;
@@ -44,13 +43,11 @@ class SimpleLabel {
         const x = targetRelLeft / containerWidth;
         const y = targetRelTop / containerHeight;
 
-
         const labelContainerHeight = this.labelContainer.getBoundingClientRect().height;
         const labelContainerWidth = this.labelContainer.getBoundingClientRect().width;
 
-
-        const labelTop = y < 0.5 ? targetTop + targetHeight : targetTop - labelContainerHeight;
-        const labelLeft = x < 0.5 ? targetLeft + targetWidth : targetLeft - labelContainerWidth;
+        const labelTop = y < 0.5 ? targetRelTop + targetHeight : targetRelTop - labelContainerHeight;
+        const labelLeft = x < 0.5 ? targetRelLeft + targetWidth : targetRelLeft - labelContainerWidth;
 
         this.labelContainer.style.top = labelTop + "px";
         this.labelContainer.style.left = labelLeft + "px";
@@ -74,7 +71,7 @@ class SimpleLabel {
         this.textElement.style.margin = "1.3em .7em";
 
         this.labelContainer.appendChild(this.textElement);
-        document.body.appendChild(this.labelContainer);
+        this.container.appendChild(this.labelContainer);
     }
 
 }
