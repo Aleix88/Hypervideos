@@ -29,6 +29,13 @@ class TagsController {
         tagElement.isVisible = isVisible;
     }
 
+    fullScreenStateChanged(isFullScreen) {
+        for (const key in this.plugins) {
+            const plugin = this.plugins[key];
+            plugin.fullScreenStateChanged(isFullScreen);
+        }
+    }
+
     __onClickTag(event) {
         const target = event.target;
         let tag = this.__getTagFromElement(target);

@@ -543,6 +543,12 @@ class HypervideoController {
                 this.__addVideoTimeObserver();
                 this.__addTags();
                 break;
+            case VideoManager.ENTER_FULL_SCREEN:
+            case VideoManager.EXIT_FULL_SCREEN:
+                if (this.tagController != null) {
+                    this.tagController.fullScreenStateChanged(state === VideoManager.ENTER_FULL_SCREEN);
+                }
+            break;
             default:
         }
 
@@ -733,6 +739,13 @@ class TagsController {
     setTagVisible(id, isVisible) {
         const tagElement = document.querySelector("#" + this.containerID).querySelector("#"+id);
         tagElement.isVisible = isVisible;
+    }
+
+    fullScreenStateChanged(isFullScreen) {
+        for (const key in this.plugins) {
+            const plugin = this.plugins[key];
+            plugin.fullScreenStateChanged(isFullScreen);
+        }
     }
 
     __onClickTag(event) {

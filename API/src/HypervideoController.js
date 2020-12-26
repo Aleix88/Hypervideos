@@ -28,6 +28,12 @@ class HypervideoController {
                 this.__addVideoTimeObserver();
                 this.__addTags();
                 break;
+            case VideoManager.ENTER_FULL_SCREEN:
+            case VideoManager.EXIT_FULL_SCREEN:
+                if (this.tagController != null) {
+                    this.tagController.fullScreenStateChanged(state === VideoManager.ENTER_FULL_SCREEN);
+                }
+            break;
             default:
         }
 

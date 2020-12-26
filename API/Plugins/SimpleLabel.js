@@ -27,9 +27,14 @@ class SimpleLabel {
         this.__hideLabel();
     }
 
-    __documentClicked(event) {
-        const target = event.target;
+    fullScreenStateChanged(isFullScreen) {
         this.__hideLabel();
+        this.focus = false;
+    }
+
+    __documentClicked(event) {
+        this.__hideLabel();
+        this.focus = false;
     }
 
     __hideLabel() {
