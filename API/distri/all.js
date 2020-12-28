@@ -686,7 +686,8 @@ class HypervideoController {
         elementsContainer.style.top = "0px";
         elementsContainer.style.left = "0px";
         elementsContainer.style.pointerEvents = "all";
-        elementsContainer.addEventListener('click', () => {
+        elementsContainer.addEventListener('click', (event) => {
+            if (elementsContainer !== event.target) {return;}
             elementsContainer.style.display = "none";
         });
 

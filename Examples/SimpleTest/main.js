@@ -48,7 +48,14 @@ document.addEventListener("DOMContentLoaded", () => {
         "plugin": {
             "name": "Questionary",
             "config": {
-                "text": "Hola soc una etiqueta en un vídeo!"
+                "title": "Quin dels següents llibre està escrit per Brandon Sanderson?",
+                "subtitle": "Elegeix la resposta que creguis correcte",
+                "correctAnswer": "Nacidos de la bruma: El imperio final",
+                "wrongAnswers": [
+                  "El nombre del viento",
+                  "Juego de tronos",
+                  "El hobbit"
+                ]
             }
         }
       },
