@@ -164,7 +164,7 @@ class HypervideoController {
         elementsContainer.id = this.containerID + "-elements";
 
         elementsContainer.style.display = "none";
-        elementsContainer.style.position = "absolute";
+        elementsContainer.style.position = "fixed";
         elementsContainer.style.width = "100%";
         elementsContainer.style.height = "100%";
         elementsContainer.style.background = "rgba(0,0,0,0.5)";

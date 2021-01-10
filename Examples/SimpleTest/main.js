@@ -81,8 +81,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const hypervideo = new Hypervideo("H9vevyszht4", Hypervideo.YOUTUBE_TYPE, "hypervideo_123");
   const hypervideo2 = new Hypervideo("../TestVideos/video_test.mp4", Hypervideo.VIDEO_TYPE, "hypervideo_2");
+  const hyperimage = new Hypervideo("../TestImages/image_test.png", Hypervideo.IMAGE_TYPE, "hyperimage");
   hypervideo.setupHypervideo(tagsJSON);
-  hypervideo2.setupHypervideo(tagsJSON)
+  hypervideo2.setupHypervideo(tagsJSON);
+  hyperimage.setupHypervideo(tagsJSON);
 
     
 

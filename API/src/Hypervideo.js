@@ -8,6 +8,7 @@ class Hypervideo {
 
     static YOUTUBE_TYPE = "YOUTUBE";
     static VIDEO_TYPE = "VIDEO";
+    static IMAGE_TYPE = "IMAGE";
 
     isDOMLoaded() {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
@@ -27,11 +28,17 @@ class Hypervideo {
 
         this.tags = this.__tagsJSONToObject(tagsJSON);
 
-        const videoManagerFactory = new VideoManagerFactory();
-        const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
+        if (this.videoType === Hypervideo.IMAGE_TYPE) {
+            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.tags);
+            hyperImageController.createSkeleton();
+        } else {
+            const videoManagerFactory = new VideoManagerFactory();
+            const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
+    
+            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
+            hypervideoController.createSkeleton();
+        }
 
-        const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
-        hypervideoController.createSkeleton();
     }
 
     __tagsJSONToObject(tagsJSON) {
@@ -87,6 +94,12 @@ class Hypervideo {
         .youtube-frame {
             width: 100%;
             height: 100%;
+        }
+
+        .hyperimage {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         .hypervideo-container {
