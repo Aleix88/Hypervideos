@@ -1,4 +1,4 @@
-class VideoTagManager extends VideoManager {
+class VideoTagManager extends ContainerManager {
 
     constructor (containerID) {
         super(containerID);
@@ -47,18 +47,18 @@ class VideoTagManager extends VideoManager {
     }
 
     __videoIsPlaying() {
-        this.videoStateChanged(VideoManager.PLAYING);
+        this.videoStateChanged(ContainerManager.PLAYING);
         this.videoTimer.play();
     }
 
     __videoIsPaused() {
-        this.videoStateChanged(VideoManager.PAUSED);
+        this.videoStateChanged(ContainerManager.PAUSED);
         this.videoTimer.pause();
     }
 
     __videoLoaded() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
-        this.videoStateChanged(VideoManager.LOADED, {duration: video.duration});
+        this.videoStateChanged(ContainerManager.LOADED, {duration: video.duration});
     }
 
     __timeHandler() {

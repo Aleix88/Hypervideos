@@ -3,10 +3,18 @@ const minify = require('gulp-minify');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const del = require('del');
+const order = require("gulp-order");
 
+const filesOrder = [
+    "Utils/Observer/**/*.js",
+    "Utils/Manager/**/*.js",
+    "Utils/*.js",
+    "View/**/*.js",
+    "Controller/**/*.js"
+];
 
 function babelTask(cb) {
-    return src('./src/*.js')
+    return src('./dev/all.js')
     //Converteix el ECMA6 en ECMA5 per poder fer minify
     .pipe(babel({
         presets: ['@babel/env'],
@@ -21,7 +29,6 @@ function babelTask(cb) {
 function minifyTask(cb) {
     return src('./babel/*.js')
     //Unifiquem tots els fitxers en un que es dira all.js
-    .pipe(concat("all.js"))
     .pipe(dest('./distri'))    
     //Minimitzem el fitxer all.js
     .pipe(minify({
@@ -38,14 +45,15 @@ function clean(cb) {
 
 function concatTask(cb) {
     return src('./src/**/*.js')
+    .pipe(order(filesOrder))
     //Unifiquem tots els fitxers en un que es dira all.js
     .pipe(concat("all.js"))
-    .pipe(dest('./distri'));
+    .pipe(dest('./dev'));
 }
 
 exports.babel = babelTask;
 exports.minify = minifyTask;
 exports.clean = clean;
 
-exports.build = series(clean, babelTask, minifyTask);
+exports.build = series(clean, concatTask, babelTask, minifyTask);
 exports.devBuild = series(clean, concatTask); 

@@ -16,6 +16,7 @@
         "gulp-minify": "^3.1.0"
     },
     "dependencies": {
-        "gulp": "^4.0.2"
+        "gulp": "^4.0.2",
+        "gulp-order": "^1.2.0"
     }
 }

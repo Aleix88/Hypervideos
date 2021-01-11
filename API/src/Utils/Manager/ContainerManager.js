@@ -1,14 +1,10 @@
-class VideoManager extends Subject {
+class ContainerManager extends Subject {
 
     constructor(containerID) {
         super();
         this.containerID = containerID;
         this.videoStateChanged = null;
         this.isFullScreen = false;
-        //Convertim la classe en "abstract"
-        if (new.target === VideoManager) {
-            throw new TypeError("Cannot construct VideoManager instances directly");
-        }
 
         this.__exitFullScreenEventListeners();
     }
@@ -44,16 +40,14 @@ class VideoManager extends Subject {
 
     _exitFSHandler(event) {
         if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
-            console.log("Exit full screen!");
             this.isFullScreen = false;
-            this.videoStateChanged(VideoManager.EXIT_FULL_SCREEN);
+            this.videoStateChanged(ContainerManager.EXIT_FULL_SCREEN);
         }
     }
 
     _enterFSHandler() {
-        console.log("Enter full screen!");
         this.isFullScreen = true;
-        this.videoStateChanged(VideoManager.ENTER_FULL_SCREEN);
+        this.videoStateChanged(ContainerManager.ENTER_FULL_SCREEN);
     }
 
     toggleFullScreen() {

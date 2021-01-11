@@ -229,6 +229,12 @@ class Hypervideo {
             left: 0;
         }
 
+        x-full-screen-button {
+            position: absolute;
+            bottom: 1em;
+            right: 1em;
+        }
+
         
         /* ICONS */
         

@@ -26,22 +26,22 @@ class BottomBarController {
 
     videoStateChanged(state, target) {
         switch (state) {
-            case VideoManager.PLAYING:
+            case ContainerManager.PLAYING:
                 this.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
-            case VideoManager.PAUSED:
+            case ContainerManager.PAUSED:
                 this.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
-            case VideoManager.LOADED:
+            case ContainerManager.LOADED:
                 this.volumeBar.setVolume(50);
                 this.videoLength = target.duration;
                 this.progressBar.setMaxLength(target.duration);
                 this.__setProgressBarTimestamps();
                 break;
-            case VideoManager.ENTER_FULL_SCREEN:
+            case ContainerManager.ENTER_FULL_SCREEN:
                 this.changeButtonIcon("control-full-screen-button", "gg-minimize");
                 break;
-            case VideoManager.EXIT_FULL_SCREEN:
+            case ContainerManager.EXIT_FULL_SCREEN:
                 this.changeButtonIcon("control-full-screen-button", "gg-maximize");
                 break;
             default:
