@@ -76,7 +76,7 @@ class Questionary {
         answerDiv.style.padding = "1em 1em";
         answerDiv.style.borderRadius = "5px";
         answerDiv.style.marginBottom = "0.3em";
-        answerDiv.style.background = "rgb(227, 231, 237)";
+        answerDiv.style.border = "solid 1px rgb(227, 231, 237)";
         answerDiv.style.cursor = "pointer";
         answerDiv.addEventListener("click", this.__answerClicked.bind(this));
         answerDiv.addEventListener("mouseover", this.__answerHover.bind(this));
@@ -89,20 +89,21 @@ class Questionary {
         if (this.answered) {return;}
         const answerTarget = event.target;
         const answer = answerTarget.children[0].textContent;
-        answerTarget.style.background = answer === this.config.correctAnswer ? "green" : "red";
+        answerTarget.style.background = answer === this.config.correctAnswer ? "#6fd179" : "#d9664c";
         this.answered = true;
     }
 
     __answerHover(event) {
         if (this.answered) {return;}
         const answerTarget = event.target;
-        answerTarget.style.background = "#d6b760";
+        answerTarget.style.background = "rgb(227, 231, 237)";
     }
 
     __answerLeave(event) {
         if (this.answered) {return;}
         const answerTarget = event.target;
-        answerTarget.style.background = "rgb(227, 231, 237)";
+        answerTarget.style.border = "solid 1px rgb(227, 231, 237)";
+        answerTarget.style.background = "white";
     }
 
     __randomLoopEach(elements, loop) {

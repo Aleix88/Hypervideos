@@ -2,7 +2,7 @@ class XFullScreenButton extends HTMLElement {
     
     constructor() {
         super();
-        this.onclick = null;
+        this.clickHandler = null;
         let shadow = this.attachShadow({mode: 'open'});
         const button = this.__createButton();
         shadow.append(button);
@@ -13,14 +13,24 @@ class XFullScreenButton extends HTMLElement {
         const buttonContainer = document.createElement("div");
         buttonContainer.classList.add("fs-button-container");
         buttonContainer.addEventListener('click', this.__buttonClicked.bind(this));
-        const icon = document.createElement("i");
-        icon.classList.add("gg-maximize");
-        buttonContainer.appendChild(icon);
+        this.icon = document.createElement("i");
+        this.icon.classList.add("gg-maximize");
+        buttonContainer.appendChild(this.icon);
         return buttonContainer;
     }
 
     __buttonClicked(e) {
-        this.onclick(e);
+        this.clickHandler(e);
+    }
+
+    isFullScreenActive(isFS) {
+        if (isFS === true) {
+            this.icon.classList.remove("gg-maximize");
+            this.icon.classList.add("gg-minimize");
+        } else {
+            this.icon.classList.remove("gg-minimize");
+            this.icon.classList.add("gg-maximize");
+        }
     }
 
     __getStyle() {
@@ -29,10 +39,12 @@ class XFullScreenButton extends HTMLElement {
         style.textContent = `
         
             .fs-button-container {
-                padding: 0.7em;
                 background: lightgray;
                 border-radius: 5px;
                 cursor: pointer;
+                width: 35px;
+                height: 35px;
+                display:flex;
             }
 
             .fs-button-container:focus,

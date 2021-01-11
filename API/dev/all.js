@@ -412,7 +412,7 @@ class XFullScreenButton extends HTMLElement {
     
     constructor() {
         super();
-        this.onclick = null;
+        this.clickHandler = null;
         let shadow = this.attachShadow({mode: 'open'});
         const button = this.__createButton();
         shadow.append(button);
@@ -423,14 +423,24 @@ class XFullScreenButton extends HTMLElement {
         const buttonContainer = document.createElement("div");
         buttonContainer.classList.add("fs-button-container");
         buttonContainer.addEventListener('click', this.__buttonClicked.bind(this));
-        const icon = document.createElement("i");
-        icon.classList.add("gg-maximize");
-        buttonContainer.appendChild(icon);
+        this.icon = document.createElement("i");
+        this.icon.classList.add("gg-maximize");
+        buttonContainer.appendChild(this.icon);
         return buttonContainer;
     }
 
     __buttonClicked(e) {
-        this.onclick(e);
+        this.clickHandler(e);
+    }
+
+    isFullScreenActive(isFS) {
+        if (isFS === true) {
+            this.icon.classList.remove("gg-maximize");
+            this.icon.classList.add("gg-minimize");
+        } else {
+            this.icon.classList.remove("gg-minimize");
+            this.icon.classList.add("gg-maximize");
+        }
     }
 
     __getStyle() {
@@ -439,10 +449,12 @@ class XFullScreenButton extends HTMLElement {
         style.textContent = `
         
             .fs-button-container {
-                padding: 0.7em;
                 background: lightgray;
                 border-radius: 5px;
                 cursor: pointer;
+                width: 35px;
+                height: 35px;
+                display:flex;
             }
 
             .fs-button-container:focus,
@@ -1271,13 +1283,16 @@ class HyperimageController {
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, this.containerID + "-elements", null);
         this.containerManager = new ContainerManager(this.containerID);
+        this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
 
     __videoStateChanged(state, target) {
         switch (state) {
             case ContainerManager.ENTER_FULL_SCREEN:
+                this.__fullScreenStateChanged(true);
+            break;
             case ContainerManager.EXIT_FULL_SCREEN:
-                
+                this.__fullScreenStateChanged(false);
             break;
             default:
         }
@@ -1286,7 +1301,9 @@ class HyperimageController {
     __fullScreenStateChanged (isFullScreen) {
         if (this.tagController != null) {
             this.tagController.fullScreenStateChanged(isFullScreen);
-            this.containerManager.toggleFullScreen();
+        }
+        if (this.fullScreenButton != null) {
+            this.fullScreenButton.isFullScreenActive(isFullScreen);
         }
     }
 
@@ -1307,12 +1324,12 @@ class HyperimageController {
     }
 
     __addFullScreenButton(container) {
-        const fullScreenButton = document.createElement("x-full-screen-button");
+        this.fullScreenButton = document.createElement("x-full-screen-button");
         const thisReference = this;
-        fullScreenButton.onclick = () => {
-            thisReference.__fullScreenStateChanged(true);
+        this.fullScreenButton.clickHandler = () => {
+            thisReference.containerManager.toggleFullScreen();
         };
-        container.appendChild(fullScreenButton);
+        container.appendChild(this.fullScreenButton);
     }
 
     __addImageElement(container) {
