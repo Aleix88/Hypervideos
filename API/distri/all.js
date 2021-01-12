@@ -270,8 +270,7 @@ var VideoTagManager = /*#__PURE__*/function (_ContainerManager) {
   }, {
     key: "restartVideo",
     value: function restartVideo() {
-      var video = document.getElementById(this.containerID).querySelector("video");
-      video.currentTime = 0;
+      this.loadProgress(0);
     }
   }, {
     key: "isVideoPlaying",

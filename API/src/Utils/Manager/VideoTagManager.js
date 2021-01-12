@@ -16,8 +16,7 @@ class VideoTagManager extends ContainerManager {
     }
 
     restartVideo() {
-        const video = document.getElementById(this.containerID).querySelector("video"); 
-        video.currentTime = 0;
+        this.loadProgress(0);
     }
 
     isVideoPlaying() {
