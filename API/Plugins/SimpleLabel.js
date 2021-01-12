@@ -1,18 +1,15 @@
-class SimpleLabel {
+class SimpleLabel extends Plugin {
 
-    constructor() {}
+    constructor() {super();}
 
     onLoad(config, container, elementsContainerID, videoManager) {
-        this.config = config;
-        this.container = container;
-        this.elementsContainerID = elementsContainerID;
-        this.videoManager = videoManager;
-        this.focus = false;
+        super.onLoad(config, container, elementsContainerID, videoManager);
         this.__createLabel();
         document.addEventListener("click", this.__documentClicked.bind(this));
     }
 
     onTagClick(event) {
+        super.onTagClick(event);
         this.focus = true;
         event.stopPropagation();
     }

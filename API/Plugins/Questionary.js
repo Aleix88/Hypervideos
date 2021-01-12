@@ -1,20 +1,15 @@
-class Questionary {
+class Questionary extends Plugin {
 
-    constructor() {}
+    constructor() {super();}
 
-    onLoad(config, container, elementsContainerID, videoManager) {
-        this.config = config;
-        this.container = container;
-        this.elementsContainerID = elementsContainerID;
-        this.videoManager = videoManager;
-        this.focus = false;
-        this.answered = false;
+    onLoad(config, container, elementsContainer, videoManager) {
+        super.onLoad(config, container, elementsContainer, videoManager);
         this.__createQuestionary();
     }
 
     onTagClick(event) {
-        const elementsContainer = document.getElementById(this.elementsContainerID);
-        elementsContainer.style.display = "block";
+        super.onTagClick(event);
+        super.showElementsContainer();
     }
 
     onTagHover(event) {
@@ -28,9 +23,7 @@ class Questionary {
 
     __createQuestionary() {
 
-        const elementsContainer = document.getElementById(this.elementsContainerID);
-
-        const qContainer = document.createElement("div");
+        this.qContainer = document.createElement("div");
         const titleHeader = document.createElement("h2");
         const subtitleElement = document.createElement("p");
         const answersContainer = document.createElement("div");
@@ -42,11 +35,11 @@ class Questionary {
             answersContainer.appendChild(answerDiv);
         });
 
-        qContainer.style.margin = "3em auto";
-        qContainer.style.padding = "1em 0.7em";
-        qContainer.style.background = "white";
-        qContainer.style.maxWidth = "600px";
-        qContainer.style.borderRadius = "5px";
+        this.qContainer.style.margin = "3em auto";
+        this.qContainer.style.padding = "1em 0.7em";
+        this.qContainer.style.background = "white";
+        this.qContainer.style.maxWidth = "600px";
+        this.qContainer.style.borderRadius = "5px";
         titleHeader.textContent = this.config.title;
         titleHeader.style.textAlign = "center";
         titleHeader.style.color = "#07285c";
@@ -58,10 +51,10 @@ class Questionary {
         answersContainer.style.display = "flex";
         answersContainer.style.flexDirection = "column";
 
-        qContainer.appendChild(titleHeader);
-        qContainer.appendChild(subtitleElement);
-        qContainer.appendChild(answersContainer);
-        elementsContainer.appendChild(qContainer);
+        this.qContainer.appendChild(titleHeader);
+        this.qContainer.appendChild(subtitleElement);
+        this.qContainer.appendChild(answersContainer);
+        this.elementsContainer.appendChild(this.qContainer);
     }
 
     __createAnswerElement(text) {

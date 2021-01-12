@@ -89,7 +89,6 @@ class HypervideoController {
         this.__addPauseScreen(container);
         this.tagController.addTagContainer(container);
         this.bottomBarController.addBottomBar(container);
-        this.__addElementsContainer();
     }
 
     addVideoTag(container) {
@@ -159,24 +158,6 @@ class HypervideoController {
         }
     }
 
-    __addElementsContainer() {
-        const elementsContainer = document.createElement("div");
-        elementsContainer.id = this.containerID + "-elements";
-
-        elementsContainer.style.display = "none";
-        elementsContainer.style.position = "fixed";
-        elementsContainer.style.width = "100%";
-        elementsContainer.style.height = "100%";
-        elementsContainer.style.background = "rgba(0,0,0,0.5)";
-        elementsContainer.style.top = "0px";
-        elementsContainer.style.left = "0px";
-        elementsContainer.style.pointerEvents = "all";
-        elementsContainer.addEventListener('click', (event) => {
-            if (elementsContainer !== event.target) {return;}
-            elementsContainer.style.display = "none";
-        });
-
-        document.body.appendChild(elementsContainer);
-    }
+    
 
 }

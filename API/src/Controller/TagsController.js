@@ -1,8 +1,7 @@
 class TagsController {
 
-    constructor(containerID, elementsContainerID, videoManager) {
+    constructor(containerID, videoManager) {
         this.containerID = containerID;
-        this.elementsContainerID = elementsContainerID;
         this.videoManager = videoManager;
         this.htmlManager = new HTMLManager();
         this.plugins = [];
@@ -15,6 +14,7 @@ class TagsController {
 
     addTags(tags, isVisible) {
         this.tags = tags;
+        this.__addElementsContainer();
         for (const tag of this.tags) {
             this.__addTagButton(tag, isVisible);
             let plugin = null;
@@ -38,9 +38,38 @@ class TagsController {
         this.__moveElementsContainer(isFullScreen ? this.tagsContainer :  document.body);
     }
 
+    __addElementsContainer() {
+        this.elementsContainer = document.createElement("div");
+        this.elementsContainer.id = this.containerID + "-elements";
+        
+        this.elementsContainer.style.display = "none";
+        this.elementsContainer.style.position = "fixed";
+        this.elementsContainer.style.width = "100%";
+        this.elementsContainer.style.height = "100%";
+        this.elementsContainer.style.background = "rgba(0,0,0,0.5)";
+        this.elementsContainer.style.top = "0px";
+        this.elementsContainer.style.left = "0px";
+        this.elementsContainer.style.pointerEvents = "all";
+        document.body.appendChild(this.elementsContainer);
+    }
+
+    __createTagElementsContainer(tagID) {
+        const tagElementsContainer = document.createElement("div");
+        tagElementsContainer.classList.add("tag-element-container");
+        tagElementsContainer.id = tagID + "-container";
+        tagElementsContainer.style.display = "none";
+        tagElementsContainer.style.position = "fixed";
+        tagElementsContainer.style.width = "100%";
+        tagElementsContainer.style.height = "100%";
+        tagElementsContainer.style.background = "rgba(0,0,0,0)";
+        tagElementsContainer.style.top = "0px";
+        tagElementsContainer.style.left = "0px";
+        this.elementsContainer.appendChild(tagElementsContainer);
+        return tagElementsContainer;
+    }
+
     __moveElementsContainer(parent) {
-        const elementsContainer = document.getElementById(this.elementsContainerID);
-        parent.appendChild(elementsContainer);
+        parent.appendChild(this.elementsContainer);
     }
 
     __onClickTag(event) {
@@ -81,7 +110,8 @@ class TagsController {
         }
         const pluginName = plugin.name;
         const classInstance = eval(`new ${pluginName}()`);
-        classInstance.onLoad(plugin.config, this.tagsContainer, this.elementsContainerID, this.videoManager);
+        const tagElementsContainer = this.__createTagElementsContainer(tagID);
+        classInstance.onLoad(plugin.config, this.tagsContainer, tagElementsContainer, this.videoManager);
         this.plugins[tagID] = classInstance;
     }
     

@@ -70,9 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         "color": "#45ccbe",
         "plugin": {
-            "name": "SimpleLabel",
+            "name": "Card",
             "config": {
-                "text": "This is a text for the label"
             }
         }
       }

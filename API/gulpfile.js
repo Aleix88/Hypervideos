@@ -6,6 +6,7 @@ const del = require('del');
 const order = require("gulp-order");
 
 const filesOrder = [
+    "Model/Plugin.js",
     "Utils/Observer/**/*.js",
     "Utils/Manager/**/*.js",
     "Utils/*.js",
