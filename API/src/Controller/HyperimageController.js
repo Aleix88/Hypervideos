@@ -37,7 +37,9 @@ class HyperimageController {
 
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
-        const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
+        const container = this.htmlManager.createElement("div", {
+            classList: ["hypervideo-container"]
+        });
 
         hypervideo.appendChild(container);
 
@@ -47,7 +49,7 @@ class HyperimageController {
     }
 
     __addFullScreenButton(container) {
-        this.fullScreenButton = document.createElement("x-full-screen-button");
+        this.fullScreenButton = this.htmlManager.createElement("x-full-screen-button");
         const thisReference = this;
         this.fullScreenButton.clickHandler = () => {
             thisReference.containerManager.toggleFullScreen();
@@ -56,9 +58,10 @@ class HyperimageController {
     }
 
     __addImageElement(container) {
-        const img = document.createElement("img");
-        img.classList.add("hyperimage");
-        img.src = this.imageSRC;
+        const img = this.htmlManager.createElement("img", {
+            classList: ["hyperimage"],
+            src: this.imageSRC
+        });
         container.appendChild(img);
         img.addEventListener('load', this.__imgLoaded.bind(this));
     }

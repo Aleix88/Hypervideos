@@ -78,7 +78,7 @@ class HypervideoController {
 
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
-        const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
+        const container = this.htmlManager.createElement("div", {classList: ["hypervideo-container"]});
 
         hypervideo.appendChild(container);
 
@@ -93,17 +93,21 @@ class HypervideoController {
 
     addVideoTag(container) {
         this.videoElementID = "video-" + this.containerID;
-        const video = this.htmlManager.createElement("video", "", this.videoElementID);
-        video.src = this.videoSRC;
+        const video = this.htmlManager.createElement("video", { 
+            id: this.videoElementID,
+            src: this.videoSRC
+        });
         container.appendChild(video);
         this.videoManager.setupVideo();
     }
 
     addVideoFromYotube(container) {
         this.videoElementID = "video-" + this.containerID;
-        const div = this.htmlManager.createElement("div", ["youtube-frame"]);
-        div.id = this.videoElementID;
-        container.appendChild(div);
+        const youtubeFrameContainer = this.htmlManager.createElement("div", {
+            classList: ["youtube-frame"],
+            id: this.videoElementID
+        });
+        container.appendChild(youtubeFrameContainer);
         this.videoManager.addYoutubeScript(this.videoElementID, this.videoSRC);
     }
 
@@ -119,7 +123,9 @@ class HypervideoController {
     }
 
     addTopBarControlls(container) {
-        const topContainer = this.htmlManager.createElement("div", ["top-controller"]);
+        const topContainer = this.htmlManager.createElement("div", {
+        classList: ["top-controller"]
+    });
         container.appendChild(topContainer);
     }
 

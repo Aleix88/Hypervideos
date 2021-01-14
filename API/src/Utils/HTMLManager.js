@@ -2,30 +2,41 @@ class HTMLManager {
 
     constructor(){}
 
-    createElement(type, elementClass, id) {
+    createElement(type, config) {
         const element = document.createElement(type);
-        if (Array.isArray(elementClass) && elementClass.length > 0) {
-            elementClass.forEach(c => {
+        if (config == null) {return element;}
+        if (config["classList"] != null && Array.isArray(config.classList) && config.classList.length > 0) {
+            config.classList.forEach(c => {
                 element.classList.add(c);
             });
         }
 
-        if (id !== undefined && id !== null) {
-            element.id = id;
+        if (config["id"] != null) {
+            element.id = config.id;
+        }
+
+        if (config["src"] != null) {
+            element.src = config.src;
+        }
+
+        if (config["href"] != null) {
+            element.href = config.href;
+        }
+
+        if (config["textContent"] != null) {
+            element.textContent = config.textContent;
+        }
+
+        if (config["style"] != null) {
+            for (const k of Object.keys(config.style)) {
+                if (element.style[k] !== undefined) {
+                    element.style[k] = config.style[k];
+                }
+            }
         }
 
         return element;
     }
-
-    getShadowElementByID(containerID, id) {
-        const shadowContainer = document.getElementById(containerID).shadowRoot;
-        return shadowContainer.getElementById(id);
-    }
-
-    getShadowElementByClassName(containerID, className) {
-        const shadowContainer = document.getElementById(containerID).shadowRoot;
-        return shadowContainer.querySelector("." + className);
-    } 
 
     hexToRGBA(hexColor, alpha) {
         const r = parseInt(hexColor.slice(1,3), 16);

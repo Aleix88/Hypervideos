@@ -9,10 +9,10 @@ class XVolumeBar extends HTMLElement {
         this.volumeChanged = (()=>{});
         let shadow = this.attachShadow({mode: 'open'});
         
-        const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
+        const container = this.htmlManager.createElement("div", {classList: ["volume-bar-container"]});
         const volumeButton = this.createVolumeButton();
-        const volumeBar = this.htmlManager.createElement("div", ["volume-bar-rect"]);
-        const volumeLevelBar = this.htmlManager.createElement("div", ["volume-bar-level"]);
+        const volumeBar = this.htmlManager.createElement("div", {classList: ["volume-bar-rect"]});
+        const volumeLevelBar = this.htmlManager.createElement("div", {classList: ["volume-bar-level"]});
 
         container.appendChild(volumeButton);
         container.appendChild(volumeBar);
@@ -25,9 +25,9 @@ class XVolumeBar extends HTMLElement {
     }
 
     createVolumeButton() {
-        const buttonContainer = this.htmlManager.createElement("div", ["volume-icon-container"]);
-        const button = this.htmlManager.createElement("button", ["volume-button"]);
-        const icon = this.htmlManager.createElement("i", ["gg-volume"]);
+        const buttonContainer = this.htmlManager.createElement("div", {classList:["volume-icon-container"]});
+        const button = this.htmlManager.createElement("button", {classList:["volume-button"]});
+        const icon = this.htmlManager.createElement("i", {classList:["gg-volume"]});
         buttonContainer.appendChild(button);
         button.appendChild(icon);
         return buttonContainer;

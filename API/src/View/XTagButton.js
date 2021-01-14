@@ -9,9 +9,9 @@ class XTagButton extends HTMLElement {
         this.clickHandler = null;
         this.leaveHandler = null;
 
-        this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
-        this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
-        this.aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
+        this.tagCircleContainer = this.htmlManager.createElement("div", {classList: ["tag-circle-container"]});
+        this.anchor = this.htmlManager.createElement("a", {classList: ["tag-anchor"]});
+        this.aspectRatioDiv = this.htmlManager.createElement("div", {classList: ["aspect-ratio-div"]});
 
         this.shadowRoot.appendChild(this.tagCircleContainer);
         this.shadowRoot.appendChild(this.anchor);

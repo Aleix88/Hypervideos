@@ -11,7 +11,7 @@ class XProgressBar extends HTMLElement {
         let shadow = this.attachShadow({mode: 'open'});
 
         this.__setupEventsListeners();
-        const bar = this.htmlManager.createElement("div", ["progress-bar"]);
+        const bar = this.htmlManager.createElement("div", {classList: ["progress-bar"]});
         shadow.appendChild(this.getStyle());
         shadow.appendChild(bar);
     }
@@ -19,7 +19,7 @@ class XProgressBar extends HTMLElement {
     static POSITION_SET = "POSITION_SET";
 
     addMarkerAt(length) {
-        const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
+        const marker = this.htmlManager.createElement("div", {classList: ["progress-bar-marker"]});
         const progress = this.convertLengthToProgress(length);
         this.shadowRoot.appendChild(marker);
         marker.style.left = progress + "%";

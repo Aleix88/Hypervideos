@@ -7,11 +7,13 @@ const order = require("gulp-order");
 
 const filesOrder = [
     "Model/Plugin.js",
-    "Utils/Observer/**/*.js",
-    "Utils/Manager/**/*.js",
+    "Model/VideoTimer.js",
+    "Model/Observer/**/*.js",
+    "Controller/Manager/**/*.js",
+    "Model/VideoManagerFactory.js",
     "Utils/*.js",
     "View/**/*.js",
-    "Controller/**/*.js"
+    "Controller/*.js"
 ];
 
 function babelTask(cb) {

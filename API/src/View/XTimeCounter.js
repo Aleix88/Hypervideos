@@ -7,8 +7,10 @@ class XTimeCounter extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.currentTime = 0;
         
-        const timeTextElement = this.htmlManager.createElement('p', ['time-text-element']);
-        timeTextElement.textContent = "00:00";
+        const timeTextElement = this.htmlManager.createElement('p', {
+            classList: ['time-text-element'],
+            textContent: "00:00"
+        });
         this.shadowRoot.appendChild(timeTextElement);
         this.shadowRoot.appendChild(this.__getStyle())
     }

@@ -8,7 +8,9 @@ class TagsController {
     }
 
     addTagContainer(container) {
-        this.tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
+        this.tagsContainer = this.htmlManager.createElement("div", {
+            classList: ["tags-container"]
+        });
         container.appendChild(this.tagsContainer);
     }
 
@@ -39,31 +41,37 @@ class TagsController {
     }
 
     __addElementsContainer() {
-        this.elementsContainer = document.createElement("div");
-        this.elementsContainer.id = this.containerID + "-elements";
-        
-        this.elementsContainer.style.display = "none";
-        this.elementsContainer.style.position = "fixed";
-        this.elementsContainer.style.width = "100%";
-        this.elementsContainer.style.height = "100%";
-        this.elementsContainer.style.background = "rgba(0,0,0,0.5)";
-        this.elementsContainer.style.top = "0px";
-        this.elementsContainer.style.left = "0px";
-        this.elementsContainer.style.pointerEvents = "all";
+        this.elementsContainer = this.htmlManager.createElement("div", {
+            id: this.containerID + "-elements", 
+            style: {
+                display: "none",
+                position: "fixed",
+                width: "100%",
+                height: "100%",
+                background: "rgba(0,0,0,0.5)",
+                top: "0px",
+                left: "0px",
+                pointerEvents: "all"
+            }
+        });
         document.body.appendChild(this.elementsContainer);
     }
 
     __createTagElementsContainer(tagID) {
-        const tagElementsContainer = document.createElement("div");
-        tagElementsContainer.classList.add("tag-element-container");
-        tagElementsContainer.id = tagID + "-container";
-        tagElementsContainer.style.display = "none";
-        tagElementsContainer.style.position = "fixed";
-        tagElementsContainer.style.width = "100%";
-        tagElementsContainer.style.height = "100%";
-        tagElementsContainer.style.background = "rgba(0,0,0,0)";
-        tagElementsContainer.style.top = "0px";
-        tagElementsContainer.style.left = "0px";
+        const tagElementsContainer = this.htmlManager.createElement("div", {
+            classList: ["tag-element-container"],
+            id: tagID + "-container",
+            style: {
+                display: "none",
+                position: "fixed",
+                width: "100%",
+                height: "100%",
+                background: "rgba(0,0,0,0)",
+                top: "0px",
+                left: "0px",
+            }
+        });
+        
         this.elementsContainer.appendChild(tagElementsContainer);
         return tagElementsContainer;
     }
@@ -116,12 +124,13 @@ class TagsController {
     }
     
     __addTagButton(tag, isVisible) {
-        const tagElement = document.createElement('x-tag-button');
+        const tagElement = this.htmlManager.createElement('x-tag-button', {
+            id: tag.id
+        });
         this.tagsContainer.appendChild(tagElement);
         tagElement.hexColor = tag.color ? tag.color : "#FFFFFF";
         tagElement.position = tag.position;
         tagElement.isVisible = isVisible;
-        tagElement.id = tag.id;
         tagElement.clickHandler = this.__onClickTag.bind(this);
         tagElement.hoverHandler = this.__onHoverTag.bind(this);
         tagElement.leaveHandler = this.__onLeaveTag.bind(this);

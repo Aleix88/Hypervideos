@@ -6,7 +6,7 @@ class XPauseScreen extends HTMLElement {
         this.didClick = null;
 
         let shadow = this.attachShadow({mode: 'open'});
-        const container = this.htmlManager.createElement('div', ["pause-container"]);
+        const container = this.htmlManager.createElement('div', {classList: ["pause-container"]});
         container.addEventListener('click', this.__onClick.bind(this));
         //this.__addPlayIcon(container);
         shadow.appendChild(container);
@@ -28,7 +28,7 @@ class XPauseScreen extends HTMLElement {
     }
 
     __addPlayIcon(container) {
-        const img = this.htmlManager.createElement("img", ["play-image"]);
+        const img = this.htmlManager.createElement("img", {classList: ["play-image"]});
         img.src = "./../../API/assets/play-button.svg";
         container.appendChild(img);
     }

@@ -3,6 +3,7 @@ class XFullScreenButton extends HTMLElement {
     constructor() {
         super();
         this.clickHandler = null;
+        this.htmlManager = new HTMLManager();
         let shadow = this.attachShadow({mode: 'open'});
         const button = this.__createButton();
         shadow.append(button);
@@ -10,11 +11,9 @@ class XFullScreenButton extends HTMLElement {
     }
 
     __createButton() {
-        const buttonContainer = document.createElement("div");
-        buttonContainer.classList.add("fs-button-container");
+        const buttonContainer = this.htmlManager.createElement("div", {classList: ["fs-button-container"]});
         buttonContainer.addEventListener('click', this.__buttonClicked.bind(this));
-        this.icon = document.createElement("i");
-        this.icon.classList.add("gg-maximize");
+        this.icon = this.htmlManager.createElement("i", {classList: "gg-maximize"});
         buttonContainer.appendChild(this.icon);
         return buttonContainer;
     }

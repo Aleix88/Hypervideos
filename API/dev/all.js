@@ -38,6 +38,43 @@ class Plugin {
     }
 
 }
+class VideoTimer {
+
+    constructor (timeHandler) {
+        this.loopCounter = 0;
+        this.timeHandler = timeHandler;
+        this.timer = null;
+        this.isPlaying = false;
+    }
+    
+    static get LOOP_TIME() {
+        return 100;
+    }
+
+    play() {
+        if (this.isPlaying === true) {return;} 
+        this.timer = setInterval(this.__handleTime.bind(this), VideoTimer.LOOP_TIME);
+        this.isPlaying = true;
+    }
+
+    pause() {
+        clearInterval(this.timer);
+        this.isPlaying = false;
+    }
+
+    loadOffset(offset) {
+        this.loopCounter = parseInt(offset/ VideoTimer.LOOP_TIME);
+    }
+
+    __handleTime() {
+        this.loopCounter++;
+        if (this.loopCounter >= 10) {
+            this.timeHandler();
+            this.loopCounter = 0;
+        }
+    }
+
+}
 class Observer {
 
     constructor(onChange) {
@@ -164,18 +201,6 @@ class ContainerManager extends Subject {
         }
     }
 }
-class VideoManagerFactory {
-
-    create(hypervideoType, containerID) {
-        switch(hypervideoType) {
-            case Hypervideo.YOUTUBE_TYPE:
-                return new YoutubeVideoManager(containerID);
-            default:
-                return new VideoTagManager(containerID);    
-        }
-    }
-
-}
 class VideoTagManager extends ContainerManager {
 
     constructor (containerID) {
@@ -247,7 +272,7 @@ class VideoTagManager extends ContainerManager {
     setVolume(volume) {
         volume = volume > 1 ? 1 : volume;
         volume = volume < 0 ? 0 : volume;
-        const video = this.htmlManager.getShadowElementByID(this.containerID, this.videoElementID);
+        const video = document.getElementById(this.containerID).querySelector("video"); 
         video.volume = volume;
     }
 
@@ -372,34 +397,57 @@ class YoutubeVideoManager extends ContainerManager {
     }
 }
 
+class VideoManagerFactory {
+
+    create(hypervideoType, containerID) {
+        switch(hypervideoType) {
+            case Hypervideo.YOUTUBE_TYPE:
+                return new YoutubeVideoManager(containerID);
+            default:
+                return new VideoTagManager(containerID);    
+        }
+    }
+
+}
 class HTMLManager {
 
     constructor(){}
 
-    createElement(type, elementClass, id) {
+    createElement(type, config) {
         const element = document.createElement(type);
-        if (Array.isArray(elementClass) && elementClass.length > 0) {
-            elementClass.forEach(c => {
+        if (config == null) {return element;}
+        if (config["classList"] != null && Array.isArray(config.classList) && config.classList.length > 0) {
+            config.classList.forEach(c => {
                 element.classList.add(c);
             });
         }
 
-        if (id !== undefined && id !== null) {
-            element.id = id;
+        if (config["id"] != null) {
+            element.id = config.id;
+        }
+
+        if (config["src"] != null) {
+            element.src = config.src;
+        }
+
+        if (config["href"] != null) {
+            element.href = config.href;
+        }
+
+        if (config["textContent"] != null) {
+            element.textContent = config.textContent;
+        }
+
+        if (config["style"] != null) {
+            for (const k of Object.keys(config.style)) {
+                if (element.style[k] !== undefined) {
+                    element.style[k] = config.style[k];
+                }
+            }
         }
 
         return element;
     }
-
-    getShadowElementByID(containerID, id) {
-        const shadowContainer = document.getElementById(containerID).shadowRoot;
-        return shadowContainer.getElementById(id);
-    }
-
-    getShadowElementByClassName(containerID, className) {
-        const shadowContainer = document.getElementById(containerID).shadowRoot;
-        return shadowContainer.querySelector("." + className);
-    } 
 
     hexToRGBA(hexColor, alpha) {
         const r = parseInt(hexColor.slice(1,3), 16);
@@ -410,48 +458,12 @@ class HTMLManager {
     }
 
 }
-class VideoTimer {
-
-    constructor (timeHandler) {
-        this.loopCounter = 0;
-        this.timeHandler = timeHandler;
-        this.timer = null;
-        this.isPlaying = false;
-    }
-    
-    static get LOOP_TIME() {
-        return 100;
-    }
-
-    play() {
-        if (this.isPlaying === true) {return;} 
-        this.timer = setInterval(this.__handleTime.bind(this), VideoTimer.LOOP_TIME);
-        this.isPlaying = true;
-    }
-
-    pause() {
-        clearInterval(this.timer);
-        this.isPlaying = false;
-    }
-
-    loadOffset(offset) {
-        this.loopCounter = parseInt(offset/ VideoTimer.LOOP_TIME);
-    }
-
-    __handleTime() {
-        this.loopCounter++;
-        if (this.loopCounter >= 10) {
-            this.timeHandler();
-            this.loopCounter = 0;
-        }
-    }
-
-}
 class XFullScreenButton extends HTMLElement {
     
     constructor() {
         super();
         this.clickHandler = null;
+        this.htmlManager = new HTMLManager();
         let shadow = this.attachShadow({mode: 'open'});
         const button = this.__createButton();
         shadow.append(button);
@@ -459,11 +471,9 @@ class XFullScreenButton extends HTMLElement {
     }
 
     __createButton() {
-        const buttonContainer = document.createElement("div");
-        buttonContainer.classList.add("fs-button-container");
+        const buttonContainer = this.htmlManager.createElement("div", {classList: ["fs-button-container"]});
         buttonContainer.addEventListener('click', this.__buttonClicked.bind(this));
-        this.icon = document.createElement("i");
-        this.icon.classList.add("gg-maximize");
+        this.icon = this.htmlManager.createElement("i", {classList: "gg-maximize"});
         buttonContainer.appendChild(this.icon);
         return buttonContainer;
     }
@@ -572,7 +582,7 @@ class XPauseScreen extends HTMLElement {
         this.didClick = null;
 
         let shadow = this.attachShadow({mode: 'open'});
-        const container = this.htmlManager.createElement('div', ["pause-container"]);
+        const container = this.htmlManager.createElement('div', {classList: ["pause-container"]});
         container.addEventListener('click', this.__onClick.bind(this));
         //this.__addPlayIcon(container);
         shadow.appendChild(container);
@@ -594,7 +604,7 @@ class XPauseScreen extends HTMLElement {
     }
 
     __addPlayIcon(container) {
-        const img = this.htmlManager.createElement("img", ["play-image"]);
+        const img = this.htmlManager.createElement("img", {classList: ["play-image"]});
         img.src = "./../../API/assets/play-button.svg";
         container.appendChild(img);
     }
@@ -642,7 +652,7 @@ class XProgressBar extends HTMLElement {
         let shadow = this.attachShadow({mode: 'open'});
 
         this.__setupEventsListeners();
-        const bar = this.htmlManager.createElement("div", ["progress-bar"]);
+        const bar = this.htmlManager.createElement("div", {classList: ["progress-bar"]});
         shadow.appendChild(this.getStyle());
         shadow.appendChild(bar);
     }
@@ -650,7 +660,7 @@ class XProgressBar extends HTMLElement {
     static POSITION_SET = "POSITION_SET";
 
     addMarkerAt(length) {
-        const marker = this.htmlManager.createElement("div", ["progress-bar-marker"]);
+        const marker = this.htmlManager.createElement("div", {classList: ["progress-bar-marker"]});
         const progress = this.convertLengthToProgress(length);
         this.shadowRoot.appendChild(marker);
         marker.style.left = progress + "%";
@@ -757,9 +767,9 @@ class XTagButton extends HTMLElement {
         this.clickHandler = null;
         this.leaveHandler = null;
 
-        this.tagCircleContainer = this.htmlManager.createElement("div", ["tag-circle-container"]);
-        this.anchor = this.htmlManager.createElement("a", ["tag-anchor"]);
-        this.aspectRatioDiv = this.htmlManager.createElement("div", ["aspect-ratio-div"]);
+        this.tagCircleContainer = this.htmlManager.createElement("div", {classList: ["tag-circle-container"]});
+        this.anchor = this.htmlManager.createElement("a", {classList: ["tag-anchor"]});
+        this.aspectRatioDiv = this.htmlManager.createElement("div", {classList: ["aspect-ratio-div"]});
 
         this.shadowRoot.appendChild(this.tagCircleContainer);
         this.shadowRoot.appendChild(this.anchor);
@@ -946,8 +956,10 @@ class XTimeCounter extends HTMLElement {
         this.htmlManager = new HTMLManager();
         this.currentTime = 0;
         
-        const timeTextElement = this.htmlManager.createElement('p', ['time-text-element']);
-        timeTextElement.textContent = "00:00";
+        const timeTextElement = this.htmlManager.createElement('p', {
+            classList: ['time-text-element'],
+            textContent: "00:00"
+        });
         this.shadowRoot.appendChild(timeTextElement);
         this.shadowRoot.appendChild(this.__getStyle())
     }
@@ -991,10 +1003,10 @@ class XVolumeBar extends HTMLElement {
         this.volumeChanged = (()=>{});
         let shadow = this.attachShadow({mode: 'open'});
         
-        const container = this.htmlManager.createElement("div", ["volume-bar-container"]);
+        const container = this.htmlManager.createElement("div", {classList: ["volume-bar-container"]});
         const volumeButton = this.createVolumeButton();
-        const volumeBar = this.htmlManager.createElement("div", ["volume-bar-rect"]);
-        const volumeLevelBar = this.htmlManager.createElement("div", ["volume-bar-level"]);
+        const volumeBar = this.htmlManager.createElement("div", {classList: ["volume-bar-rect"]});
+        const volumeLevelBar = this.htmlManager.createElement("div", {classList: ["volume-bar-level"]});
 
         container.appendChild(volumeButton);
         container.appendChild(volumeBar);
@@ -1007,9 +1019,9 @@ class XVolumeBar extends HTMLElement {
     }
 
     createVolumeButton() {
-        const buttonContainer = this.htmlManager.createElement("div", ["volume-icon-container"]);
-        const button = this.htmlManager.createElement("button", ["volume-button"]);
-        const icon = this.htmlManager.createElement("i", ["gg-volume"]);
+        const buttonContainer = this.htmlManager.createElement("div", {classList:["volume-icon-container"]});
+        const button = this.htmlManager.createElement("button", {classList:["volume-button"]});
+        const icon = this.htmlManager.createElement("i", {classList:["gg-volume"]});
         buttonContainer.appendChild(button);
         button.appendChild(icon);
         return buttonContainer;
@@ -1195,7 +1207,10 @@ class BottomBarController {
     }
 
     addBottomBar(container) {
-        const bottomController = this.htmlManager.createElement("div",["bottom-controller"]);
+        
+        const bottomController = this.htmlManager.createElement("div", {
+            classList: ["bottom-controller"]
+        });
         container.appendChild(bottomController);
         this.playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
         this.replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
@@ -1266,14 +1281,22 @@ class BottomBarController {
     }
 
     createTimeCounter() {
-        const timeCounter = this.htmlManager.createElement("x-time-counter", ["time-counter"]);
+        const timeCounter = this.htmlManager.createElement("x-time-counter", {
+            classList: ["time-counter"]
+        });
         return timeCounter;
     }
 
     createControlButton(buttonClass, buttonIcon, eventHandler) {
-        const buttonContainer = this.htmlManager.createElement("div", ["control-button-container"]);
-        const button = this.htmlManager.createElement("button", ["control-button",buttonClass]);
-        const icon = this.htmlManager.createElement("i", [buttonIcon]);
+        const buttonContainer = this.htmlManager.createElement("div", {
+            classList: ["control-button-container"]
+        });
+        const button = this.htmlManager.createElement("button", {
+             classList: ["control-button",buttonClass]
+        });
+        const icon = this.htmlManager.createElement("i", {
+            classList: [buttonIcon]
+        });
         buttonContainer.appendChild(button);
         button.appendChild(icon);
         if (eventHandler !== null && eventHandler !== undefined) {
@@ -1283,7 +1306,9 @@ class BottomBarController {
     }
 
     createProgressBar() {
-        const progressBar = this.htmlManager.createElement("x-progress-bar", ["progress-container"]);
+        const progressBar = this.htmlManager.createElement("x-progress-bar", {
+            classList: ["progress-container"]
+        });
         progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
         if (this.videoLength !== null) {
             progressBar.setMaxLength(this.videoLength);
@@ -1303,7 +1328,9 @@ class BottomBarController {
     }
 
     createVolumeBar() {
-        const volumeBar = this.htmlManager.createElement("x-volume-bar", ["volume-bar"]);
+        const volumeBar = this.htmlManager.createElement("x-volume-bar", {
+            classList: ["volume-bar"]
+        });
         volumeBar.volumeChanged = this.__volumeChanged.bind(this);
         return volumeBar;
     }
@@ -1352,7 +1379,9 @@ class HyperimageController {
 
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
-        const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
+        const container = this.htmlManager.createElement("div", {
+            classList: ["hypervideo-container"]
+        });
 
         hypervideo.appendChild(container);
 
@@ -1362,7 +1391,7 @@ class HyperimageController {
     }
 
     __addFullScreenButton(container) {
-        this.fullScreenButton = document.createElement("x-full-screen-button");
+        this.fullScreenButton = this.htmlManager.createElement("x-full-screen-button");
         const thisReference = this;
         this.fullScreenButton.clickHandler = () => {
             thisReference.containerManager.toggleFullScreen();
@@ -1371,9 +1400,10 @@ class HyperimageController {
     }
 
     __addImageElement(container) {
-        const img = document.createElement("img");
-        img.classList.add("hyperimage");
-        img.src = this.imageSRC;
+        const img = this.htmlManager.createElement("img", {
+            classList: ["hyperimage"],
+            src: this.imageSRC
+        });
         container.appendChild(img);
         img.addEventListener('load', this.__imgLoaded.bind(this));
     }
@@ -1837,7 +1867,7 @@ class HypervideoController {
 
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
-        const container = this.htmlManager.createElement("div", ["hypervideo-container"]);
+        const container = this.htmlManager.createElement("div", {classList: ["hypervideo-container"]});
 
         hypervideo.appendChild(container);
 
@@ -1852,17 +1882,21 @@ class HypervideoController {
 
     addVideoTag(container) {
         this.videoElementID = "video-" + this.containerID;
-        const video = this.htmlManager.createElement("video", "", this.videoElementID);
-        video.src = this.videoSRC;
+        const video = this.htmlManager.createElement("video", { 
+            id: this.videoElementID,
+            src: this.videoSRC
+        });
         container.appendChild(video);
         this.videoManager.setupVideo();
     }
 
     addVideoFromYotube(container) {
         this.videoElementID = "video-" + this.containerID;
-        const div = this.htmlManager.createElement("div", ["youtube-frame"]);
-        div.id = this.videoElementID;
-        container.appendChild(div);
+        const youtubeFrameContainer = this.htmlManager.createElement("div", {
+            classList: ["youtube-frame"],
+            id: this.videoElementID
+        });
+        container.appendChild(youtubeFrameContainer);
         this.videoManager.addYoutubeScript(this.videoElementID, this.videoSRC);
     }
 
@@ -1878,7 +1912,9 @@ class HypervideoController {
     }
 
     addTopBarControlls(container) {
-        const topContainer = this.htmlManager.createElement("div", ["top-controller"]);
+        const topContainer = this.htmlManager.createElement("div", {
+        classList: ["top-controller"]
+    });
         container.appendChild(topContainer);
     }
 
@@ -1931,7 +1967,9 @@ class TagsController {
     }
 
     addTagContainer(container) {
-        this.tagsContainer = this.htmlManager.createElement("div", ["tags-container"]);
+        this.tagsContainer = this.htmlManager.createElement("div", {
+            classList: ["tags-container"]
+        });
         container.appendChild(this.tagsContainer);
     }
 
@@ -1962,31 +2000,37 @@ class TagsController {
     }
 
     __addElementsContainer() {
-        this.elementsContainer = document.createElement("div");
-        this.elementsContainer.id = this.containerID + "-elements";
-        
-        this.elementsContainer.style.display = "none";
-        this.elementsContainer.style.position = "fixed";
-        this.elementsContainer.style.width = "100%";
-        this.elementsContainer.style.height = "100%";
-        this.elementsContainer.style.background = "rgba(0,0,0,0.5)";
-        this.elementsContainer.style.top = "0px";
-        this.elementsContainer.style.left = "0px";
-        this.elementsContainer.style.pointerEvents = "all";
+        this.elementsContainer = this.htmlManager.createElement("div", {
+            id: this.containerID + "-elements", 
+            style: {
+                display: "none",
+                position: "fixed",
+                width: "100%",
+                height: "100%",
+                background: "rgba(0,0,0,0.5)",
+                top: "0px",
+                left: "0px",
+                pointerEvents: "all"
+            }
+        });
         document.body.appendChild(this.elementsContainer);
     }
 
     __createTagElementsContainer(tagID) {
-        const tagElementsContainer = document.createElement("div");
-        tagElementsContainer.classList.add("tag-element-container");
-        tagElementsContainer.id = tagID + "-container";
-        tagElementsContainer.style.display = "none";
-        tagElementsContainer.style.position = "fixed";
-        tagElementsContainer.style.width = "100%";
-        tagElementsContainer.style.height = "100%";
-        tagElementsContainer.style.background = "rgba(0,0,0,0)";
-        tagElementsContainer.style.top = "0px";
-        tagElementsContainer.style.left = "0px";
+        const tagElementsContainer = this.htmlManager.createElement("div", {
+            classList: ["tag-element-container"],
+            id: tagID + "-container",
+            style: {
+                display: "none",
+                position: "fixed",
+                width: "100%",
+                height: "100%",
+                background: "rgba(0,0,0,0)",
+                top: "0px",
+                left: "0px",
+            }
+        });
+        
         this.elementsContainer.appendChild(tagElementsContainer);
         return tagElementsContainer;
     }
@@ -2039,12 +2083,13 @@ class TagsController {
     }
     
     __addTagButton(tag, isVisible) {
-        const tagElement = document.createElement('x-tag-button');
+        const tagElement = this.htmlManager.createElement('x-tag-button', {
+            id: tag.id
+        });
         this.tagsContainer.appendChild(tagElement);
         tagElement.hexColor = tag.color ? tag.color : "#FFFFFF";
         tagElement.position = tag.position;
         tagElement.isVisible = isVisible;
-        tagElement.id = tag.id;
         tagElement.clickHandler = this.__onClickTag.bind(this);
         tagElement.hoverHandler = this.__onHoverTag.bind(this);
         tagElement.leaveHandler = this.__onLeaveTag.bind(this);
