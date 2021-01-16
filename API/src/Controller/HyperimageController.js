@@ -1,9 +1,9 @@
 class HyperimageController {
 
-    constructor(imageSRC, containerID, tags){
+    constructor(imageSRC, containerID, config){
         this.containerID = containerID;
         this.imageSRC = imageSRC;
-        this.tags = tags;
+        this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, this.containerID + "-elements", null);
         this.containerManager = new ContainerManager(this.containerID);
@@ -67,8 +67,8 @@ class HyperimageController {
     }
 
     __addTags() {
-        this.tagController.addTags(this.tags, false);
-        for (const tag of this.tags) {
+        this.tagController.addTags(this.config.tags, false);
+        for (const tag of this.config.tags) {
             this.tagController.setTagVisible(tag.id, true);
         }
     }

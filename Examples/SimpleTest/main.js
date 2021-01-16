@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const tagsJSON = `{
+    "videoTitle": "Video title",
     "tags": [
       {
         "position": {

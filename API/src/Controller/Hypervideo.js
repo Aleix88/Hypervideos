@@ -14,7 +14,7 @@ class Hypervideo {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
-    setupHypervideo(tagsJSON) {
+    setupHypervideo(configJSON) {
 
         this.__addGlobalStyle();
         
@@ -26,30 +26,30 @@ class Hypervideo {
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
 
-        this.tags = this.__tagsJSONToObject(tagsJSON);
+        this.config = this.__configJSONToObject(configJSON);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
-            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.tags);
+            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config);
             hyperImageController.createSkeleton();
         } else {
             const videoManagerFactory = new VideoManagerFactory();
             const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
     
-            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
+            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.config);
             hypervideoController.createSkeleton();
         }
 
     }
 
-    __tagsJSONToObject(tagsJSON) {
+    __configJSONToObject(configJSON) {
         try {
-            let tagsConfig = JSON.parse(tagsJSON).tags;
+            let config = JSON.parse(configJSON);
             let i = 0;
-            tagsConfig = tagsConfig.map((t) => {
+            config.tags = config.tags.map((t) => {
                 t.id = this.containerID + "-tag-" + i++;
                 return t;
             })
-            return tagsConfig;
+            return config;
         } catch(error) {
             throw "Error: Not valid JSON";
         }
@@ -113,18 +113,32 @@ class Hypervideo {
             -webkit-user-select: none;
             -ms-user-select: none;
         }
-
-        .hypervideo-container-fullscreen {
-
-        }
         
         /* Top control bar */
         .top-controller {
-            background-color: rgba(0, 150, 0, 0.37);;
+            background: rgb(0,0,0);
+            background: linear-gradient(180deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .top-title {
+            color:white;
+            margin: 1em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+
+        .hypervideo-container:hover > .top-controller,
+        .hypervideo-container:focus > .top-controller {
+            opacity: 1;
         }
         
 
@@ -158,8 +172,8 @@ class Hypervideo {
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgb(2,0,36);
-            background: linear-gradient(0deg, rgba(2,0,36,1) 30%, rgba(0,212,255,0) 100%);
+            background: rgb(0,0,0);
+            background: linear-gradient(0deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
             padding: 4px;
             transition: opacity 0.2s;
         }

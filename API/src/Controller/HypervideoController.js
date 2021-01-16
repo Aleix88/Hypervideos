@@ -1,15 +1,16 @@
 class HypervideoController {
 
-    constructor(videoSRC, videoType, containerID, videoManager, tags){
+    constructor(videoSRC, videoType, containerID, videoManager, config){
         this.videoLength = null;
         this.containerID = containerID;
         this.videoSRC = videoSRC;
         this.videoManager = videoManager;
         this.videoType = videoType;
-        this.tags = tags;
+        this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
-        this.bottomBarController = new BottomBarController(this, containerID, tags);
+        this.bottomBarController = new BottomBarController(this, containerID, this.config.tags);
+        this.topBarController = new TopBarController(this, containerID);
         this.tagController = new TagsController(this.containerID, this.containerID + "-elements",videoManager);
     }
 
@@ -84,7 +85,7 @@ class HypervideoController {
 
         this.addVideoElement(container);
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
-            this.addTopBarControlls(container);
+            this.topBarController.addTopBar(container, this.config.videoTitle);
         }
         this.__addPauseScreen(container);
         this.tagController.addTagContainer(container);
@@ -122,13 +123,6 @@ class HypervideoController {
         }
     }
 
-    addTopBarControlls(container) {
-        const topContainer = this.htmlManager.createElement("div", {
-        classList: ["top-controller"]
-    });
-        container.appendChild(topContainer);
-    }
-
     __addPauseScreen(container) {
         const pauseScreen = this.htmlManager.createElement("x-pause-screen");
         const thisReference = this;
@@ -152,11 +146,11 @@ class HypervideoController {
     }
 
     __addTags() {
-        this.tagController.addTags(this.tags, false);
+        this.tagController.addTags(this.config.tags, false);
     }
 
     __manageTags(time) {
-        for (const tag of this.tags) {
+        for (const tag of this.config.tags) {
             const tagTimestamp = tag.timeConfig.timestamp;
             const tagDuration = tag.timeConfig.duration;
             const isVisible = time >= tagTimestamp && time < tagTimestamp + tagDuration;

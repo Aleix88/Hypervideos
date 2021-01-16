@@ -1342,10 +1342,10 @@ class BottomBarController {
 }
 class HyperimageController {
 
-    constructor(imageSRC, containerID, tags){
+    constructor(imageSRC, containerID, config){
         this.containerID = containerID;
         this.imageSRC = imageSRC;
-        this.tags = tags;
+        this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, this.containerID + "-elements", null);
         this.containerManager = new ContainerManager(this.containerID);
@@ -1409,8 +1409,8 @@ class HyperimageController {
     }
 
     __addTags() {
-        this.tagController.addTags(this.tags, false);
-        for (const tag of this.tags) {
+        this.tagController.addTags(this.config.tags, false);
+        for (const tag of this.config.tags) {
             this.tagController.setTagVisible(tag.id, true);
         }
     }
@@ -1435,7 +1435,7 @@ class Hypervideo {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
-    setupHypervideo(tagsJSON) {
+    setupHypervideo(configJSON) {
 
         this.__addGlobalStyle();
         
@@ -1447,30 +1447,30 @@ class Hypervideo {
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
 
-        this.tags = this.__tagsJSONToObject(tagsJSON);
+        this.config = this.__configJSONToObject(configJSON);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
-            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.tags);
+            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config);
             hyperImageController.createSkeleton();
         } else {
             const videoManagerFactory = new VideoManagerFactory();
             const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
     
-            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.tags);
+            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.config);
             hypervideoController.createSkeleton();
         }
 
     }
 
-    __tagsJSONToObject(tagsJSON) {
+    __configJSONToObject(configJSON) {
         try {
-            let tagsConfig = JSON.parse(tagsJSON).tags;
+            let config = JSON.parse(configJSON);
             let i = 0;
-            tagsConfig = tagsConfig.map((t) => {
+            config.tags = config.tags.map((t) => {
                 t.id = this.containerID + "-tag-" + i++;
                 return t;
             })
-            return tagsConfig;
+            return config;
         } catch(error) {
             throw "Error: Not valid JSON";
         }
@@ -1534,18 +1534,32 @@ class Hypervideo {
             -webkit-user-select: none;
             -ms-user-select: none;
         }
-
-        .hypervideo-container-fullscreen {
-
-        }
         
         /* Top control bar */
         .top-controller {
-            background-color: rgba(0, 150, 0, 0.37);;
+            background: rgb(0,0,0);
+            background: linear-gradient(180deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .top-title {
+            color:white;
+            margin: 1em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+        }
+
+        .hypervideo-container:hover > .top-controller,
+        .hypervideo-container:focus > .top-controller {
+            opacity: 1;
         }
         
 
@@ -1579,8 +1593,8 @@ class Hypervideo {
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgb(2,0,36);
-            background: linear-gradient(0deg, rgba(2,0,36,1) 30%, rgba(0,212,255,0) 100%);
+            background: rgb(0,0,0);
+            background: linear-gradient(0deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
             padding: 4px;
             transition: opacity 0.2s;
         }
@@ -1789,16 +1803,17 @@ class Hypervideo {
 }
 class HypervideoController {
 
-    constructor(videoSRC, videoType, containerID, videoManager, tags){
+    constructor(videoSRC, videoType, containerID, videoManager, config){
         this.videoLength = null;
         this.containerID = containerID;
         this.videoSRC = videoSRC;
         this.videoManager = videoManager;
         this.videoType = videoType;
-        this.tags = tags;
+        this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
-        this.bottomBarController = new BottomBarController(this, containerID, tags);
+        this.bottomBarController = new BottomBarController(this, containerID, this.config.tags);
+        this.topBarController = new TopBarController(this, containerID);
         this.tagController = new TagsController(this.containerID, this.containerID + "-elements",videoManager);
     }
 
@@ -1873,7 +1888,7 @@ class HypervideoController {
 
         this.addVideoElement(container);
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
-            this.addTopBarControlls(container);
+            this.topBarController.addTopBar(container, this.config.videoTitle);
         }
         this.__addPauseScreen(container);
         this.tagController.addTagContainer(container);
@@ -1911,13 +1926,6 @@ class HypervideoController {
         }
     }
 
-    addTopBarControlls(container) {
-        const topContainer = this.htmlManager.createElement("div", {
-        classList: ["top-controller"]
-    });
-        container.appendChild(topContainer);
-    }
-
     __addPauseScreen(container) {
         const pauseScreen = this.htmlManager.createElement("x-pause-screen");
         const thisReference = this;
@@ -1941,11 +1949,11 @@ class HypervideoController {
     }
 
     __addTags() {
-        this.tagController.addTags(this.tags, false);
+        this.tagController.addTags(this.config.tags, false);
     }
 
     __manageTags(time) {
-        for (const tag of this.tags) {
+        for (const tag of this.config.tags) {
             const tagTimestamp = tag.timeConfig.timestamp;
             const tagDuration = tag.timeConfig.duration;
             const isVisible = time >= tagTimestamp && time < tagTimestamp + tagDuration;
@@ -2094,4 +2102,28 @@ class TagsController {
         tagElement.hoverHandler = this.__onHoverTag.bind(this);
         tagElement.leaveHandler = this.__onLeaveTag.bind(this);
     }
+}
+class TopBarController {
+
+    constructor (hypervideoController, containerID) {
+        this.hypervideoController = hypervideoController;
+        this.htmlManager = new HTMLManager();
+        this.containerID = containerID;
+    }
+
+    addTopBar(container, videoTitle) {
+        const topContainer = this.htmlManager.createElement("div", {
+            classList: ["top-controller"]
+        });
+        const titleHeader = this.htmlManager.createElement("h3", {
+            classList: ["top-title"],
+            textContent: videoTitle
+        });
+
+        topContainer.appendChild(titleHeader);
+        container.appendChild(topContainer);
+    }
+
+
+    
 }
