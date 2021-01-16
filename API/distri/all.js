@@ -701,7 +701,7 @@ var XFullScreenButton = /*#__PURE__*/function (_HTMLElement) {
       });
       buttonContainer.addEventListener('click', this.__buttonClicked.bind(this));
       this.icon = this.htmlManager.createElement("i", {
-        classList: "gg-maximize"
+        classList: ["gg-maximize"]
       });
       buttonContainer.appendChild(this.icon);
       return buttonContainer;

@@ -13,7 +13,7 @@ class XFullScreenButton extends HTMLElement {
     __createButton() {
         const buttonContainer = this.htmlManager.createElement("div", {classList: ["fs-button-container"]});
         buttonContainer.addEventListener('click', this.__buttonClicked.bind(this));
-        this.icon = this.htmlManager.createElement("i", {classList: "gg-maximize"});
+        this.icon = this.htmlManager.createElement("i", {classList: ["gg-maximize"]});
         buttonContainer.appendChild(this.icon);
         return buttonContainer;
     }
