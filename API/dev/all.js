@@ -1347,7 +1347,7 @@ class HyperimageController {
         this.imageSRC = imageSRC;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
-        this.tagController = new TagsController(this.containerID, this.containerID + "-elements", null);
+        this.tagController = new TagsController(this.containerID, null);
         this.containerManager = new ContainerManager(this.containerID);
         this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
@@ -1814,7 +1814,7 @@ class HypervideoController {
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
         this.bottomBarController = new BottomBarController(this, containerID, this.config.tags);
         this.topBarController = new TopBarController(this, containerID);
-        this.tagController = new TagsController(this.containerID, this.containerID + "-elements",videoManager);
+        this.tagController = new TagsController(this.containerID, videoManager);
     }
 
     __videoStateChanged(state, target) {

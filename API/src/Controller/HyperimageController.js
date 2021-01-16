@@ -5,7 +5,7 @@ class HyperimageController {
         this.imageSRC = imageSRC;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
-        this.tagController = new TagsController(this.containerID, this.containerID + "-elements", null);
+        this.tagController = new TagsController(this.containerID, null);
         this.containerManager = new ContainerManager(this.containerID);
         this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }

@@ -10,12 +10,16 @@ class Questionary extends Plugin {
     onTagClick(event) {
         super.onTagClick(event);
         super.showElementsContainer();
+        if (this.videoManager != null) {
+            this.videoManager.pause();
+        }
     }
 
     onTagHover(event) {
     }
 
     onTagLeave(event) {
+
     }
 
     fullScreenStateChanged(isFullScreen) {
