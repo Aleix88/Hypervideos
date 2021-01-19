@@ -13,12 +13,12 @@ class BottomBarController {
             classList: ["bottom-controller"]
         });
         container.appendChild(bottomController);
-        this.playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
-        this.replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
-        this.fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
-        this.timeCounter = this.createTimeCounter();
-        this.progressBar = this.createProgressBar();
-        this.volumeBar = this.createVolumeBar();
+        this.playButton = this.__createControlButton("control-play-button", "gg-play-button", this.__playButtonClicked);
+        this.replayButton = this.__createControlButton("control-repeat-button", "gg-repeat", this.__restartVideo);
+        this.fullScreenButton = this.__createControlButton( "control-full-screen-button", "gg-maximize", this.__toggleFullScreen);
+        this.timeCounter = this.__createTimeCounter();
+        this.progressBar = this.__createProgressBar();
+        this.volumeBar = this.__createVolumeBar();
         bottomController.appendChild(this.playButton);
         bottomController.appendChild(this.replayButton);
         bottomController.appendChild(this.fullScreenButton);
@@ -30,10 +30,10 @@ class BottomBarController {
     videoStateChanged(state, target) {
         switch (state) {
             case ContainerManager.PLAYING:
-                this.changeButtonIcon("control-play-button", "gg-play-pause");
+                this.__changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case ContainerManager.PAUSED:
-                this.changeButtonIcon("control-play-button", "gg-play-button");
+                this.__changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case ContainerManager.LOADED:
                 this.volumeBar.setVolume(50);
@@ -42,10 +42,10 @@ class BottomBarController {
                 this.__setProgressBarTimestamps();
                 break;
             case ContainerManager.ENTER_FULL_SCREEN:
-                this.changeButtonIcon("control-full-screen-button", "gg-minimize");
+                this.__changeButtonIcon("control-full-screen-button", "gg-minimize");
                 break;
             case ContainerManager.EXIT_FULL_SCREEN:
-                this.changeButtonIcon("control-full-screen-button", "gg-maximize");
+                this.__changeButtonIcon("control-full-screen-button", "gg-maximize");
                 break;
             default:
         }
@@ -56,20 +56,20 @@ class BottomBarController {
         this.timeCounter.currentTime = time;
     }
 
-    restartVideo() {
+    __restartVideo() {
         this.progressBar.setCurrentLength(0);
         this.hypervideoController.restartVideo();
     }
 
-    toggleFullScreen() {
+    __toggleFullScreen() {
         this.hypervideoController.toggleFullScreen();
     }
 
-    playButtonClicked() {
+    __playButtonClicked() {
         this.hypervideoController.play();
     }
 
-    changeButtonIcon(buttonClass, iconName) {
+    __changeButtonIcon(buttonClass, iconName) {
         let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
         if (button.length <= 0) {
             return;
@@ -81,14 +81,14 @@ class BottomBarController {
         icon[0].className = iconName;
     }
 
-    createTimeCounter() {
+    __createTimeCounter() {
         const timeCounter = this.htmlManager.createElement("x-time-counter", {
             classList: ["time-counter"]
         });
         return timeCounter;
     }
 
-    createControlButton(buttonClass, buttonIcon, eventHandler) {
+    __createControlButton(buttonClass, buttonIcon, eventHandler) {
         const buttonContainer = this.htmlManager.createElement("div", {
             classList: ["control-button-container"]
         });
@@ -106,7 +106,7 @@ class BottomBarController {
         return buttonContainer;
     }
 
-    createProgressBar() {
+    __createProgressBar() {
         const progressBar = this.htmlManager.createElement("x-progress-bar", {
             classList: ["progress-container"]
         });
@@ -128,7 +128,7 @@ class BottomBarController {
         }
     }
 
-    createVolumeBar() {
+    __createVolumeBar() {
         const volumeBar = this.htmlManager.createElement("x-volume-bar", {
             classList: ["volume-bar"]
         });

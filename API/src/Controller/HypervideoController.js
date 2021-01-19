@@ -83,7 +83,7 @@ class HypervideoController {
 
         hypervideo.appendChild(container);
 
-        this.addVideoElement(container);
+        this.__addVideoElement(container);
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
             this.topBarController.addTopBar(container, this.config.videoTitle);
         }
@@ -92,7 +92,7 @@ class HypervideoController {
         this.bottomBarController.addBottomBar(container);
     }
 
-    addVideoTag(container) {
+    __addVideoTag(container) {
         this.videoElementID = "video-" + this.containerID;
         const video = this.htmlManager.createElement("video", { 
             id: this.videoElementID,
@@ -102,7 +102,7 @@ class HypervideoController {
         this.videoManager.setupVideo();
     }
 
-    addVideoFromYotube(container) {
+    __addVideoFromYotube(container) {
         this.videoElementID = "video-" + this.containerID;
         const youtubeFrameContainer = this.htmlManager.createElement("div", {
             classList: ["youtube-frame"],
@@ -112,13 +112,13 @@ class HypervideoController {
         this.videoManager.addYoutubeScript(this.videoElementID, this.videoSRC);
     }
 
-    addVideoElement(container) {
+    __addVideoElement(container) {
         switch (this.videoType) {
             case Hypervideo.YOUTUBE_TYPE:
-                this.addVideoFromYotube(container);
+                this.__addVideoFromYotube(container);
                 break;
             default:
-                this.addVideoTag(container);
+                this.__addVideoTag(container);
                 break;
         }
     }

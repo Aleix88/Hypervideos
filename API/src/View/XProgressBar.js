@@ -12,7 +12,7 @@ class XProgressBar extends HTMLElement {
 
         this.__setupEventsListeners();
         const bar = this.htmlManager.createElement("div", {classList: ["progress-bar"]});
-        shadow.appendChild(this.getStyle());
+        shadow.appendChild(this.__getStyle());
         shadow.appendChild(bar);
     }
 
@@ -20,7 +20,7 @@ class XProgressBar extends HTMLElement {
 
     addMarkerAt(length) {
         const marker = this.htmlManager.createElement("div", {classList: ["progress-bar-marker"]});
-        const progress = this.convertLengthToProgress(length);
+        const progress = this.__convertLengthToProgress(length);
         this.shadowRoot.appendChild(marker);
         marker.style.left = progress + "%";
     }
@@ -31,11 +31,6 @@ class XProgressBar extends HTMLElement {
         eventsManager.touchEnd(document, this.__mouseUp.bind(this));
         eventsManager.touchLeave(document, this.__mouseLeave.bind(this));
         eventsManager.touchMove(document, this.__mouseMoving.bind(this));
-
-        // this.onmousedown = this.__mouseDown.bind(this);
-        // document.addEventListener('mouseup', this.__mouseUp.bind(this));
-        // document.addEventListener('mouseleave', this.__mouseLeave.bind(this));
-        // document.addEventListener('mousemove', this.__mouseMoving.bind(this));
     }
     
     __recalculatePosition(clientX) {
@@ -79,7 +74,7 @@ class XProgressBar extends HTMLElement {
         console.log("Down");
     }
 
-    convertLengthToProgress(length) {
+    __convertLengthToProgress(length) {
         return Math.round((parseFloat(length) / parseFloat(this.maxLength)) * 100); 
     }
 
@@ -88,7 +83,7 @@ class XProgressBar extends HTMLElement {
         this.currentLength = this.currentLength > this.maxLength ? this.maxLength : this.currentLength;
         this.currentLength = this.currentLength < 0 ? 0 : this.currentLength;
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
-        const progress = this.convertLengthToProgress(length);
+        const progress = this.__convertLengthToProgress(length);
         this.currentProgress = progress/100;
         progressBar.style.width = progress + "%";
     }
@@ -105,7 +100,7 @@ class XProgressBar extends HTMLElement {
         this.setCurrentLength(this.currentLength + inc);
     }
 
-    getStyle() {
+    __getStyle() {
         const style = document.createElement("style");
         style.textContent = `
             .progress-bar {

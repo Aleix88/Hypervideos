@@ -457,31 +457,33 @@ class HTMLManager {
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
     }
 
-}
-class TouchEventsManager {
-
-    constructor() {}
-
-    static IS_TOUCH_EVENT = 0;
-    static IS_CLICK_EVENT = 1;
-
-    __isDesktopBrowser() {
+    isDesktopBrowser() {
         let check = false;
         (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
         return !check;
     }
 
+}
+class TouchEventsManager {
+
+    constructor() {
+        this.htmlManager = new HTMLManager();
+    }
+
+    static IS_TOUCH_EVENT = 0;
+    static IS_CLICK_EVENT = 1;
+
     touchStart(element, handler) {
-        const touchType = this.__isDesktopBrowser() === true ? 'mousedown' : 'touchstart';
-        const eventType = this.__isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
+        const touchType = this.htmlManager.isDesktopBrowser() === true ? 'mousedown' : 'touchstart';
+        const eventType = this.htmlManager.isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
         element.addEventListener(touchType, (e)=>{
             handler(eventType, e);
         });
     }
 
     touchEnd(element, handler) {
-        const touchType = this.__isDesktopBrowser() === true ? 'mouseup' : 'touchend';
-        const eventType = this.__isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
+        const touchType = this.htmlManager.isDesktopBrowser() === true ? 'mouseup' : 'touchend';
+        const eventType = this.htmlManager.isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
 
         element.addEventListener(touchType, (e)=>{
             handler(eventType, e);
@@ -489,8 +491,8 @@ class TouchEventsManager {
     }
 
     touchLeave(element, handler) {
-        const touchType = this.__isDesktopBrowser() === true ? 'mouseleave' : 'touchcancel';
-        const eventType = this.__isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
+        const touchType = this.htmlManager.isDesktopBrowser() === true ? 'mouseleave' : 'touchcancel';
+        const eventType = this.htmlManager.isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
 
         element.addEventListener(touchType, (e)=>{
             handler(eventType, e);
@@ -498,8 +500,8 @@ class TouchEventsManager {
     }
 
     touchMove(element, handler) {
-        const touchType = this.__isDesktopBrowser() === true ? 'mousemove' : 'touchmove';
-        const eventType = this.__isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
+        const touchType = this.htmlManager.isDesktopBrowser() === true ? 'mousemove' : 'touchmove';
+        const eventType = this.htmlManager.isDesktopBrowser() === true ? TouchEventsManager.IS_CLICK_EVENT : TouchEventsManager.IS_TOUCH_EVENT;
 
         element.addEventListener(touchType, (e)=>{
             handler(eventType, e);
@@ -702,7 +704,7 @@ class XProgressBar extends HTMLElement {
 
         this.__setupEventsListeners();
         const bar = this.htmlManager.createElement("div", {classList: ["progress-bar"]});
-        shadow.appendChild(this.getStyle());
+        shadow.appendChild(this.__getStyle());
         shadow.appendChild(bar);
     }
 
@@ -710,7 +712,7 @@ class XProgressBar extends HTMLElement {
 
     addMarkerAt(length) {
         const marker = this.htmlManager.createElement("div", {classList: ["progress-bar-marker"]});
-        const progress = this.convertLengthToProgress(length);
+        const progress = this.__convertLengthToProgress(length);
         this.shadowRoot.appendChild(marker);
         marker.style.left = progress + "%";
     }
@@ -721,11 +723,6 @@ class XProgressBar extends HTMLElement {
         eventsManager.touchEnd(document, this.__mouseUp.bind(this));
         eventsManager.touchLeave(document, this.__mouseLeave.bind(this));
         eventsManager.touchMove(document, this.__mouseMoving.bind(this));
-
-        // this.onmousedown = this.__mouseDown.bind(this);
-        // document.addEventListener('mouseup', this.__mouseUp.bind(this));
-        // document.addEventListener('mouseleave', this.__mouseLeave.bind(this));
-        // document.addEventListener('mousemove', this.__mouseMoving.bind(this));
     }
     
     __recalculatePosition(clientX) {
@@ -769,7 +766,7 @@ class XProgressBar extends HTMLElement {
         console.log("Down");
     }
 
-    convertLengthToProgress(length) {
+    __convertLengthToProgress(length) {
         return Math.round((parseFloat(length) / parseFloat(this.maxLength)) * 100); 
     }
 
@@ -778,7 +775,7 @@ class XProgressBar extends HTMLElement {
         this.currentLength = this.currentLength > this.maxLength ? this.maxLength : this.currentLength;
         this.currentLength = this.currentLength < 0 ? 0 : this.currentLength;
         const progressBar = this.shadowRoot.querySelector(".progress-bar");
-        const progress = this.convertLengthToProgress(length);
+        const progress = this.__convertLengthToProgress(length);
         this.currentProgress = progress/100;
         progressBar.style.width = progress + "%";
     }
@@ -795,7 +792,7 @@ class XProgressBar extends HTMLElement {
         this.setCurrentLength(this.currentLength + inc);
     }
 
-    getStyle() {
+    __getStyle() {
         const style = document.createElement("style");
         style.textContent = `
             .progress-bar {
@@ -837,7 +834,7 @@ class XTagButton extends HTMLElement {
         this.shadowRoot.appendChild(this.tagCircleContainer);
         this.shadowRoot.appendChild(this.anchor);
         this.shadowRoot.appendChild(this.aspectRatioDiv);
-        this.shadowRoot.appendChild(this.getStyle());
+        this.shadowRoot.appendChild(this.__getStyle());
         this.__setupEventListeners(this);
     }
 
@@ -921,7 +918,7 @@ class XTagButton extends HTMLElement {
         this.tagCircleContainer.classList.add("effectDissapear");
     }
 
-    getStyle() {
+    __getStyle() {
 
         let style = document.createElement("style");
         style.textContent = `
@@ -1075,7 +1072,7 @@ class XVolumeBar extends HTMLElement {
         container.appendChild(volumeBar);
         volumeBar.appendChild(volumeLevelBar);
         shadow.appendChild(container);
-        shadow.appendChild(this.getStyle());
+        shadow.appendChild(this.__getStyle());
 
         this.__setupEventsListeners(volumeBar, container);
 
@@ -1148,7 +1145,7 @@ class XVolumeBar extends HTMLElement {
         volumeLevelBar.style.width = volume + "%";
     }
 
-    getStyle() {
+    __getStyle() {
         const style = document.createElement("style");
         style.textContent = `
             .volume-bar-container {
@@ -1278,12 +1275,12 @@ class BottomBarController {
             classList: ["bottom-controller"]
         });
         container.appendChild(bottomController);
-        this.playButton = this.createControlButton("control-play-button", "gg-play-button", this.playButtonClicked);
-        this.replayButton = this.createControlButton("control-repeat-button", "gg-repeat", this.restartVideo);
-        this.fullScreenButton = this.createControlButton( "control-full-screen-button", "gg-maximize", this.toggleFullScreen);
-        this.timeCounter = this.createTimeCounter();
-        this.progressBar = this.createProgressBar();
-        this.volumeBar = this.createVolumeBar();
+        this.playButton = this.__createControlButton("control-play-button", "gg-play-button", this.__playButtonClicked);
+        this.replayButton = this.__createControlButton("control-repeat-button", "gg-repeat", this.__restartVideo);
+        this.fullScreenButton = this.__createControlButton( "control-full-screen-button", "gg-maximize", this.__toggleFullScreen);
+        this.timeCounter = this.__createTimeCounter();
+        this.progressBar = this.__createProgressBar();
+        this.volumeBar = this.__createVolumeBar();
         bottomController.appendChild(this.playButton);
         bottomController.appendChild(this.replayButton);
         bottomController.appendChild(this.fullScreenButton);
@@ -1295,10 +1292,10 @@ class BottomBarController {
     videoStateChanged(state, target) {
         switch (state) {
             case ContainerManager.PLAYING:
-                this.changeButtonIcon("control-play-button", "gg-play-pause");
+                this.__changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case ContainerManager.PAUSED:
-                this.changeButtonIcon("control-play-button", "gg-play-button");
+                this.__changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case ContainerManager.LOADED:
                 this.volumeBar.setVolume(50);
@@ -1307,10 +1304,10 @@ class BottomBarController {
                 this.__setProgressBarTimestamps();
                 break;
             case ContainerManager.ENTER_FULL_SCREEN:
-                this.changeButtonIcon("control-full-screen-button", "gg-minimize");
+                this.__changeButtonIcon("control-full-screen-button", "gg-minimize");
                 break;
             case ContainerManager.EXIT_FULL_SCREEN:
-                this.changeButtonIcon("control-full-screen-button", "gg-maximize");
+                this.__changeButtonIcon("control-full-screen-button", "gg-maximize");
                 break;
             default:
         }
@@ -1321,20 +1318,20 @@ class BottomBarController {
         this.timeCounter.currentTime = time;
     }
 
-    restartVideo() {
+    __restartVideo() {
         this.progressBar.setCurrentLength(0);
         this.hypervideoController.restartVideo();
     }
 
-    toggleFullScreen() {
+    __toggleFullScreen() {
         this.hypervideoController.toggleFullScreen();
     }
 
-    playButtonClicked() {
+    __playButtonClicked() {
         this.hypervideoController.play();
     }
 
-    changeButtonIcon(buttonClass, iconName) {
+    __changeButtonIcon(buttonClass, iconName) {
         let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
         if (button.length <= 0) {
             return;
@@ -1346,14 +1343,14 @@ class BottomBarController {
         icon[0].className = iconName;
     }
 
-    createTimeCounter() {
+    __createTimeCounter() {
         const timeCounter = this.htmlManager.createElement("x-time-counter", {
             classList: ["time-counter"]
         });
         return timeCounter;
     }
 
-    createControlButton(buttonClass, buttonIcon, eventHandler) {
+    __createControlButton(buttonClass, buttonIcon, eventHandler) {
         const buttonContainer = this.htmlManager.createElement("div", {
             classList: ["control-button-container"]
         });
@@ -1371,7 +1368,7 @@ class BottomBarController {
         return buttonContainer;
     }
 
-    createProgressBar() {
+    __createProgressBar() {
         const progressBar = this.htmlManager.createElement("x-progress-bar", {
             classList: ["progress-container"]
         });
@@ -1393,7 +1390,7 @@ class BottomBarController {
         }
     }
 
-    createVolumeBar() {
+    __createVolumeBar() {
         const volumeBar = this.htmlManager.createElement("x-volume-bar", {
             classList: ["volume-bar"]
         });
@@ -1497,7 +1494,7 @@ class Hypervideo {
     static VIDEO_TYPE = "VIDEO";
     static IMAGE_TYPE = "IMAGE";
 
-    isDOMLoaded() {
+    __isDOMLoaded() {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
@@ -1506,9 +1503,9 @@ class Hypervideo {
         this.__addGlobalStyle();
         
         const container = document.getElementById(this.containerID);
-        container.appendChild(this.getStyle());
+        container.appendChild(this.__getStyle());
 
-        if (!this.isDOMLoaded()) {
+        if (!this.__isDOMLoaded()) {
             //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
@@ -1564,7 +1561,7 @@ class Hypervideo {
         document.querySelector("head").appendChild(style);
     }
 
-    getStyle() {
+    __getStyle() {
         let style = document.createElement('style');
         style.textContent = `
 
@@ -1952,7 +1949,7 @@ class HypervideoController {
 
         hypervideo.appendChild(container);
 
-        this.addVideoElement(container);
+        this.__addVideoElement(container);
         if (this.videoType != Hypervideo.YOUTUBE_TYPE) {
             this.topBarController.addTopBar(container, this.config.videoTitle);
         }
@@ -1961,7 +1958,7 @@ class HypervideoController {
         this.bottomBarController.addBottomBar(container);
     }
 
-    addVideoTag(container) {
+    __addVideoTag(container) {
         this.videoElementID = "video-" + this.containerID;
         const video = this.htmlManager.createElement("video", { 
             id: this.videoElementID,
@@ -1971,7 +1968,7 @@ class HypervideoController {
         this.videoManager.setupVideo();
     }
 
-    addVideoFromYotube(container) {
+    __addVideoFromYotube(container) {
         this.videoElementID = "video-" + this.containerID;
         const youtubeFrameContainer = this.htmlManager.createElement("div", {
             classList: ["youtube-frame"],
@@ -1981,13 +1978,13 @@ class HypervideoController {
         this.videoManager.addYoutubeScript(this.videoElementID, this.videoSRC);
     }
 
-    addVideoElement(container) {
+    __addVideoElement(container) {
         switch (this.videoType) {
             case Hypervideo.YOUTUBE_TYPE:
-                this.addVideoFromYotube(container);
+                this.__addVideoFromYotube(container);
                 break;
             default:
-                this.addVideoTag(container);
+                this.__addVideoTag(container);
                 break;
         }
     }

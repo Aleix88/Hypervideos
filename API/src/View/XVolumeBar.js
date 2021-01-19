@@ -10,7 +10,7 @@ class XVolumeBar extends HTMLElement {
         let shadow = this.attachShadow({mode: 'open'});
         
         const container = this.htmlManager.createElement("div", {classList: ["volume-bar-container"]});
-        const volumeButton = this.createVolumeButton();
+        const volumeButton = this.__createVolumeButton();
         const volumeBar = this.htmlManager.createElement("div", {classList: ["volume-bar-rect"]});
         const volumeLevelBar = this.htmlManager.createElement("div", {classList: ["volume-bar-level"]});
 
@@ -18,13 +18,13 @@ class XVolumeBar extends HTMLElement {
         container.appendChild(volumeBar);
         volumeBar.appendChild(volumeLevelBar);
         shadow.appendChild(container);
-        shadow.appendChild(this.getStyle());
+        shadow.appendChild(this.__getStyle());
 
         this.__setupEventsListeners(volumeBar, container);
 
     }
 
-    createVolumeButton() {
+    __createVolumeButton() {
         const buttonContainer = this.htmlManager.createElement("div", {classList:["volume-icon-container"]});
         const button = this.htmlManager.createElement("button", {classList:["volume-button"]});
         const icon = this.htmlManager.createElement("i", {classList:["gg-volume"]});
@@ -91,7 +91,7 @@ class XVolumeBar extends HTMLElement {
         volumeLevelBar.style.width = volume + "%";
     }
 
-    getStyle() {
+    __getStyle() {
         const style = document.createElement("style");
         style.textContent = `
             .volume-bar-container {

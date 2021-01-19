@@ -10,7 +10,7 @@ class Hypervideo {
     static VIDEO_TYPE = "VIDEO";
     static IMAGE_TYPE = "IMAGE";
 
-    isDOMLoaded() {
+    __isDOMLoaded() {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
@@ -19,9 +19,9 @@ class Hypervideo {
         this.__addGlobalStyle();
         
         const container = document.getElementById(this.containerID);
-        container.appendChild(this.getStyle());
+        container.appendChild(this.__getStyle());
 
-        if (!this.isDOMLoaded()) {
+        if (!this.__isDOMLoaded()) {
             //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
@@ -77,7 +77,7 @@ class Hypervideo {
         document.querySelector("head").appendChild(style);
     }
 
-    getStyle() {
+    __getStyle() {
         let style = document.createElement('style');
         style.textContent = `
 

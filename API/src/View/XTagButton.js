@@ -16,7 +16,7 @@ class XTagButton extends HTMLElement {
         this.shadowRoot.appendChild(this.tagCircleContainer);
         this.shadowRoot.appendChild(this.anchor);
         this.shadowRoot.appendChild(this.aspectRatioDiv);
-        this.shadowRoot.appendChild(this.getStyle());
+        this.shadowRoot.appendChild(this.__getStyle());
         this.__setupEventListeners(this);
     }
 
@@ -100,7 +100,7 @@ class XTagButton extends HTMLElement {
         this.tagCircleContainer.classList.add("effectDissapear");
     }
 
-    getStyle() {
+    __getStyle() {
 
         let style = document.createElement("style");
         style.textContent = `
