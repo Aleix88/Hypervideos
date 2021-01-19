@@ -26,10 +26,16 @@ class XProgressBar extends HTMLElement {
     }
 
     __setupEventsListeners() {
-        this.onmousedown = this.__mouseDown.bind(this);
-        document.addEventListener('mouseup', this.__mouseUp.bind(this));
-        document.addEventListener('mouseleave', this.__mouseLeave.bind(this));
-        document.addEventListener('mousemove', this.__mouseMoving.bind(this));
+        const eventsManager = new TouchEventsManager();
+        eventsManager.touchStart(this, this.__mouseDown.bind(this));
+        eventsManager.touchEnd(document, this.__mouseUp.bind(this));
+        eventsManager.touchLeave(document, this.__mouseLeave.bind(this));
+        eventsManager.touchMove(document, this.__mouseMoving.bind(this));
+
+        // this.onmousedown = this.__mouseDown.bind(this);
+        // document.addEventListener('mouseup', this.__mouseUp.bind(this));
+        // document.addEventListener('mouseleave', this.__mouseLeave.bind(this));
+        // document.addEventListener('mousemove', this.__mouseMoving.bind(this));
     }
     
     __recalculatePosition(clientX) {
@@ -41,28 +47,36 @@ class XProgressBar extends HTMLElement {
         this.setCurrentLength(progress * this.maxLength);
     }
 
-    __mouseLeave(event) {
+    __mouseLeave(type, event) {
         if (!this.isMoving) {return;}
         this.isMoving = false;
-        this.__recalculatePosition(event.clientX);
+        const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.changedTouches[0].clientX : event.clientX;
+        this.__recalculatePosition(clientX);
         this.progressBarChanged(this.currentProgress);
+        console.log("Leave");
     }
 
-    __mouseUp(event) {
+    __mouseUp(type, event) {
         if (!this.isMoving) {return;}
         this.isMoving = false;
-        this.__recalculatePosition(event.clientX);
+        const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.changedTouches[0].clientX : event.clientX;
+        this.__recalculatePosition(clientX);
         this.progressBarChanged(this.currentProgress);
+        console.log("Up");
     }
 
-    __mouseMoving(event) {
+    __mouseMoving(type, event) {
         if (!this.isMoving) {return;}
-        this.__recalculatePosition(event.clientX);
+        const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
+        this.__recalculatePosition(clientX);
+        console.log("Moving");
     }
 
-    __mouseDown(event) {
+    __mouseDown(type, event) {
         this.isMoving = true;
-        this.__recalculatePosition(event.clientX);
+        const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
+        this.__recalculatePosition(clientX);
+        console.log("Down");
     }
 
     convertLengthToProgress(length) {

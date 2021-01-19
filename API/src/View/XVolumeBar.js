@@ -34,12 +34,13 @@ class XVolumeBar extends HTMLElement {
     }
 
     __setupEventsListeners(volumeBar,container) {
-        volumeBar.onmousedown = this.__mouseDown.bind(this);
+        const eventsManager = new TouchEventsManager();
+        eventsManager.touchMove(document, this.__mouseMoving.bind(this));
+        eventsManager.touchStart(volumeBar, this.__mouseDown.bind(this));
+        eventsManager.touchLeave(container, this.__mouseLeaveElement.bind(this));
+        eventsManager.touchEnd(document, this.__mouseUp.bind(this));
+        eventsManager.touchLeave(document, this.__mouseLeaveDocument.bind(this));
         container.onmouseenter = this.__mouseEnter.bind(this);
-        container.onmouseleave = (this.__mouseLeaveElement.bind(this));
-        document.addEventListener('mouseup', this.__mouseUp.bind(this));
-        document.addEventListener('mouseleave', this.__mouseLeaveDocument.bind(this));
-        document.addEventListener('mousemove', this.__mouseMoving.bind(this));
     }
 
     __mouseEnter() {
@@ -61,14 +62,16 @@ class XVolumeBar extends HTMLElement {
         this.isVolMoving = false;
     }
 
-    __mouseMoving(event) {
+    __mouseMoving(type, event) {
         if (!this.isVolMoving) {return;}
-        this.__calculateVolumePosition(event.clientX);
+        const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
+        this.__calculateVolumePosition(clientX);
     }
 
-    __mouseDown(event) {
+    __mouseDown(type, event) {
         this.isVolMoving = true;
-        this.__calculateVolumePosition(event.clientX);
+        const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
+        this.__calculateVolumePosition(clientX);
     }
     
     __calculateVolumePosition(clientX) {
