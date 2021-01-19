@@ -23,9 +23,28 @@ class HyperimageController {
     }
 
     __fullScreenStateChanged (isFullScreen) {
+        if (this.imageContainer != null) {
+            if (isFullScreen === true) {
+                const imageWidthMargin = window.innerWidth - this.config.size.width;
+                const imageHeightMargin = window.innerHeight - this.config.size.height;
+                const shouldWidthShrink = imageHeightMargin >= imageWidthMargin;
+
+                this.imageElement.style.width = shouldWidthShrink ? "100%" : "auto";
+                this.imageElement.style.height = !shouldWidthShrink ? "100%" : "auto";
+                this.imageContainer.style.width = shouldWidthShrink ? "100%" : "fit-content";
+                this.imageContainer.style.height = !shouldWidthShrink ? "100%" : "fit-content";
+            } else {
+                this.imageElement.style.width = "inherit";
+                this.imageElement.style.height = "inherit";
+                this.imageContainer.style.width = this.config.size.width;
+                this.imageContainer.style.height = this.config.size.height;
+            }
+        }
+
         if (this.tagController != null) {
             this.tagController.fullScreenStateChanged(isFullScreen);
         }
+
         if (this.fullScreenButton != null) {
             this.fullScreenButton.isFullScreenActive(isFullScreen);
         }
@@ -36,16 +55,22 @@ class HyperimageController {
     }
 
     createSkeleton() {
-        const hypervideo = document.getElementById(this.containerID);
+        let hypervideo = document.getElementById(this.containerID);
+        hypervideo.style.width = this.config.size.width + "px";
+        hypervideo.style.height = this.config.size.height + "px";
         const container = this.htmlManager.createElement("div", {
             classList: ["hypervideo-container"]
+        });
+        this.imageContainer = this.htmlManager.createElement("div", {
+            classList: ["img-container"]
         });
 
         hypervideo.appendChild(container);
 
-        this.__addImageElement(container);
+        container.appendChild(this.imageContainer);
+        this.__addImageElement(this.imageContainer);
+        this.tagController.addTagContainer(this.imageContainer);
         this.__addFullScreenButton(container);
-        this.tagController.addTagContainer(container);
     }
 
     __addFullScreenButton(container) {
@@ -58,12 +83,12 @@ class HyperimageController {
     }
 
     __addImageElement(container) {
-        const img = this.htmlManager.createElement("img", {
+        this.imageElement = this.htmlManager.createElement("img", {
             classList: ["hyperimage"],
             src: this.imageSRC
         });
-        container.appendChild(img);
-        img.addEventListener('load', this.__imgLoaded.bind(this));
+        container.appendChild(this.imageElement);
+        this.imageElement.addEventListener('load', this.__imgLoaded.bind(this));
     }
 
     __addTags() {
