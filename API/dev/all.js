@@ -1568,18 +1568,21 @@ class Hypervideo {
         let style = document.createElement('style');
         style.textContent = `
             .hypervideo:-moz-full-screen {
-                width: 100%;
-                height: 100%;
+                background: black;
+                width: 100% !important;
+                height: 100% !important;
             }
             
             .hypervideo:-webkit-full-screen {
-                width: 100%;
-                height: 100%;
+                background: black;
+                width: 100% !important;
+                height: 100% !important;
             }
             
             .hypervideo:fullscreen {
-                width: 100%;
-                height: 100%;
+                background: black;
+                width: 100% !important;
+                height: 100% !important;
             }
         `;
 
