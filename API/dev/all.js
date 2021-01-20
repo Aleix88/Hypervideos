@@ -232,6 +232,12 @@ class VideoTagManager extends ContainerManager {
         return video.currentTime;
     }
 
+    getVideoDuration() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        return video.duration;
+    }
+
+
     
     //0-1
     loadProgress(progress) {
@@ -344,6 +350,10 @@ class YoutubeVideoManager extends ContainerManager {
         let firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.appendChild(tag);
         window.onYouTubeIframeAPIReady = this.__onYouTubeIframeAPIReady.bind(this);
+    }
+
+    getVideoDuration() {
+        return this.player.getDuration();
     }
 
     __onYouTubeIframeAPIReady() {
@@ -1262,11 +1272,10 @@ class XVolumeBar extends HTMLElement {
 customElements.define('x-volume-bar', XVolumeBar);
 class BottomBarController {
 
-    constructor (hypervideoController, containerID, tags) {
+    constructor (hypervideoController, containerID) {
         this.hypervideoController = hypervideoController;
         this.htmlManager = new HTMLManager();
         this.containerID = containerID;
-        this.tags = tags;
     }
 
     addBottomBar(container) {
@@ -1913,7 +1922,7 @@ class HypervideoController {
         this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
-        this.bottomBarController = new BottomBarController(this, containerID, this.config.tags);
+        this.bottomBarController = new BottomBarController(this, containerID);
         this.topBarController = new TopBarController(this, containerID);
         this.tagController = new TagsController(this.containerID, videoManager);
     }
@@ -1935,6 +1944,8 @@ class HypervideoController {
             case ContainerManager.LOADED:
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
+                this.__filterTagsByDuration();
+                this.bottomBarController.tags = this.config.tags;
                 this.__addVideoTimeObserver();
                 this.__addTags();
                 break;
@@ -2006,6 +2017,12 @@ class HypervideoController {
         const isVideoWidder = this.config.size.width >= this.config.size.height;
         hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : Math.floor((this.config.size.height * HypervideoController.ASPECT_RATIO.x)/HypervideoController.ASPECT_RATIO.y) + "px";
         hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : Math.floor((this.config.size.width * HypervideoController.ASPECT_RATIO.y)/HypervideoController.ASPECT_RATIO.x) + "px";
+    }
+
+    __filterTagsByDuration() {
+        this.config.tags = this.config.tags.filter ((e) => {
+            return e.timeConfig.timestamp <= this.videoManager.getVideoDuration();
+        });
     }
 
     __addVideoTag(container) {

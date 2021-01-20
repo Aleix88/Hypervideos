@@ -29,6 +29,12 @@ class VideoTagManager extends ContainerManager {
         return video.currentTime;
     }
 
+    getVideoDuration() {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        return video.duration;
+    }
+
+
     
     //0-1
     loadProgress(progress) {

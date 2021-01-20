@@ -1,10 +1,9 @@
 class BottomBarController {
 
-    constructor (hypervideoController, containerID, tags) {
+    constructor (hypervideoController, containerID) {
         this.hypervideoController = hypervideoController;
         this.htmlManager = new HTMLManager();
         this.containerID = containerID;
-        this.tags = tags;
     }
 
     addBottomBar(container) {

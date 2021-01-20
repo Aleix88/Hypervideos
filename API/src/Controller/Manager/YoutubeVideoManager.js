@@ -60,6 +60,10 @@ class YoutubeVideoManager extends ContainerManager {
         window.onYouTubeIframeAPIReady = this.__onYouTubeIframeAPIReady.bind(this);
     }
 
+    getVideoDuration() {
+        return this.player.getDuration();
+    }
+
     __onYouTubeIframeAPIReady() {
         const player = new YT.Player(this.iframeContainerID, {
             height: '360',
