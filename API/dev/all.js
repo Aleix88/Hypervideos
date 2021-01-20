@@ -41,7 +41,6 @@ class Plugin {
 class VideoTimer {
 
     constructor (timeHandler) {
-        this.loopCounter = 0;
         this.timeHandler = timeHandler;
         this.timer = null;
         this.isPlaying = false;
@@ -62,16 +61,8 @@ class VideoTimer {
         this.isPlaying = false;
     }
 
-    loadOffset(offset) {
-        this.loopCounter = parseInt(offset/ VideoTimer.LOOP_TIME);
-    }
-
     __handleTime() {
-        this.loopCounter++;
-        if (this.loopCounter >= 10) {
-            this.timeHandler();
-            this.loopCounter = 0;
-        }
+        this.timeHandler();
     }
 
 }
@@ -134,6 +125,8 @@ class ContainerManager extends Subject {
     restartVideo() {}
 
     isVideoPlaying(){}
+
+    getVideoDuration() {}
 
     get currentTime() {return 0;}
     
@@ -243,8 +236,7 @@ class VideoTagManager extends ContainerManager {
     loadProgress(progress) {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.currentTime = video.duration * progress;
-        this.videoTimer.loadOffset(video.currentTime - Math.floor(video.currentTime));
-        this.notify(video.currentTime);
+        this.notify(video.currentTime * 1000);
     }
 
     setupVideo() {
@@ -271,7 +263,7 @@ class VideoTagManager extends ContainerManager {
 
     __timeHandler() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
-        this.notify(video.currentTime);
+        this.notify(video.currentTime * 1000);
     }
 
     //0-1
@@ -331,8 +323,7 @@ class YoutubeVideoManager extends ContainerManager {
         if (this.player === null) {return;}
         this.player.seekTo(seconds, true);
         const currentTime = this.player.getCurrentTime();
-        this.videoTimer.loadOffset(currentTime - Math.floor(currentTime));
-        this.notify(seconds);
+        this.notify(seconds * 1000);
     }
 
     setVolume(volume) {
@@ -403,7 +394,7 @@ class YoutubeVideoManager extends ContainerManager {
     }
      
     __timeHandler() {
-        this.notify(this.player.getCurrentTime());
+        this.notify(this.player.getCurrentTime() * 1000);
     }
 }
 
@@ -1309,7 +1300,7 @@ class BottomBarController {
             case ContainerManager.LOADED:
                 this.volumeBar.setVolume(50);
                 this.videoLength = target.duration;
-                this.progressBar.setMaxLength(target.duration);
+                this.progressBar.setMaxLength(target.duration * 1000);
                 this.__setProgressBarTimestamps();
                 break;
             case ContainerManager.ENTER_FULL_SCREEN:
@@ -1324,7 +1315,7 @@ class BottomBarController {
 
     videoTimeChange(time) {
         this.progressBar.setCurrentLength(time);
-        this.timeCounter.currentTime = time;
+        this.timeCounter.currentTime = time/1000;
     }
 
     __restartVideo() {
@@ -1383,7 +1374,7 @@ class BottomBarController {
         });
         progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
         if (this.videoLength !== null) {
-            progressBar.setMaxLength(this.videoLength);
+            progressBar.setMaxLength(this.videoLength * 1000);
         }
         return progressBar;
     }
@@ -2073,7 +2064,7 @@ class HypervideoController {
         const thisReference = this;
         const observer = new Observer((time) => {
             thisReference.bottomBarController.videoTimeChange(time);
-            thisReference.__manageTags(time);
+            thisReference.__manageTags(time/1000);
         });
         this.videoManager.addObserver(observer);
     }
@@ -2252,8 +2243,5 @@ class TopBarController {
 
         topContainer.appendChild(titleHeader);
         container.appendChild(topContainer);
-    }
-
-
-    
+    }    
 }

@@ -23,6 +23,8 @@ class ContainerManager extends Subject {
 
     isVideoPlaying(){}
 
+    getVideoDuration() {}
+
     get currentTime() {return 0;}
     
     //0-1

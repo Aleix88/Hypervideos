@@ -40,8 +40,7 @@ class VideoTagManager extends ContainerManager {
     loadProgress(progress) {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         video.currentTime = video.duration * progress;
-        this.videoTimer.loadOffset(video.currentTime - Math.floor(video.currentTime));
-        this.notify(video.currentTime);
+        this.notify(video.currentTime * 1000);
     }
 
     setupVideo() {
@@ -68,7 +67,7 @@ class VideoTagManager extends ContainerManager {
 
     __timeHandler() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
-        this.notify(video.currentTime);
+        this.notify(video.currentTime * 1000);
     }
 
     //0-1

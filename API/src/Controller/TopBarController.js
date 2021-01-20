@@ -17,8 +17,5 @@ class TopBarController {
 
         topContainer.appendChild(titleHeader);
         container.appendChild(topContainer);
-    }
-
-
-    
+    }    
 }

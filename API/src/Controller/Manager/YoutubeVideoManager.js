@@ -39,8 +39,7 @@ class YoutubeVideoManager extends ContainerManager {
         if (this.player === null) {return;}
         this.player.seekTo(seconds, true);
         const currentTime = this.player.getCurrentTime();
-        this.videoTimer.loadOffset(currentTime - Math.floor(currentTime));
-        this.notify(seconds);
+        this.notify(seconds * 1000);
     }
 
     setVolume(volume) {
@@ -111,6 +110,6 @@ class YoutubeVideoManager extends ContainerManager {
     }
      
     __timeHandler() {
-        this.notify(this.player.getCurrentTime());
+        this.notify(this.player.getCurrentTime() * 1000);
     }
 }

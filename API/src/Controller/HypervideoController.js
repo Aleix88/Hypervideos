@@ -160,7 +160,7 @@ class HypervideoController {
         const thisReference = this;
         const observer = new Observer((time) => {
             thisReference.bottomBarController.videoTimeChange(time);
-            thisReference.__manageTags(time);
+            thisReference.__manageTags(time/1000);
         });
         this.videoManager.addObserver(observer);
     }

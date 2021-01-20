@@ -1,7 +1,6 @@
 class VideoTimer {
 
     constructor (timeHandler) {
-        this.loopCounter = 0;
         this.timeHandler = timeHandler;
         this.timer = null;
         this.isPlaying = false;
@@ -22,16 +21,8 @@ class VideoTimer {
         this.isPlaying = false;
     }
 
-    loadOffset(offset) {
-        this.loopCounter = parseInt(offset/ VideoTimer.LOOP_TIME);
-    }
-
     __handleTime() {
-        this.loopCounter++;
-        if (this.loopCounter >= 10) {
-            this.timeHandler();
-            this.loopCounter = 0;
-        }
+        this.timeHandler();
     }
 
 }

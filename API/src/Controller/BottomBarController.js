@@ -37,7 +37,7 @@ class BottomBarController {
             case ContainerManager.LOADED:
                 this.volumeBar.setVolume(50);
                 this.videoLength = target.duration;
-                this.progressBar.setMaxLength(target.duration);
+                this.progressBar.setMaxLength(target.duration * 1000);
                 this.__setProgressBarTimestamps();
                 break;
             case ContainerManager.ENTER_FULL_SCREEN:
@@ -52,7 +52,7 @@ class BottomBarController {
 
     videoTimeChange(time) {
         this.progressBar.setCurrentLength(time);
-        this.timeCounter.currentTime = time;
+        this.timeCounter.currentTime = time/1000;
     }
 
     __restartVideo() {
@@ -111,7 +111,7 @@ class BottomBarController {
         });
         progressBar.progressBarChanged = this.__progressBarChanged.bind(this);
         if (this.videoLength !== null) {
-            progressBar.setMaxLength(this.videoLength);
+            progressBar.setMaxLength(this.videoLength * 1000);
         }
         return progressBar;
     }
