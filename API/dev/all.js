@@ -1441,8 +1441,8 @@ class HyperimageController {
             } else {
                 this.imageElement.style.width = "inherit";
                 this.imageElement.style.height = "inherit";
-                this.imageContainer.style.width = this.config.size.width;
-                this.imageContainer.style.height = this.config.size.height;
+                this.imageContainer.style.width = this.config.size.width + "px";
+                this.imageContainer.style.height = this.config.size.height + "px";
             }
         }
 
@@ -1606,6 +1606,9 @@ class Hypervideo {
         .youtube-frame {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .hyperimage {
@@ -1915,6 +1918,11 @@ class HypervideoController {
         this.tagController = new TagsController(this.containerID, videoManager);
     }
 
+    static ASPECT_RATIO = {
+        x: 16,
+        y: 9
+    };
+
     __videoStateChanged(state, target) {
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
@@ -1982,6 +1990,7 @@ class HypervideoController {
         const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", {classList: ["hypervideo-container"]});
 
+        this.__maintainAspectRation(hypervideo);
         hypervideo.appendChild(container);
 
         this.__addVideoElement(container);
@@ -1991,6 +2000,12 @@ class HypervideoController {
         this.__addPauseScreen(container);
         this.tagController.addTagContainer(container);
         this.bottomBarController.addBottomBar(container);
+    }
+
+    __maintainAspectRation(hypervideo) {
+        const isVideoWidder = this.config.size.width >= this.config.size.height;
+        hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : Math.floor((this.config.size.height * HypervideoController.ASPECT_RATIO.x)/HypervideoController.ASPECT_RATIO.y) + "px";
+        hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : Math.floor((this.config.size.width * HypervideoController.ASPECT_RATIO.y)/HypervideoController.ASPECT_RATIO.x) + "px";
     }
 
     __addVideoTag(container) {

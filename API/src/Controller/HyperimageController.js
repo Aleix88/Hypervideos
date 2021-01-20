@@ -36,8 +36,8 @@ class HyperimageController {
             } else {
                 this.imageElement.style.width = "inherit";
                 this.imageElement.style.height = "inherit";
-                this.imageContainer.style.width = this.config.size.width;
-                this.imageContainer.style.height = this.config.size.height;
+                this.imageContainer.style.width = this.config.size.width + "px";
+                this.imageContainer.style.height = this.config.size.height + "px";
             }
         }
 

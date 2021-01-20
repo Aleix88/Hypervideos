@@ -4,3 +4,6 @@ API/babel
 #Node modules
 node_modules
 package-lock.json
+
+#No afegim alguns videos
+Examples/TestVideos/f.mp4
