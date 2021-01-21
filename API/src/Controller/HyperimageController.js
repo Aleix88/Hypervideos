@@ -70,7 +70,9 @@ class HyperimageController {
         container.appendChild(this.imageContainer);
         this.__addImageElement(this.imageContainer);
         this.tagController.addTagContainer(this.imageContainer);
-        this.__addFullScreenButton(container);
+        if (this.htmlManager.isDesktopBrowser() === true) {
+            this.__addFullScreenButton(container);
+        }
     }
 
     __addFullScreenButton(container) {

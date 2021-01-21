@@ -361,6 +361,7 @@ class YoutubeVideoManager extends ContainerManager {
                 'controls': 0,
                 'disablekb': 1,
                 'fs': 0,
+                'playsinline': 1,
                 'modestbranding': 1,
                 'rel': 0,
                 'iv_load_policy': 3,
@@ -1277,13 +1278,15 @@ class BottomBarController {
         container.appendChild(bottomController);
         this.playButton = this.__createControlButton("control-play-button", "gg-play-button", this.__playButtonClicked);
         this.replayButton = this.__createControlButton("control-repeat-button", "gg-repeat", this.__restartVideo);
-        this.fullScreenButton = this.__createControlButton( "control-full-screen-button", "gg-maximize", this.__toggleFullScreen);
         this.timeCounter = this.__createTimeCounter();
         this.progressBar = this.__createProgressBar();
         this.volumeBar = this.__createVolumeBar();
         bottomController.appendChild(this.playButton);
         bottomController.appendChild(this.replayButton);
-        bottomController.appendChild(this.fullScreenButton);
+        if (this.htmlManager.isDesktopBrowser() === true) {
+            this.fullScreenButton = this.__createControlButton( "control-full-screen-button", "gg-maximize", this.__toggleFullScreen);
+            bottomController.appendChild(this.fullScreenButton);
+        }
         bottomController.appendChild(this.timeCounter);
         bottomController.appendChild(this.progressBar);
         bottomController.appendChild(this.volumeBar);
@@ -1475,7 +1478,9 @@ class HyperimageController {
         container.appendChild(this.imageContainer);
         this.__addImageElement(this.imageContainer);
         this.tagController.addTagContainer(this.imageContainer);
-        this.__addFullScreenButton(container);
+        if (this.htmlManager.isDesktopBrowser() === true) {
+            this.__addFullScreenButton(container);
+        }
     }
 
     __addFullScreenButton(container) {
@@ -2022,6 +2027,8 @@ class HypervideoController {
             id: this.videoElementID,
             src: this.videoSRC
         });
+        video.setAttribute("webkit-playsinline", ""); //Block full screen on mobile
+        video.setAttribute("playsinline", "");
         container.appendChild(video);
         this.videoManager.setupVideo();
     }

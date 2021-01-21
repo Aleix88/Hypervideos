@@ -118,6 +118,8 @@ class HypervideoController {
             id: this.videoElementID,
             src: this.videoSRC
         });
+        video.setAttribute("webkit-playsinline", ""); //Block full screen on mobile
+        video.setAttribute("playsinline", "");
         container.appendChild(video);
         this.videoManager.setupVideo();
     }
