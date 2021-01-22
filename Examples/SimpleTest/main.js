@@ -160,6 +160,18 @@ document.addEventListener("DOMContentLoaded", () => {
         "plugin": {
             "name": "Card",
             "config": {
+                "title": "Landscape photography",
+                "description": "When most people start out taking landscape photos, they think they need to get a wide angle lens in order to capture the whole landscape. When I bought my first DSLR, I was one of those people. I made sure I had a wide angle lens because I knew I mostly wanted to photograph landscapes from my adventures, and that’s what everyone told me I required to get the job done.",
+                "imageSrc": "../TestImages/nature.jpg",
+                "backgroundColor": "#F2D5A0",
+                "titleColor": "rgb(138 104 43)",
+                "descriptionColor": "rgb(138 104 43)",
+                "button": {
+                  "title": "Read Post",
+                  "href": "https://www.google.es", 
+                  "backgroundColor": "red",
+                  "textColor": "blue"
+                }
             }
         }
       }
