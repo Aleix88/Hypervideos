@@ -125,7 +125,7 @@ class BottomBarController {
     __setProgressBarTimestamps() {
         for (let t of this.tags) {
             const timestamp = t.timeConfig.timestamp;
-            this.progressBar.addMarkerAt(timestamp);
+            this.progressBar.addMarkerAt(timestamp * 1000);
         }
     }
 
