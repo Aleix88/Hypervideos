@@ -22,15 +22,18 @@ class YoutubeVideoManager extends ContainerManager {
     }
     
     isVideoPlaying() {
+        if (this.player === null) {return;}
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
     get currentTime() {
+        if (this.player === null) {return;}
         return this.player.getCurrentTime();
     }
 
     //0-1
     loadProgress(progress) {
+        if (this.player === null) {return;}
         const videoDuration = this.player.getDuration();
         this.__loadTime(videoDuration * progress);
     }

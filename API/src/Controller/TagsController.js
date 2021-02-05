@@ -112,8 +112,8 @@ class TagsController {
 
     __createTagPluginForTagIfNeeded(tagID, plugin) {
         if (this.plugins.hasOwnProperty(tagID) && this.plugins[tagID] != null) {return;} 
-        if (plugin == null) {
-            this.plugins[tagID] = plugin;
+        if (plugin == null || Object.keys(plugin).length === 0) {
+            this.plugins[tagID] = null;
             return;
         }
         const pluginName = plugin.name;

@@ -14,7 +14,7 @@ class Hypervideo {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
-    setupHypervideo(configJSON) {
+    setupHypervideo(config) {
 
         this.__addGlobalStyle();
         
@@ -22,11 +22,10 @@ class Hypervideo {
         container.appendChild(this.__getStyle());
 
         if (!this.__isDOMLoaded()) {
-            //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
 
-        this.config = this.__configJSONToObject(configJSON);
+        this.config = this.__assingIdToTags(config);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
             const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config);
@@ -41,9 +40,8 @@ class Hypervideo {
 
     }
 
-    __configJSONToObject(configJSON) {
+    __assingIdToTags(config) {
         try {
-            let config = JSON.parse(configJSON);
             let i = 0;
             config.tags = config.tags.map((t) => {
                 t.id = this.containerID + "-tag-" + i++;

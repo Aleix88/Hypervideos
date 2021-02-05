@@ -31,8 +31,8 @@ class XTagButton extends HTMLElement {
     get hexColor() {return this.hexColor;}
 
     set position(newValue) {
-        this.style.top = newValue.x + "%";
-        this.style.left = newValue.y + "%";
+        this.style.top = newValue.y + "%";
+        this.style.left = newValue.x + "%";
         this.style.transform = "translate(-50%, -50%)";
     }
 
