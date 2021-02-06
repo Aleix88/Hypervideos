@@ -48,18 +48,24 @@ var Plugin = /*#__PURE__*/function () {
       this.container = container;
       this.elementsContainer = elementsContainer;
       this.videoManager = videoManager;
+      this.__firstClick = false;
     }
   }, {
     key: "onTagClick",
     value: function onTagClick(event) {
       var thisReference = this;
-      this.elementsContainer.addEventListener('click', function (event) {
-        if (thisReference.elementsContainer !== event.target) {
-          return;
-        }
 
-        thisReference.hideElementsContainer();
-      });
+      if (this.__firstClick === false) {
+        console.log("Add event!");
+        this.elementsContainer.addEventListener('click', function (event) {
+          if (thisReference.elementsContainer !== event.target) {
+            return;
+          }
+
+          thisReference.hideElementsContainer();
+        });
+        this.__firstClick = true;
+      }
     }
   }, {
     key: "onTagHover",
