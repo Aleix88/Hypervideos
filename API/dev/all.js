@@ -11,7 +11,6 @@ class Plugin {
 
     onTagClick(event) {
         const thisReference = this;
-        this.elementsContainer.style.display = "block";
         this.elementsContainer.addEventListener('click', (event) => {
             if (thisReference.elementsContainer !== event.target) {return;}
             thisReference.hideElementsContainer();
@@ -399,18 +398,6 @@ class YoutubeVideoManager extends ContainerManager {
     }
 }
 
-class VideoManagerFactory {
-
-    create(hypervideoType, containerID) {
-        switch(hypervideoType) {
-            case Hypervideo.YOUTUBE_TYPE:
-                return new YoutubeVideoManager(containerID);
-            default:
-                return new VideoTagManager(containerID);    
-        }
-    }
-
-}
 class HTMLManager {
 
     constructor(){}
@@ -508,6 +495,18 @@ class TouchEventsManager {
         element.addEventListener(touchType, (e)=>{
             handler(eventType, e);
         });
+    }
+
+}
+class VideoManagerFactory {
+
+    create(hypervideoType, containerID) {
+        switch(hypervideoType) {
+            case Hypervideo.YOUTUBE_TYPE:
+                return new YoutubeVideoManager(containerID);
+            default:
+                return new VideoTagManager(containerID);    
+        }
     }
 
 }

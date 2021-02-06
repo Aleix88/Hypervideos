@@ -10,7 +10,6 @@ const filesOrder = [
     "Model/VideoTimer.js",
     "Model/Observer/**/*.js",
     "Controller/Manager/**/*.js",
-    "Model/VideoManagerFactory.js",
     "Utils/*.js",
     "View/**/*.js",
     "Controller/*.js"

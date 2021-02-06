@@ -11,7 +11,6 @@ class Plugin {
 
     onTagClick(event) {
         const thisReference = this;
-        this.elementsContainer.style.display = "block";
         this.elementsContainer.addEventListener('click', (event) => {
             if (thisReference.elementsContainer !== event.target) {return;}
             thisReference.hideElementsContainer();
