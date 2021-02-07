@@ -13,7 +13,6 @@ class Plugin {
     onTagClick(event) {
         const thisReference = this;
         if (this.__firstClick === false) {
-            console.log("Add event!")
             this.elementsContainer.addEventListener('click', (event) => {
                 if (thisReference.elementsContainer !== event.target) {return;}
                 thisReference.hideElementsContainer();
@@ -636,12 +635,11 @@ class XPauseScreen extends HTMLElement {
     constructor() {
         super();
         this.htmlManager = new HTMLManager();
-        this.didClick = null;
+        this.clickHandler = null;
 
         let shadow = this.attachShadow({mode: 'open'});
         const container = this.htmlManager.createElement('div', {classList: ["pause-container"]});
         container.addEventListener('click', this.__onClick.bind(this));
-        //this.__addPlayIcon(container);
         shadow.appendChild(container);
         shadow.appendChild(this.__getStyle());
     }
@@ -657,13 +655,7 @@ class XPauseScreen extends HTMLElement {
     }
 
     __onClick() {
-        this.didClick();
-    }
-
-    __addPlayIcon(container) {
-        const img = this.htmlManager.createElement("img", {classList: ["play-image"]});
-        img.src = "./../../API/assets/play-button.svg";
-        container.appendChild(img);
+        this.clickHandler();
     }
 
     __getStyle () {
@@ -1935,12 +1927,6 @@ class HypervideoController {
     __videoStateChanged(state, target) {
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
-            case ContainerManager.PLAYING:
-                pauseScreen.hide();
-                break;
-            case ContainerManager.PAUSED:
-                pauseScreen.show();
-                break;
             case ContainerManager.LOADED:
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
@@ -2061,7 +2047,7 @@ class HypervideoController {
     __addPauseScreen(container) {
         const pauseScreen = this.htmlManager.createElement("x-pause-screen");
         const thisReference = this;
-        pauseScreen.didClick = (() => {
+        pauseScreen.clickHandler = (() => {
             if (thisReference.videoManager.isVideoPlaying()) {
                 thisReference.videoManager.pause();
             } else {

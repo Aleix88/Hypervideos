@@ -3,12 +3,11 @@ class XPauseScreen extends HTMLElement {
     constructor() {
         super();
         this.htmlManager = new HTMLManager();
-        this.didClick = null;
+        this.clickHandler = null;
 
         let shadow = this.attachShadow({mode: 'open'});
         const container = this.htmlManager.createElement('div', {classList: ["pause-container"]});
         container.addEventListener('click', this.__onClick.bind(this));
-        //this.__addPlayIcon(container);
         shadow.appendChild(container);
         shadow.appendChild(this.__getStyle());
     }
@@ -24,13 +23,7 @@ class XPauseScreen extends HTMLElement {
     }
 
     __onClick() {
-        this.didClick();
-    }
-
-    __addPlayIcon(container) {
-        const img = this.htmlManager.createElement("img", {classList: ["play-image"]});
-        img.src = "./../../API/assets/play-button.svg";
-        container.appendChild(img);
+        this.clickHandler();
     }
 
     __getStyle () {

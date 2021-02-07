@@ -56,7 +56,6 @@ var Plugin = /*#__PURE__*/function () {
       var thisReference = this;
 
       if (this.__firstClick === false) {
-        console.log("Add event!");
         this.elementsContainer.addEventListener('click', function (event) {
           if (thisReference.elementsContainer !== event.target) {
             return;
@@ -818,7 +817,7 @@ var XPauseScreen = /*#__PURE__*/function (_HTMLElement2) {
 
     _this5 = _super5.call(this);
     _this5.htmlManager = new HTMLManager();
-    _this5.didClick = null;
+    _this5.clickHandler = null;
 
     var shadow = _this5.attachShadow({
       mode: 'open'
@@ -828,8 +827,7 @@ var XPauseScreen = /*#__PURE__*/function (_HTMLElement2) {
       classList: ["pause-container"]
     });
 
-    container.addEventListener('click', _this5.__onClick.bind(_assertThisInitialized(_this5))); //this.__addPlayIcon(container);
-
+    container.addEventListener('click', _this5.__onClick.bind(_assertThisInitialized(_this5)));
     shadow.appendChild(container);
     shadow.appendChild(_this5.__getStyle());
     return _this5;
@@ -850,16 +848,7 @@ var XPauseScreen = /*#__PURE__*/function (_HTMLElement2) {
   }, {
     key: "__onClick",
     value: function __onClick() {
-      this.didClick();
-    }
-  }, {
-    key: "__addPlayIcon",
-    value: function __addPlayIcon(container) {
-      var img = this.htmlManager.createElement("img", {
-        classList: ["play-image"]
-      });
-      img.src = "./../../API/assets/play-button.svg";
-      container.appendChild(img);
+      this.clickHandler();
     }
   }, {
     key: "__getStyle",
@@ -1838,14 +1827,6 @@ var HypervideoController = /*#__PURE__*/function () {
       var pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
 
       switch (state) {
-        case ContainerManager.PLAYING:
-          pauseScreen.hide();
-          break;
-
-        case ContainerManager.PAUSED:
-          pauseScreen.show();
-          break;
-
         case ContainerManager.LOADED:
           this.videoManager.setVolume(0.5);
           this.videoLength = target.duration;
@@ -2004,7 +1985,7 @@ var HypervideoController = /*#__PURE__*/function () {
       var pauseScreen = this.htmlManager.createElement("x-pause-screen");
       var thisReference = this;
 
-      pauseScreen.didClick = function () {
+      pauseScreen.clickHandler = function () {
         if (thisReference.videoManager.isVideoPlaying()) {
           thisReference.videoManager.pause();
         } else {
