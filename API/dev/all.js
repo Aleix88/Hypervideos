@@ -309,15 +309,18 @@ class YoutubeVideoManager extends ContainerManager {
     }
     
     isVideoPlaying() {
+        if (this.player === null) {return;}
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
     get currentTime() {
+        if (this.player === null) {return;}
         return this.player.getCurrentTime();
     }
 
     //0-1
     loadProgress(progress) {
+        if (this.player === null) {return;}
         const videoDuration = this.player.getDuration();
         this.__loadTime(videoDuration * progress);
     }
@@ -443,9 +446,14 @@ class HTMLManager {
     }
 
     hexToRGBA(hexColor, alpha) {
-        const r = parseInt(hexColor.slice(1,3), 16);
-        const g = parseInt(hexColor.slice(3,5), 16);
-        const b = parseInt(hexColor.slice(5,7), 16);
+        let r = parseInt(hexColor.slice(1,3), 16);
+        let g = parseInt(hexColor.slice(3,5), 16);
+        let b = parseInt(hexColor.slice(5,7), 16);
+        r = isNaN(r) ? 255 : r;
+        if (hexColor.length <= 4) {
+            g = r;
+            b = r;
+        }
 
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
     }
@@ -847,8 +855,8 @@ class XTagButton extends HTMLElement {
     get hexColor() {return this.hexColor;}
 
     set position(newValue) {
-        this.style.top = newValue.x + "%";
-        this.style.left = newValue.y + "%";
+        this.style.top = newValue.y + "%";
+        this.style.left = newValue.x + "%";
         this.style.transform = "translate(-50%, -50%)";
     }
 
@@ -1524,7 +1532,7 @@ class Hypervideo {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
-    setupHypervideo(configJSON) {
+    setupHypervideo(config) {
 
         this.__addGlobalStyle();
         
@@ -1532,11 +1540,10 @@ class Hypervideo {
         container.appendChild(this.__getStyle());
 
         if (!this.__isDOMLoaded()) {
-            //TODO: AVISAR DE L'ERROR, PER ARA DEIXO UN CONSOLE LOG
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
 
-        this.config = this.__configJSONToObject(configJSON);
+        this.config = this.__assingIdToTags(config);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
             const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config);
@@ -1551,9 +1558,8 @@ class Hypervideo {
 
     }
 
-    __configJSONToObject(configJSON) {
+    __assingIdToTags(config) {
         try {
-            let config = JSON.parse(configJSON);
             let i = 0;
             config.tags = config.tags.map((t) => {
                 t.id = this.containerID + "-tag-" + i++;
@@ -2197,8 +2203,8 @@ class TagsController {
 
     __createTagPluginForTagIfNeeded(tagID, plugin) {
         if (this.plugins.hasOwnProperty(tagID) && this.plugins[tagID] != null) {return;} 
-        if (plugin == null) {
-            this.plugins[tagID] = plugin;
+        if (plugin == null || Object.keys(plugin).length === 0) {
+            this.plugins[tagID] = null;
             return;
         }
         const pluginName = plugin.name;

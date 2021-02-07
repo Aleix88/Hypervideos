@@ -39,9 +39,14 @@ class HTMLManager {
     }
 
     hexToRGBA(hexColor, alpha) {
-        const r = parseInt(hexColor.slice(1,3), 16);
-        const g = parseInt(hexColor.slice(3,5), 16);
-        const b = parseInt(hexColor.slice(5,7), 16);
+        let r = parseInt(hexColor.slice(1,3), 16);
+        let g = parseInt(hexColor.slice(3,5), 16);
+        let b = parseInt(hexColor.slice(5,7), 16);
+        r = isNaN(r) ? 255 : r;
+        if (hexColor.length <= 4) {
+            g = r;
+            b = r;
+        }
 
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
     }
