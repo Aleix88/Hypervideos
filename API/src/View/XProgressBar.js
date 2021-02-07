@@ -16,8 +16,6 @@ class XProgressBar extends HTMLElement {
         shadow.appendChild(bar);
     }
 
-    static POSITION_SET = "POSITION_SET";
-
     addMarkerAt(length) {
         const marker = this.htmlManager.createElement("div", {classList: ["progress-bar-marker"]});
         const progress = this.__convertLengthToProgress(length);
@@ -48,7 +46,6 @@ class XProgressBar extends HTMLElement {
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.changedTouches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
         this.progressBarChanged(this.currentProgress);
-        console.log("Leave");
     }
 
     __mouseUp(type, event) {
@@ -57,21 +54,18 @@ class XProgressBar extends HTMLElement {
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.changedTouches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
         this.progressBarChanged(this.currentProgress);
-        console.log("Up");
     }
 
     __mouseMoving(type, event) {
         if (!this.isMoving) {return;}
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
-        console.log("Moving");
     }
 
     __mouseDown(type, event) {
         this.isMoving = true;
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
-        console.log("Down");
     }
 
     __convertLengthToProgress(length) {

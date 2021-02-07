@@ -12,16 +12,6 @@ class XPauseScreen extends HTMLElement {
         shadow.appendChild(this.__getStyle());
     }
 
-    hide() {
-        const container = this.shadowRoot.querySelector(".pause-container");
-        container.classList.add("hide");
-    }
-
-    show() {
-        const container = this.shadowRoot.querySelector(".pause-container");
-        container.classList.remove("hide");
-    }
-
     __onClick() {
         this.clickHandler();
     }
@@ -37,10 +27,6 @@ class XPauseScreen extends HTMLElement {
                 cursor: pointer;
                 display: flex;
                 margin: 0;
-            }
-
-            .hide {
-                opacity: 0;
             }
 
             .play-image {
