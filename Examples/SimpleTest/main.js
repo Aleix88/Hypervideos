@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const video = `{
+  const video = {
     "videoTitle": "Video title",
     "size": {
       "width": 50,
@@ -81,9 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     ]
-  }`;
+  };
 
-  const tagsJSON = `{
+  const tagsJSON = {
     "videoTitle": "Video title",
     "size": {
       "width": 564,
@@ -176,12 +176,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     ]
-  }`;
+  };
 
-  // const hypervideo = new Hypervideo("H9vevyszht4", Hypervideo.YOUTUBE_TYPE, "hypervideo_123");
+  const hypervideo = new Hypervideo("H9vevyszht4", Hypervideo.YOUTUBE_TYPE, "hypervideo_123");
   const hypervideo2 = new Hypervideo("../TestVideos/f.mp4", Hypervideo.VIDEO_TYPE, "hypervideo_2");
   const hyperimage = new Hypervideo("../TestImages/nature.jpg", Hypervideo.IMAGE_TYPE, "hyperimage");
-  // hypervideo.setupHypervideo(video);
+  hypervideo.setupHypervideo(video);
   hypervideo2.setupHypervideo(video);
   hyperimage.setupHypervideo(tagsJSON);
 
