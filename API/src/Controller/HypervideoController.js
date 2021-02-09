@@ -22,12 +22,6 @@ class HypervideoController {
     __videoStateChanged(state, target) {
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
-            case ContainerManager.PLAYING:
-                pauseScreen.hide();
-                break;
-            case ContainerManager.PAUSED:
-                pauseScreen.show();
-                break;
             case ContainerManager.LOADED:
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
@@ -148,7 +142,7 @@ class HypervideoController {
     __addPauseScreen(container) {
         const pauseScreen = this.htmlManager.createElement("x-pause-screen");
         const thisReference = this;
-        pauseScreen.didClick = (() => {
+        pauseScreen.clickHandler = (() => {
             if (thisReference.videoManager.isVideoPlaying()) {
                 thisReference.videoManager.pause();
             } else {

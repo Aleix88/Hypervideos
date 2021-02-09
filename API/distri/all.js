@@ -48,19 +48,23 @@ var Plugin = /*#__PURE__*/function () {
       this.container = container;
       this.elementsContainer = elementsContainer;
       this.videoManager = videoManager;
+      this.__firstClick = false;
     }
   }, {
     key: "onTagClick",
     value: function onTagClick(event) {
       var thisReference = this;
-      this.elementsContainer.style.display = "block";
-      this.elementsContainer.addEventListener('click', function (event) {
-        if (thisReference.elementsContainer !== event.target) {
-          return;
-        }
 
-        thisReference.hideElementsContainer();
-      });
+      if (this.__firstClick === false) {
+        this.elementsContainer.addEventListener('click', function (event) {
+          if (thisReference.elementsContainer !== event.target) {
+            return;
+          }
+
+          thisReference.hideElementsContainer();
+        });
+        this.__firstClick = true;
+      }
     }
   }, {
     key: "onTagHover",
@@ -600,27 +604,6 @@ var YoutubeVideoManager = /*#__PURE__*/function (_ContainerManager2) {
   return YoutubeVideoManager;
 }(ContainerManager);
 
-var VideoManagerFactory = /*#__PURE__*/function () {
-  function VideoManagerFactory() {
-    _classCallCheck(this, VideoManagerFactory);
-  }
-
-  _createClass(VideoManagerFactory, [{
-    key: "create",
-    value: function create(hypervideoType, containerID) {
-      switch (hypervideoType) {
-        case Hypervideo.YOUTUBE_TYPE:
-          return new YoutubeVideoManager(containerID);
-
-        default:
-          return new VideoTagManager(containerID);
-      }
-    }
-  }]);
-
-  return VideoManagerFactory;
-}();
-
 var HTMLManager = /*#__PURE__*/function () {
   function HTMLManager() {
     _classCallCheck(this, HTMLManager);
@@ -752,6 +735,27 @@ _defineProperty(TouchEventsManager, "IS_TOUCH_EVENT", 0);
 
 _defineProperty(TouchEventsManager, "IS_CLICK_EVENT", 1);
 
+var VideoManagerFactory = /*#__PURE__*/function () {
+  function VideoManagerFactory() {
+    _classCallCheck(this, VideoManagerFactory);
+  }
+
+  _createClass(VideoManagerFactory, [{
+    key: "create",
+    value: function create(hypervideoType, containerID) {
+      switch (hypervideoType) {
+        case Hypervideo.YOUTUBE_TYPE:
+          return new YoutubeVideoManager(containerID);
+
+        default:
+          return new VideoTagManager(containerID);
+      }
+    }
+  }]);
+
+  return VideoManagerFactory;
+}();
+
 var XFullScreenButton = /*#__PURE__*/function (_HTMLElement) {
   _inherits(XFullScreenButton, _HTMLElement);
 
@@ -832,7 +836,7 @@ var XPauseScreen = /*#__PURE__*/function (_HTMLElement2) {
 
     _this5 = _super5.call(this);
     _this5.htmlManager = new HTMLManager();
-    _this5.didClick = null;
+    _this5.clickHandler = null;
 
     var shadow = _this5.attachShadow({
       mode: 'open'
@@ -842,44 +846,22 @@ var XPauseScreen = /*#__PURE__*/function (_HTMLElement2) {
       classList: ["pause-container"]
     });
 
-    container.addEventListener('click', _this5.__onClick.bind(_assertThisInitialized(_this5))); //this.__addPlayIcon(container);
-
+    container.addEventListener('click', _this5.__onClick.bind(_assertThisInitialized(_this5)));
     shadow.appendChild(container);
     shadow.appendChild(_this5.__getStyle());
     return _this5;
   }
 
   _createClass(XPauseScreen, [{
-    key: "hide",
-    value: function hide() {
-      var container = this.shadowRoot.querySelector(".pause-container");
-      container.classList.add("hide");
-    }
-  }, {
-    key: "show",
-    value: function show() {
-      var container = this.shadowRoot.querySelector(".pause-container");
-      container.classList.remove("hide");
-    }
-  }, {
     key: "__onClick",
     value: function __onClick() {
-      this.didClick();
-    }
-  }, {
-    key: "__addPlayIcon",
-    value: function __addPlayIcon(container) {
-      var img = this.htmlManager.createElement("img", {
-        classList: ["play-image"]
-      });
-      img.src = "./../../API/assets/play-button.svg";
-      container.appendChild(img);
+      this.clickHandler();
     }
   }, {
     key: "__getStyle",
     value: function __getStyle() {
       var style = document.createElement("style");
-      style.textContent = "\n\n            .pause-container {\n                width: 100%;\n                height: 100%;\n                background: rgba(0,0,0,0.1);\n                cursor: pointer;\n                display: flex;\n                margin: 0;\n            }\n\n            .hide {\n                opacity: 0;\n            }\n\n            .play-image {\n                width: 100px;\n                height: 100px;\n                margin: auto;\n            }\n        ";
+      style.textContent = "\n\n            .pause-container {\n                width: 100%;\n                height: 100%;\n                background: rgba(0,0,0,0.1);\n                cursor: pointer;\n                display: flex;\n                margin: 0;\n            }\n\n            .play-image {\n                width: 100px;\n                height: 100px;\n                margin: auto;\n            }\n        ";
       return style;
     }
   }]);
@@ -967,7 +949,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement3) {
       this.__recalculatePosition(clientX);
 
       this.progressBarChanged(this.currentProgress);
-      console.log("Leave");
     }
   }, {
     key: "__mouseUp",
@@ -982,7 +963,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement3) {
       this.__recalculatePosition(clientX);
 
       this.progressBarChanged(this.currentProgress);
-      console.log("Up");
     }
   }, {
     key: "__mouseMoving",
@@ -994,8 +974,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement3) {
       var clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
 
       this.__recalculatePosition(clientX);
-
-      console.log("Moving");
     }
   }, {
     key: "__mouseDown",
@@ -1004,8 +982,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement3) {
       var clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
 
       this.__recalculatePosition(clientX);
-
-      console.log("Down");
     }
   }, {
     key: "__convertLengthToProgress",
@@ -1052,8 +1028,6 @@ var XProgressBar = /*#__PURE__*/function (_HTMLElement3) {
 
   return XProgressBar;
 }( /*#__PURE__*/_wrapNativeSuper(HTMLElement));
-
-_defineProperty(XProgressBar, "POSITION_SET", "POSITION_SET");
 
 customElements.define('x-progress-bar', XProgressBar);
 
@@ -1813,7 +1787,7 @@ var Hypervideo = /*#__PURE__*/function () {
     key: "__getStyle",
     value: function __getStyle() {
       var style = document.createElement('style');
-      style.textContent = "\n\n        video {\n            width: 100%;\n            height: 100%;\n            background: black;\n        }\n        \n        button {\n            cursor: pointer;\n        }\n        \n        .youtube-frame {\n            width: 100%;\n            height: 100%;\n            position: absolute;\n            top: 0;\n            left: 0;\n        }\n\n        .hyperimage {\n            width: 100%;\n            height: 100%;\n            object-fit: contain;\n        }\n        \n        .hypervideo-container {\n            position: relative;\n            width: 100%;\n            height: 100%;\n            text-align:center;\n            user-drag: none; \n            user-select: none;\n            -moz-user-select: none;\n            -webkit-user-drag: none;\n            -webkit-user-select: none;\n            -ms-user-select: none;\n        }\n\n        .img-container {\n            margin: auto;\n            position: relative;\n        }\n        \n        /* Top control bar */\n        .top-controller {\n            background: rgb(0,0,0);\n            background: linear-gradient(180deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);\n            position: absolute;\n            top: 0;\n            left: 0;\n            right: 0;\n            opacity: 0;\n            transition: opacity 0.2s;\n            text-align:left;\n        }\n\n        .top-title {\n            color:white;\n            margin: 1em;\n            overflow: hidden;\n            text-overflow: ellipsis;\n            display: -webkit-box;\n            -webkit-line-clamp: 1;\n            -webkit-box-orient: vertical;\n        }\n\n        .hypervideo-container:hover > .top-controller,\n        .hypervideo-container:focus > .top-controller {\n            opacity: 1;\n        }\n        \n\n        /* Tags */\n\n        x-tag-button {\n            pointer-events: all;\n            position: absolute;\n            width: 5%;\n            top: 50px;\n            left: 50px;\n            display: block;\n            visibility: hidden;\n        }\n\n        .tags-container {\n            pointer-events: none;\n            position: absolute;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n        }\n\n        /*  Bottom control bar  */\n        .bottom-controller {\n            display: flex;\n            opacity: 0;\n            justify-content: flex-start;\n            position: absolute;\n            bottom: 0;\n            left: 0;\n            right: 0;\n            background: rgb(0,0,0);\n            background: linear-gradient(0deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);\n            padding: 4px;\n            transition: opacity 0.2s;\n        }\n\n        .hypervideo-container:hover > .bottom-controller,\n        .hypervideo-container:focus > .bottom-controller {\n            opacity: 1;\n        }\n        \n        .control-button-container {\n            background: rgba(0,0,0,0);\n            height: 2em;\n            padding-left: 0.4em;\n            padding-right: 0.4em;\n            border: none;\n            cursor: pointer;\n        }\n        \n        .control-button-container:not(:last-child) {\n            margin-right: 2px;\n        }\n        \n        .control-button {\n            color: white;  \n            border: none;\n            outline: none;\n            background-color: rgba(0,0,0,0);\n            height: 100%; \n            width: 2em;\n            margin: auto;\n            padding: 0;\n        }\n        \n        .control-button:hover,\n        .control-button:focus {\n            color: rgb(97, 87, 245);\n        }\n        \n        .progress-container {\n            flex-grow: 1;\n            margin-right: 2px;\n            height: 3px;\n            background: rgba(210,210,210,0.68);\n            align-self: center;\n            position: relative;\n            cursor: pointer; \n            transition: height 0.2s;\n        }        \n\n        .progress-container:focus,\n        .progress-container:hover {\n            height: 5px;\n        }\n\n        x-time-counter {\n            display: flex;\n            margin-right: 1em;\n            align-items: center;\n        }\n\n        x-pause-screen {\n            width: 100%;\n            height: 100%;\n            margin: auto;\n            position: absolute;\n            top: 0;\n            left: 0;\n        }\n\n        x-full-screen-button {\n            position: absolute;\n            bottom: 1em;\n            right: 1em;\n        }\n\n        \n        /* ICONS */\n        \n        .gg-play-button {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 22px;\n            height: 22px;\n            margin: auto; /*Aquesta linia s'ha d'afegir*/\n        }\n        .gg-play-button::before {\n            content: \"\";\n            display: block;\n            box-sizing: border-box;\n            position: absolute;\n            width: 0;\n            height: 10px;\n            border-top: 5px solid transparent;\n            border-bottom: 5px solid transparent;\n            border-left: 6px solid;\n            top: 6px;\n            left: 9px;\n        }\n        \n        .gg-repeat {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            box-shadow:\n                -2px -2px 0 0,\n                2px 2px 0 0;\n            width: 14px;\n            height: 6px;\n            margin: auto;\n        }\n        .gg-repeat::after,\n        .gg-repeat::before {\n            content: \"\";\n            display: block;\n            box-sizing: border-box;\n            position: absolute;\n            width: 0;\n            height: 0;\n            border-top: 3px solid transparent;\n            border-bottom: 3px solid transparent;\n        }\n        .gg-repeat::before {\n            border-left: 5px solid;\n            top: -4px;\n            right: 0;\n        }\n        .gg-repeat::after {\n            border-right: 5px solid;\n            bottom: -4px;\n            left: 0;\n        }\n        .gg-maximize {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 14px;\n            height: 14px;\n            box-shadow:\n                -6px -6px 0 -4px,\n                6px 6px 0 -4px,\n                6px -6px 0 -4px,\n                -6px 6px 0 -4px;\n            margin: auto;\n        }\n        \n        .gg-minimize {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 4px;\n            height: 4px;\n            box-shadow:\n                -8px -4px 0 -1px,\n                -6px -4px 0 -1px,\n                8px 4px 0 -1px,\n                6px 4px 0 -1px,\n                8px -4px 0 -1px,\n                6px -4px 0 -1px,\n                -8px 4px 0 -1px,\n                -6px 4px 0 -1px;\n            margin: auto;\n        }\n        .gg-minimize::after,\n        .gg-minimize::before {\n            content: \"\";\n            display: block;\n            box-sizing: border-box;\n            position: absolute;\n            width: 2px;\n            height: 18px;\n            border-top: 6px solid;\n            border-bottom: 6px solid;\n            box-shadow: 18px 0 0 -2px;\n            top: -7px;\n        }\n        .gg-minimize::after {\n            left: -3px;\n        }\n        .gg-minimize::before {\n            right: -3px;\n        }\n        \n        .gg-play-pause {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 8px;\n            height: 10px;\n            border-left: 3px solid;\n            border-right: 3px solid;\n            margin: auto;\n        }\n        \n        ";
+      style.textContent = "\n\n        video {\n            width: 100%;\n            height: 100%;\n            background: black;\n        }\n        \n        button {\n            cursor: pointer;\n        }\n        \n        .youtube-frame {\n            width: 100%;\n            height: 100%;\n            position: absolute;\n            top: 0;\n            left: 0;\n        }\n\n        .hyperimage {\n            width: 100%;\n            height: 100%;\n            object-fit: contain;\n        }\n        \n        .hypervideo-container {\n            position: relative;\n            width: 100%;\n            height: 100%;\n            text-align:center;\n            user-drag: none; \n            user-select: none;\n            -moz-user-select: none;\n            -webkit-user-drag: none;\n            -webkit-user-select: none;\n            -ms-user-select: none;\n        }\n\n        .img-container {\n            margin: auto;\n            position: relative;\n            width: 100%;\n            height: 100%;\n            text-align: center;\n        }\n        \n        /* Top control bar */\n        .top-controller {\n            background: rgb(0,0,0);\n            background: linear-gradient(180deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);\n            position: absolute;\n            top: 0;\n            left: 0;\n            right: 0;\n            opacity: 0;\n            transition: opacity 0.2s;\n            text-align:left;\n        }\n\n        .top-title {\n            color:white;\n            margin: 1em;\n            overflow: hidden;\n            text-overflow: ellipsis;\n            display: -webkit-box;\n            -webkit-line-clamp: 1;\n            -webkit-box-orient: vertical;\n        }\n\n        .hypervideo-container:hover > .top-controller,\n        .hypervideo-container:focus > .top-controller {\n            opacity: 1;\n        }\n        \n\n        /* Tags */\n\n        x-tag-button {\n            pointer-events: all;\n            position: absolute;\n            width: 5%;\n            top: 50px;\n            left: 50px;\n            display: block;\n            visibility: hidden;\n        }\n\n        .tags-container {\n            pointer-events: none;\n            position: absolute;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n        }\n\n        /*  Bottom control bar  */\n        .bottom-controller {\n            display: flex;\n            opacity: 0;\n            justify-content: flex-start;\n            position: absolute;\n            bottom: 0;\n            left: 0;\n            right: 0;\n            background: rgb(0,0,0);\n            background: linear-gradient(0deg, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);\n            padding: 4px;\n            transition: opacity 0.2s;\n        }\n\n        .hypervideo-container:hover > .bottom-controller,\n        .hypervideo-container:focus > .bottom-controller {\n            opacity: 1;\n        }\n        \n        .control-button-container {\n            background: rgba(0,0,0,0);\n            height: 2em;\n            padding-left: 0.4em;\n            padding-right: 0.4em;\n            border: none;\n            cursor: pointer;\n        }\n        \n        .control-button-container:not(:last-child) {\n            margin-right: 2px;\n        }\n        \n        .control-button {\n            color: white;  \n            border: none;\n            outline: none;\n            background-color: rgba(0,0,0,0);\n            height: 100%; \n            width: 2em;\n            margin: auto;\n            padding: 0;\n        }\n        \n        .control-button:hover,\n        .control-button:focus {\n            color: rgb(97, 87, 245);\n        }\n        \n        .progress-container {\n            flex-grow: 1;\n            margin-right: 2px;\n            height: 3px;\n            background: rgba(210,210,210,0.68);\n            align-self: center;\n            position: relative;\n            cursor: pointer; \n            transition: height 0.2s;\n        }        \n\n        .progress-container:focus,\n        .progress-container:hover {\n            height: 5px;\n        }\n\n        x-time-counter {\n            display: flex;\n            margin-right: 1em;\n            align-items: center;\n        }\n\n        x-pause-screen {\n            width: 100%;\n            height: 100%;\n            margin: auto;\n            position: absolute;\n            top: 0;\n            left: 0;\n        }\n\n        x-full-screen-button {\n            position: absolute;\n            bottom: 1em;\n            right: 1em;\n        }\n\n        \n        /* ICONS */\n        \n        .gg-play-button {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 22px;\n            height: 22px;\n            margin: auto; /*Aquesta linia s'ha d'afegir*/\n        }\n        .gg-play-button::before {\n            content: \"\";\n            display: block;\n            box-sizing: border-box;\n            position: absolute;\n            width: 0;\n            height: 10px;\n            border-top: 5px solid transparent;\n            border-bottom: 5px solid transparent;\n            border-left: 6px solid;\n            top: 6px;\n            left: 9px;\n        }\n        \n        .gg-repeat {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            box-shadow:\n                -2px -2px 0 0,\n                2px 2px 0 0;\n            width: 14px;\n            height: 6px;\n            margin: auto;\n        }\n        .gg-repeat::after,\n        .gg-repeat::before {\n            content: \"\";\n            display: block;\n            box-sizing: border-box;\n            position: absolute;\n            width: 0;\n            height: 0;\n            border-top: 3px solid transparent;\n            border-bottom: 3px solid transparent;\n        }\n        .gg-repeat::before {\n            border-left: 5px solid;\n            top: -4px;\n            right: 0;\n        }\n        .gg-repeat::after {\n            border-right: 5px solid;\n            bottom: -4px;\n            left: 0;\n        }\n        .gg-maximize {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 14px;\n            height: 14px;\n            box-shadow:\n                -6px -6px 0 -4px,\n                6px 6px 0 -4px,\n                6px -6px 0 -4px,\n                -6px 6px 0 -4px;\n            margin: auto;\n        }\n        \n        .gg-minimize {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 4px;\n            height: 4px;\n            box-shadow:\n                -8px -4px 0 -1px,\n                -6px -4px 0 -1px,\n                8px 4px 0 -1px,\n                6px 4px 0 -1px,\n                8px -4px 0 -1px,\n                6px -4px 0 -1px,\n                -8px 4px 0 -1px,\n                -6px 4px 0 -1px;\n            margin: auto;\n        }\n        .gg-minimize::after,\n        .gg-minimize::before {\n            content: \"\";\n            display: block;\n            box-sizing: border-box;\n            position: absolute;\n            width: 2px;\n            height: 18px;\n            border-top: 6px solid;\n            border-bottom: 6px solid;\n            box-shadow: 18px 0 0 -2px;\n            top: -7px;\n        }\n        .gg-minimize::after {\n            left: -3px;\n        }\n        .gg-minimize::before {\n            right: -3px;\n        }\n        \n        .gg-play-pause {\n            box-sizing: border-box;\n            position: relative;\n            display: block;\n            transform: scale(var(--ggs,1));\n            width: 8px;\n            height: 10px;\n            border-left: 3px solid;\n            border-right: 3px solid;\n            margin: auto;\n        }\n        \n        ";
       return style;
     }
   }]);
@@ -1850,14 +1824,6 @@ var HypervideoController = /*#__PURE__*/function () {
       var pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
 
       switch (state) {
-        case ContainerManager.PLAYING:
-          pauseScreen.hide();
-          break;
-
-        case ContainerManager.PAUSED:
-          pauseScreen.show();
-          break;
-
         case ContainerManager.LOADED:
           this.videoManager.setVolume(0.5);
           this.videoLength = target.duration;
@@ -2016,7 +1982,7 @@ var HypervideoController = /*#__PURE__*/function () {
       var pauseScreen = this.htmlManager.createElement("x-pause-screen");
       var thisReference = this;
 
-      pauseScreen.didClick = function () {
+      pauseScreen.clickHandler = function () {
         if (thisReference.videoManager.isVideoPlaying()) {
           thisReference.videoManager.pause();
         } else {

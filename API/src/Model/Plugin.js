@@ -7,15 +7,18 @@ class Plugin {
         this.container = container;
         this.elementsContainer = elementsContainer;
         this.videoManager = videoManager;
+        this.__firstClick = false;
     }
 
     onTagClick(event) {
         const thisReference = this;
-        this.elementsContainer.style.display = "block";
-        this.elementsContainer.addEventListener('click', (event) => {
-            if (thisReference.elementsContainer !== event.target) {return;}
-            thisReference.hideElementsContainer();
-        });
+        if (this.__firstClick === false) {
+            this.elementsContainer.addEventListener('click', (event) => {
+                if (thisReference.elementsContainer !== event.target) {return;}
+                thisReference.hideElementsContainer();
+            });
+            this.__firstClick = true;
+        }
     }
 
     onTagHover(event) {

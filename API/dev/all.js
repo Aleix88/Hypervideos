@@ -7,15 +7,18 @@ class Plugin {
         this.container = container;
         this.elementsContainer = elementsContainer;
         this.videoManager = videoManager;
+        this.__firstClick = false;
     }
 
     onTagClick(event) {
         const thisReference = this;
-        this.elementsContainer.style.display = "block";
-        this.elementsContainer.addEventListener('click', (event) => {
-            if (thisReference.elementsContainer !== event.target) {return;}
-            thisReference.hideElementsContainer();
-        });
+        if (this.__firstClick === false) {
+            this.elementsContainer.addEventListener('click', (event) => {
+                if (thisReference.elementsContainer !== event.target) {return;}
+                thisReference.hideElementsContainer();
+            });
+            this.__firstClick = true;
+        }
     }
 
     onTagHover(event) {
@@ -402,18 +405,6 @@ class YoutubeVideoManager extends ContainerManager {
     }
 }
 
-class VideoManagerFactory {
-
-    create(hypervideoType, containerID) {
-        switch(hypervideoType) {
-            case Hypervideo.YOUTUBE_TYPE:
-                return new YoutubeVideoManager(containerID);
-            default:
-                return new VideoTagManager(containerID);    
-        }
-    }
-
-}
 class HTMLManager {
 
     constructor(){}
@@ -516,6 +507,18 @@ class TouchEventsManager {
         element.addEventListener(touchType, (e)=>{
             handler(eventType, e);
         });
+    }
+
+}
+class VideoManagerFactory {
+
+    create(hypervideoType, containerID) {
+        switch(hypervideoType) {
+            case Hypervideo.YOUTUBE_TYPE:
+                return new YoutubeVideoManager(containerID);
+            default:
+                return new VideoTagManager(containerID);    
+        }
     }
 
 }
@@ -640,34 +643,17 @@ class XPauseScreen extends HTMLElement {
     constructor() {
         super();
         this.htmlManager = new HTMLManager();
-        this.didClick = null;
+        this.clickHandler = null;
 
         let shadow = this.attachShadow({mode: 'open'});
         const container = this.htmlManager.createElement('div', {classList: ["pause-container"]});
         container.addEventListener('click', this.__onClick.bind(this));
-        //this.__addPlayIcon(container);
         shadow.appendChild(container);
         shadow.appendChild(this.__getStyle());
     }
 
-    hide() {
-        const container = this.shadowRoot.querySelector(".pause-container");
-        container.classList.add("hide");
-    }
-
-    show() {
-        const container = this.shadowRoot.querySelector(".pause-container");
-        container.classList.remove("hide");
-    }
-
     __onClick() {
-        this.didClick();
-    }
-
-    __addPlayIcon(container) {
-        const img = this.htmlManager.createElement("img", {classList: ["play-image"]});
-        img.src = "./../../API/assets/play-button.svg";
-        container.appendChild(img);
+        this.clickHandler();
     }
 
     __getStyle () {
@@ -681,10 +667,6 @@ class XPauseScreen extends HTMLElement {
                 cursor: pointer;
                 display: flex;
                 margin: 0;
-            }
-
-            .hide {
-                opacity: 0;
             }
 
             .play-image {
@@ -718,8 +700,6 @@ class XProgressBar extends HTMLElement {
         shadow.appendChild(bar);
     }
 
-    static POSITION_SET = "POSITION_SET";
-
     addMarkerAt(length) {
         const marker = this.htmlManager.createElement("div", {classList: ["progress-bar-marker"]});
         const progress = this.__convertLengthToProgress(length);
@@ -750,7 +730,6 @@ class XProgressBar extends HTMLElement {
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.changedTouches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
         this.progressBarChanged(this.currentProgress);
-        console.log("Leave");
     }
 
     __mouseUp(type, event) {
@@ -759,21 +738,18 @@ class XProgressBar extends HTMLElement {
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.changedTouches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
         this.progressBarChanged(this.currentProgress);
-        console.log("Up");
     }
 
     __mouseMoving(type, event) {
         if (!this.isMoving) {return;}
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
-        console.log("Moving");
     }
 
     __mouseDown(type, event) {
         this.isMoving = true;
         const clientX = type === TouchEventsManager.IS_TOUCH_EVENT ? event.touches[0].clientX : event.clientX;
         this.__recalculatePosition(clientX);
-        console.log("Down");
     }
 
     __convertLengthToProgress(length) {
@@ -1644,6 +1620,9 @@ class Hypervideo {
         .img-container {
             margin: auto;
             position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
         }
         
         /* Top control bar */
@@ -1937,12 +1916,6 @@ class HypervideoController {
     __videoStateChanged(state, target) {
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
-            case ContainerManager.PLAYING:
-                pauseScreen.hide();
-                break;
-            case ContainerManager.PAUSED:
-                pauseScreen.show();
-                break;
             case ContainerManager.LOADED:
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
@@ -2063,7 +2036,7 @@ class HypervideoController {
     __addPauseScreen(container) {
         const pauseScreen = this.htmlManager.createElement("x-pause-screen");
         const thisReference = this;
-        pauseScreen.didClick = (() => {
+        pauseScreen.clickHandler = (() => {
             if (thisReference.videoManager.isVideoPlaying()) {
                 thisReference.videoManager.pause();
             } else {

@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const video = {
     "videoTitle": "Video title",
     "size": {
@@ -82,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     ]
   };
-
   const tagsJSON = {
     "videoTitle": "Video title",
     "size": {
@@ -142,6 +140,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 "wrongAnswers": [
                   "El nombre del viento",
                   "Juego de tronos",
+                  "El hobbit",
+                  "Juego de tronos",
+                  "El hobbit",
+                  "Juego de tronos",
+                  "El hobbit",
+                  "Juego de tronos",
                   "El hobbit"
                 ]
             }
@@ -177,15 +181,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     ]
   };
-
   const hypervideo = new Hypervideo("H9vevyszht4", Hypervideo.YOUTUBE_TYPE, "hypervideo_123");
   const hypervideo2 = new Hypervideo("../TestVideos/f.mp4", Hypervideo.VIDEO_TYPE, "hypervideo_2");
   const hyperimage = new Hypervideo("../TestImages/nature.jpg", Hypervideo.IMAGE_TYPE, "hyperimage");
   hypervideo.setupHypervideo(video);
   hypervideo2.setupHypervideo(video);
   hyperimage.setupHypervideo(tagsJSON);
-
-    
-
-
 })
