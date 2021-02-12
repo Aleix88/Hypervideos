@@ -845,7 +845,7 @@ class XTagButton extends HTMLElement {
         if (newValue === true) {
             this.__animateAppear();
         } else if (newValue === false) {
-            this.__animateDisppear();
+            this.__animateDisappear();
         }
         this.oldIsVisible = newValue;
     }
@@ -890,7 +890,7 @@ class XTagButton extends HTMLElement {
         this.tagCircleContainer.classList.add("effectAppear");
     }
 
-    __animateDisppear() {
+    __animateDisappear() {
 
         const thisReference = this;
         const timer = setInterval(() => {

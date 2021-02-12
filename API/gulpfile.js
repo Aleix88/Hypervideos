@@ -16,7 +16,7 @@ const filesOrder = [
 ];
 
 function babelTask(cb) {
-    return src('./dev/all.js')
+    return src('./dev/hypervideo.js')
     //Converteix el ECMA6 en ECMA5 per poder fer minify
     .pipe(babel({
         presets: ['@babel/env'],
@@ -49,7 +49,7 @@ function concatTask(cb) {
     return src('./src/**/*.js')
     .pipe(order(filesOrder))
     //Unifiquem tots els fitxers en un que es dira all.js
-    .pipe(concat("all.js"))
+    .pipe(concat("hypervideo.js"))
     .pipe(dest('./dev'));
 }
 

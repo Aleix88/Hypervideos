@@ -1125,8 +1125,8 @@ var XTagButton = /*#__PURE__*/function (_HTMLElement4) {
       this.tagCircleContainer.classList.add("effectAppear");
     }
   }, {
-    key: "__animateDisppear",
-    value: function __animateDisppear() {
+    key: "__animateDisappear",
+    value: function __animateDisappear() {
       var thisReference = this;
       var timer = setInterval(function () {
         thisReference.style.visibility = "hidden";
@@ -1171,7 +1171,7 @@ var XTagButton = /*#__PURE__*/function (_HTMLElement4) {
       if (newValue === true) {
         this.__animateAppear();
       } else if (newValue === false) {
-        this.__animateDisppear();
+        this.__animateDisappear();
       }
 
       this.oldIsVisible = newValue;
