@@ -1377,7 +1377,7 @@ var XVolumeBar = /*#__PURE__*/function (_HTMLElement6) {
     key: "setVolume",
     value: function setVolume(volume) {
       volume = volume < 0 ? 0 : volume;
-      volume = volume > 100 ? 100 : volume;
+      volume = volume > this.maxVolume ? this.maxVolume : volume;
       this.volume = volume;
       this.volumeChanged(volume);
       var volumeLevelBar = this.shadowRoot.querySelector(".volume-bar-level");

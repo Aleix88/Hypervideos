@@ -1124,7 +1124,7 @@ class XVolumeBar extends HTMLElement {
 
     setVolume(volume) {
         volume = volume < 0 ? 0 : volume;
-        volume = volume > 100 ? 100 : volume;
+        volume = volume > this.maxVolume ? this.maxVolume : volume;
         this.volume = volume;
         this.volumeChanged(volume);
         const volumeLevelBar = this.shadowRoot.querySelector(".volume-bar-level");
