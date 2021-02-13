@@ -122,23 +122,21 @@ class MediaManager extends Subject {
     static EXIT_FULL_SCREEN = 4;
 
     __exitFullScreenEventListeners() {
-        document.addEventListener('fullscreenchange', this._exitFSHandler.bind(this), false);
-        document.addEventListener('mozfullscreenchange', this._exitFSHandler.bind(this), false);
-        document.addEventListener('MSFullscreenChange', this._exitFSHandler.bind(this), false);
-        document.addEventListener('webkitfullscreenchange', this._exitFSHandler.bind(this), false);
+        document.addEventListener('fullscreenchange', this._fullScreenChangeHandler.bind(this), false);
+        document.addEventListener('mozfullscreenchange', this._fullScreenChangeHandler.bind(this), false);
+        document.addEventListener('MSFullscreenChange', this._fullScreenChangeHandler.bind(this), false);
+        document.addEventListener('webkitfullscreenchange', this._fullScreenChangeHandler.bind(this), false);
     }
 
-    _exitFSHandler(event) {
+    _fullScreenChangeHandler(event) {
         if (event.target.id !== this.containerID) {return;}
         if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
             this.isFullScreen = false;
             this.mediaStateChanged(MediaManager.EXIT_FULL_SCREEN);
+        } else {
+            this.isFullScreen = true;
+            this.mediaStateChanged(MediaManager.ENTER_FULL_SCREEN);
         }
-    }
-
-    _enterFSHandler() {
-        this.isFullScreen = true;
-        this.mediaStateChanged(MediaManager.ENTER_FULL_SCREEN);
     }
 
     toggleFullScreen() {
@@ -154,16 +152,12 @@ class MediaManager extends Subject {
     requestFullScreen(container) {
         if (container.requestFullscreen) {
             container.requestFullscreen();
-            this._enterFSHandler();
         } else if (container.mozRequestFullScreen) {
             container.mozRequestFullScreen();
-            this._enterFSHandler();
         } else if (container.webkitRequestFullscreen) {
             container.webkitRequestFullscreen();
-            this._enterFSHandler();
         } else if (container.msRequestFullscreen) {
             container.msRequestFullscreen();
-            this._enterFSHandler();
         }
     }
 
