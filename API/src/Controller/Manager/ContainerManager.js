@@ -41,6 +41,7 @@ class ContainerManager extends Subject {
     }
 
     _exitFSHandler(event) {
+        if (event.target.id !== this.containerID) {return;}
         if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
             this.isFullScreen = false;
             this.videoStateChanged(ContainerManager.EXIT_FULL_SCREEN);
@@ -81,13 +82,10 @@ class ContainerManager extends Subject {
     requestExitFullScreen(container) {
         if (document.exitFullscreen) {
             document.exitFullscreen();
-            this._exitFSHandler();
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
-            this._exitFSHandler();
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
-            this._exitFSHandler();
         }
     }
 }
