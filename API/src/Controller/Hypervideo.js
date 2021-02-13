@@ -16,11 +16,11 @@ class Hypervideo {
 
     setupHypervideo(config) {
 
-        this.__addGlobalStyle();
         
         if (!this.__isDOMLoaded()) {
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
+        this.__addGlobalStyle();
 
         this.config = this.__assingIdToTags(config);
 
