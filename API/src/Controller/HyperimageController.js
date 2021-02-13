@@ -1,21 +1,21 @@
 class HyperimageController {
 
-    constructor(imageSRC, containerID, config, containerManager){
+    constructor(imageSRC, containerID, config, mediaManager){
         this.containerID = containerID;
         this.imageSRC = imageSRC;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, null);
-        this.containerManager = containerManager;
-        this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
+        this.mediaManager = mediaManager;
+        this.mediaManager.mediaStateChanged = this.__mediaStateChanged.bind(this);
     }
 
-    __videoStateChanged(state, target) {
+    __mediaStateChanged(state, target) {
         switch (state) {
-            case ContainerManager.ENTER_FULL_SCREEN:
+            case MediaManager.ENTER_FULL_SCREEN:
                 this.__fullScreenStateChanged(true);
             break;
-            case ContainerManager.EXIT_FULL_SCREEN:
+            case MediaManager.EXIT_FULL_SCREEN:
                 this.__fullScreenStateChanged(false);
             break;
             default:
@@ -79,7 +79,7 @@ class HyperimageController {
         this.fullScreenButton = this.htmlManager.createElement("x-full-screen-button");
         const thisReference = this;
         this.fullScreenButton.clickHandler = () => {
-            thisReference.containerManager.toggleFullScreen();
+            thisReference.mediaManager.toggleFullScreen();
         };
         container.appendChild(this.fullScreenButton);
     }

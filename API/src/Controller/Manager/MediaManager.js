@@ -1,9 +1,9 @@
-class ContainerManager extends Subject {
+class MediaManager extends Subject {
 
     constructor(containerID) {
         super();
         this.containerID = containerID;
-        this.videoStateChanged = null;
+        this.mediaStateChanged = null;
         this.isFullScreen = false;
 
         this.__exitFullScreenEventListeners();
@@ -14,24 +14,6 @@ class ContainerManager extends Subject {
     static LOADED = 2;
     static ENTER_FULL_SCREEN = 3;
     static EXIT_FULL_SCREEN = 4;
-
-    play() {}
-
-    pause() {}
-
-    restartVideo() {}
-
-    isVideoPlaying(){}
-
-    getVideoDuration() {}
-
-    get currentTime() {return 0;}
-    
-    //0-1
-    loadProgress(progress) {}
-
-    //0-1
-    setVolume(volume) {}
 
     __exitFullScreenEventListeners() {
         document.addEventListener('fullscreenchange', this._exitFSHandler.bind(this), false);
@@ -44,13 +26,13 @@ class ContainerManager extends Subject {
         if (event.target.id !== this.containerID) {return;}
         if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
             this.isFullScreen = false;
-            this.videoStateChanged(ContainerManager.EXIT_FULL_SCREEN);
+            this.mediaStateChanged(MediaManager.EXIT_FULL_SCREEN);
         }
     }
 
     _enterFSHandler() {
         this.isFullScreen = true;
-        this.videoStateChanged(ContainerManager.ENTER_FULL_SCREEN);
+        this.mediaStateChanged(MediaManager.ENTER_FULL_SCREEN);
     }
 
     toggleFullScreen() {

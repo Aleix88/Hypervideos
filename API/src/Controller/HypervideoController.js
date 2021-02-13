@@ -8,7 +8,7 @@ class HypervideoController {
         this.videoType = videoType;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
-        this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
+        this.videoManager.mediaStateChanged = this.__videoStateChanged.bind(this);
         this.bottomBarController = new BottomBarController(this, containerID);
         this.topBarController = new TopBarController(this, containerID);
         this.tagController = new TagsController(this.containerID, videoManager);
@@ -22,7 +22,7 @@ class HypervideoController {
     __videoStateChanged(state, target) {
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
-            case ContainerManager.LOADED:
+            case MediaManager.LOADED:
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
                 this.__filterTagsByDuration();
@@ -30,10 +30,10 @@ class HypervideoController {
                 this.__addVideoTimeObserver();
                 this.__addTags();
                 break;
-            case ContainerManager.ENTER_FULL_SCREEN:
-            case ContainerManager.EXIT_FULL_SCREEN:
+            case MediaManager.ENTER_FULL_SCREEN:
+            case MediaManager.EXIT_FULL_SCREEN:
                 if (this.tagController != null) {
-                    this.tagController.fullScreenStateChanged(state === ContainerManager.ENTER_FULL_SCREEN);
+                    this.tagController.fullScreenStateChanged(state === MediaManager.ENTER_FULL_SCREEN);
                 }
             break;
             default:

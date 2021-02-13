@@ -104,12 +104,12 @@ class Subject {
     }
 
 }
-class ContainerManager extends Subject {
+class MediaManager extends Subject {
 
     constructor(containerID) {
         super();
         this.containerID = containerID;
-        this.videoStateChanged = null;
+        this.mediaStateChanged = null;
         this.isFullScreen = false;
 
         this.__exitFullScreenEventListeners();
@@ -120,24 +120,6 @@ class ContainerManager extends Subject {
     static LOADED = 2;
     static ENTER_FULL_SCREEN = 3;
     static EXIT_FULL_SCREEN = 4;
-
-    play() {}
-
-    pause() {}
-
-    restartVideo() {}
-
-    isVideoPlaying(){}
-
-    getVideoDuration() {}
-
-    get currentTime() {return 0;}
-    
-    //0-1
-    loadProgress(progress) {}
-
-    //0-1
-    setVolume(volume) {}
 
     __exitFullScreenEventListeners() {
         document.addEventListener('fullscreenchange', this._exitFSHandler.bind(this), false);
@@ -150,13 +132,13 @@ class ContainerManager extends Subject {
         if (event.target.id !== this.containerID) {return;}
         if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
             this.isFullScreen = false;
-            this.videoStateChanged(ContainerManager.EXIT_FULL_SCREEN);
+            this.mediaStateChanged(MediaManager.EXIT_FULL_SCREEN);
         }
     }
 
     _enterFSHandler() {
         this.isFullScreen = true;
-        this.videoStateChanged(ContainerManager.ENTER_FULL_SCREEN);
+        this.mediaStateChanged(MediaManager.ENTER_FULL_SCREEN);
     }
 
     toggleFullScreen() {
@@ -195,7 +177,7 @@ class ContainerManager extends Subject {
         }
     }
 }
-class VideoTagManager extends ContainerManager {
+class VideoTagManager extends MediaManager {
 
     constructor (containerID) {
         super(containerID);
@@ -248,18 +230,18 @@ class VideoTagManager extends ContainerManager {
     }
 
     __videoIsPlaying() {
-        this.videoStateChanged(ContainerManager.PLAYING);
+        this.mediaStateChanged(MediaManager.PLAYING);
         this.videoTimer.play();
     }
 
     __videoIsPaused() {
-        this.videoStateChanged(ContainerManager.PAUSED);
+        this.mediaStateChanged(MediaManager.PAUSED);
         this.videoTimer.pause();
     }
 
     __videoLoaded() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
-        this.videoStateChanged(ContainerManager.LOADED, {duration: video.duration});
+        this.mediaStateChanged(MediaManager.LOADED, {duration: video.duration});
     }
 
     __timeHandler() {
@@ -283,7 +265,7 @@ class VideoTagManager extends ContainerManager {
     }
 
 }
-class YoutubeVideoManager extends ContainerManager {
+class YoutubeVideoManager extends MediaManager {
 
     constructor(containerID) {
         super(containerID);
@@ -381,7 +363,7 @@ class YoutubeVideoManager extends ContainerManager {
     __onPlayerReady(event) {
         const iFrame = document.querySelector("#"+this.iframeContainerID);
         iFrame.style.pointerEvents = "none";
-        this.videoStateChanged(ContainerManager.LOADED, {duration: this.player.getDuration()});
+        this.mediaStateChanged(MediaManager.LOADED, {duration: this.player.getDuration()});
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
@@ -389,11 +371,11 @@ class YoutubeVideoManager extends ContainerManager {
             if (this.firstTimePlaying === true && this.player.getCurrentTime() >= 0.1) {
                 this.__loadTime(0);
             }
-            this.videoStateChanged(ContainerManager.PLAYING);
+            this.mediaStateChanged(MediaManager.PLAYING);
             this.videoTimer.play();
             this.firstTimePlaying = false;
         } else if (event.data == YT.PlayerState.PAUSED) {
-            this.videoStateChanged(ContainerManager.PAUSED);
+            this.mediaStateChanged(MediaManager.PAUSED);
             this.videoTimer.pause();
         }
     }
@@ -515,7 +497,7 @@ class VideoManagerFactory {
             case Hypervideo.YOUTUBE_TYPE:
                 return new YoutubeVideoManager(containerID);
             case Hypervideo.IMAGE_TYPE:
-                return new ContainerManager(containerID);
+                return new MediaManager(containerID);
             default:
                 return new VideoTagManager(containerID);    
         }
@@ -1278,22 +1260,22 @@ class BottomBarController {
 
     videoStateChanged(state, target) {
         switch (state) {
-            case ContainerManager.PLAYING:
+            case MediaManager.PLAYING:
                 this.__changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
-            case ContainerManager.PAUSED:
+            case MediaManager.PAUSED:
                 this.__changeButtonIcon("control-play-button", "gg-play-button");
                 break;
-            case ContainerManager.LOADED:
+            case MediaManager.LOADED:
                 this.volumeBar.setVolume(50);
                 this.videoLength = target.duration;
                 this.progressBar.setMaxLength(target.duration * 1000);
                 this.__setProgressBarTimestamps();
                 break;
-            case ContainerManager.ENTER_FULL_SCREEN:
+            case MediaManager.ENTER_FULL_SCREEN:
                 this.__changeButtonIcon("control-full-screen-button", "gg-minimize");
                 break;
-            case ContainerManager.EXIT_FULL_SCREEN:
+            case MediaManager.EXIT_FULL_SCREEN:
                 this.__changeButtonIcon("control-full-screen-button", "gg-maximize");
                 break;
             default:
@@ -1392,22 +1374,22 @@ class BottomBarController {
 }
 class HyperimageController {
 
-    constructor(imageSRC, containerID, config, containerManager){
+    constructor(imageSRC, containerID, config, mediaManager){
         this.containerID = containerID;
         this.imageSRC = imageSRC;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, null);
-        this.containerManager = containerManager;
-        this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
+        this.mediaManager = mediaManager;
+        this.mediaManager.mediaStateChanged = this.__mediaStateChanged.bind(this);
     }
 
-    __videoStateChanged(state, target) {
+    __mediaStateChanged(state, target) {
         switch (state) {
-            case ContainerManager.ENTER_FULL_SCREEN:
+            case MediaManager.ENTER_FULL_SCREEN:
                 this.__fullScreenStateChanged(true);
             break;
-            case ContainerManager.EXIT_FULL_SCREEN:
+            case MediaManager.EXIT_FULL_SCREEN:
                 this.__fullScreenStateChanged(false);
             break;
             default:
@@ -1471,7 +1453,7 @@ class HyperimageController {
         this.fullScreenButton = this.htmlManager.createElement("x-full-screen-button");
         const thisReference = this;
         this.fullScreenButton.clickHandler = () => {
-            thisReference.containerManager.toggleFullScreen();
+            thisReference.mediaManager.toggleFullScreen();
         };
         container.appendChild(this.fullScreenButton);
     }
@@ -1890,7 +1872,7 @@ class HypervideoController {
         this.videoType = videoType;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
-        this.videoManager.videoStateChanged = this.__videoStateChanged.bind(this);
+        this.videoManager.mediaStateChanged = this.__videoStateChanged.bind(this);
         this.bottomBarController = new BottomBarController(this, containerID);
         this.topBarController = new TopBarController(this, containerID);
         this.tagController = new TagsController(this.containerID, videoManager);
@@ -1904,7 +1886,7 @@ class HypervideoController {
     __videoStateChanged(state, target) {
         const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
-            case ContainerManager.LOADED:
+            case MediaManager.LOADED:
                 this.videoManager.setVolume(0.5);
                 this.videoLength = target.duration;
                 this.__filterTagsByDuration();
@@ -1912,10 +1894,10 @@ class HypervideoController {
                 this.__addVideoTimeObserver();
                 this.__addTags();
                 break;
-            case ContainerManager.ENTER_FULL_SCREEN:
-            case ContainerManager.EXIT_FULL_SCREEN:
+            case MediaManager.ENTER_FULL_SCREEN:
+            case MediaManager.EXIT_FULL_SCREEN:
                 if (this.tagController != null) {
-                    this.tagController.fullScreenStateChanged(state === ContainerManager.ENTER_FULL_SCREEN);
+                    this.tagController.fullScreenStateChanged(state === MediaManager.ENTER_FULL_SCREEN);
                 }
             break;
             default:
