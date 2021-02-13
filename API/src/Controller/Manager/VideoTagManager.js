@@ -78,11 +78,4 @@ class VideoTagManager extends MediaManager {
         video.volume = volume;
     }
 
-    setVolume(volume) {
-        volume = volume > 1 ? 1 : volume;
-        volume = volume < 0 ? 0 : volume;
-        const video = document.getElementById(this.containerID).querySelector("video"); 
-        video.volume = volume;
-    }
-
 }

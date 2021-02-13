@@ -6,7 +6,7 @@ class MediaManager extends Subject {
         this.mediaStateChanged = null;
         this.isFullScreen = false;
 
-        this.__exitFullScreenEventListeners();
+        this.__fullScreenEventListeners();
     }
 
     static PLAYING = 0;
@@ -15,7 +15,7 @@ class MediaManager extends Subject {
     static ENTER_FULL_SCREEN = 3;
     static EXIT_FULL_SCREEN = 4;
 
-    __exitFullScreenEventListeners() {
+    __fullScreenEventListeners() {
         document.addEventListener('fullscreenchange', this._fullScreenChangeHandler.bind(this), false);
         document.addEventListener('mozfullscreenchange', this._fullScreenChangeHandler.bind(this), false);
         document.addEventListener('MSFullscreenChange', this._fullScreenChangeHandler.bind(this), false);

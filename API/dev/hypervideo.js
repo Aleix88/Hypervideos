@@ -112,7 +112,7 @@ class MediaManager extends Subject {
         this.mediaStateChanged = null;
         this.isFullScreen = false;
 
-        this.__exitFullScreenEventListeners();
+        this.__fullScreenEventListeners();
     }
 
     static PLAYING = 0;
@@ -121,7 +121,7 @@ class MediaManager extends Subject {
     static ENTER_FULL_SCREEN = 3;
     static EXIT_FULL_SCREEN = 4;
 
-    __exitFullScreenEventListeners() {
+    __fullScreenEventListeners() {
         document.addEventListener('fullscreenchange', this._fullScreenChangeHandler.bind(this), false);
         document.addEventListener('mozfullscreenchange', this._fullScreenChangeHandler.bind(this), false);
         document.addEventListener('MSFullscreenChange', this._fullScreenChangeHandler.bind(this), false);
@@ -244,13 +244,6 @@ class VideoTagManager extends MediaManager {
     }
 
     //0-1
-    setVolume(volume) {
-        volume = volume > 1 ? 1 : volume;
-        volume = volume < 0 ? 0 : volume;
-        const video = document.getElementById(this.containerID).querySelector("video"); 
-        video.volume = volume;
-    }
-
     setVolume(volume) {
         volume = volume > 1 ? 1 : volume;
         volume = volume < 0 ? 0 : volume;
