@@ -514,6 +514,8 @@ class VideoManagerFactory {
         switch(hypervideoType) {
             case Hypervideo.YOUTUBE_TYPE:
                 return new YoutubeVideoManager(containerID);
+            case Hypervideo.IMAGE_TYPE:
+                return new ContainerManager(containerID);
             default:
                 return new VideoTagManager(containerID);    
         }
@@ -1390,13 +1392,13 @@ class BottomBarController {
 }
 class HyperimageController {
 
-    constructor(imageSRC, containerID, config){
+    constructor(imageSRC, containerID, config, containerManager){
         this.containerID = containerID;
         this.imageSRC = imageSRC;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, null);
-        this.containerManager = new ContainerManager(this.containerID);
+        this.containerManager = containerManager;
         this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
 
@@ -1512,20 +1514,21 @@ class Hypervideo {
 
     setupHypervideo(config) {
 
-        this.__addGlobalStyle();
         
         if (!this.__isDOMLoaded()) {
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
+        this.__addGlobalStyle();
 
         this.config = this.__assingIdToTags(config);
+        
+        const videoManagerFactory = new VideoManagerFactory();
+        const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
-            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config);
+            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config, videoManager);
             hyperImageController.createSkeleton();
         } else {
-            const videoManagerFactory = new VideoManagerFactory();
-            const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
     
             const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.config);
             hypervideoController.createSkeleton();

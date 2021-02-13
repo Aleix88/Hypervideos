@@ -1,12 +1,12 @@
 class HyperimageController {
 
-    constructor(imageSRC, containerID, config){
+    constructor(imageSRC, containerID, config, containerManager){
         this.containerID = containerID;
         this.imageSRC = imageSRC;
         this.config = config;
         this.htmlManager = new HTMLManager(); 
         this.tagController = new TagsController(this.containerID, null);
-        this.containerManager = new ContainerManager(this.containerID);
+        this.containerManager = containerManager;
         this.containerManager.videoStateChanged = this.__videoStateChanged.bind(this);
     }
 

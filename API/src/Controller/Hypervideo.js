@@ -23,13 +23,14 @@ class Hypervideo {
         this.__addGlobalStyle();
 
         this.config = this.__assingIdToTags(config);
+        
+        const videoManagerFactory = new VideoManagerFactory();
+        const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
-            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config);
+            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config, videoManager);
             hyperImageController.createSkeleton();
         } else {
-            const videoManagerFactory = new VideoManagerFactory();
-            const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
     
             const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.config);
             hypervideoController.createSkeleton();
