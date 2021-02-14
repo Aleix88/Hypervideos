@@ -491,6 +491,45 @@ class VideoManagerFactory {
     }
 
 }
+class ControlButton {
+
+    constructor(containerID) {
+        this.htmlManager = new HTMLManager();
+        this.containerID = containerID;
+    }
+    
+    createControlButton(buttonClass, buttonIcon, eventHandler) {
+        const buttonContainer = this.htmlManager.createElement("div", {
+            classList: ["control-button-container"]
+        });
+        const button = this.htmlManager.createElement("button", {
+             classList: ["control-button",buttonClass]
+        });
+        const icon = this.htmlManager.createElement("i", {
+            classList: [buttonIcon]
+        });
+        buttonContainer.appendChild(button);
+        button.appendChild(icon);
+        if (eventHandler !== null && eventHandler !== undefined) {
+            buttonContainer.addEventListener("click", eventHandler);
+        }
+        return buttonContainer;
+    }
+
+
+    changeButtonIcon(buttonClass, iconName) {
+        let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
+        if (button.length <= 0) {
+            return;
+        }
+        let icon = button.getElementsByTagName("i");
+        if (icon.length <= 0) {
+            return;
+        }
+        icon[0].className = iconName;
+    }
+
+}
 class XFullScreenButton extends HTMLElement {
     
     constructor() {
@@ -1221,23 +1260,23 @@ class BottomBarController {
         this.hypervideoController = hypervideoController;
         this.htmlManager = new HTMLManager();
         this.containerID = containerID;
+        this.controlButton = new ControlButton(containerID);
     }
 
     addBottomBar(container) {
-        
         const bottomController = this.htmlManager.createElement("div", {
             classList: ["bottom-controller"]
         });
         container.appendChild(bottomController);
-        this.playButton = this.__createControlButton("control-play-button", "gg-play-button", this.__playButtonClicked);
-        this.replayButton = this.__createControlButton("control-repeat-button", "gg-repeat", this.__restartVideo);
+        this.playButton = this.controlButton.createControlButton("control-play-button", "gg-play-button", this.__playButtonClicked.bind(this));
+        this.replayButton = this.controlButton.createControlButton("control-repeat-button", "gg-repeat", this.__restartVideo.bind(this));
         this.timeCounter = this.__createTimeCounter();
         this.progressBar = this.__createProgressBar();
         this.volumeBar = this.__createVolumeBar();
         bottomController.appendChild(this.playButton);
         bottomController.appendChild(this.replayButton);
         if (this.htmlManager.isDesktopBrowser() === true) {
-            this.fullScreenButton = this.__createControlButton( "control-full-screen-button", "gg-maximize", this.__toggleFullScreen);
+            this.fullScreenButton = this.controlButton.createControlButton( "control-full-screen-button", "gg-maximize", this.__toggleFullScreen.bind(this));
             bottomController.appendChild(this.fullScreenButton);
         }
         bottomController.appendChild(this.timeCounter);
@@ -1248,10 +1287,10 @@ class BottomBarController {
     videoStateChanged(state, target) {
         switch (state) {
             case MediaManager.PLAYING:
-                this.__changeButtonIcon("control-play-button", "gg-play-pause");
+                this.controlButton.changeButtonIcon("control-play-button", "gg-play-pause");
                 break;
             case MediaManager.PAUSED:
-                this.__changeButtonIcon("control-play-button", "gg-play-button");
+                this.controlButton.changeButtonIcon("control-play-button", "gg-play-button");
                 break;
             case MediaManager.LOADED:
                 this.volumeBar.setVolume(50);
@@ -1260,10 +1299,10 @@ class BottomBarController {
                 this.__setProgressBarTimestamps();
                 break;
             case MediaManager.ENTER_FULL_SCREEN:
-                this.__changeButtonIcon("control-full-screen-button", "gg-minimize");
+                this.controlButton.changeButtonIcon("control-full-screen-button", "gg-minimize");
                 break;
             case MediaManager.EXIT_FULL_SCREEN:
-                this.__changeButtonIcon("control-full-screen-button", "gg-maximize");
+                this.controlButton.changeButtonIcon("control-full-screen-button", "gg-maximize");
                 break;
             default:
         }
@@ -1287,41 +1326,11 @@ class BottomBarController {
         this.hypervideoController.play();
     }
 
-    __changeButtonIcon(buttonClass, iconName) {
-        let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
-        if (button.length <= 0) {
-            return;
-        }
-        let icon = button.getElementsByTagName("i");
-        if (icon.length <= 0) {
-            return;
-        }
-        icon[0].className = iconName;
-    }
-
     __createTimeCounter() {
         const timeCounter = this.htmlManager.createElement("x-time-counter", {
             classList: ["time-counter"]
         });
         return timeCounter;
-    }
-
-    __createControlButton(buttonClass, buttonIcon, eventHandler) {
-        const buttonContainer = this.htmlManager.createElement("div", {
-            classList: ["control-button-container"]
-        });
-        const button = this.htmlManager.createElement("button", {
-             classList: ["control-button",buttonClass]
-        });
-        const icon = this.htmlManager.createElement("i", {
-            classList: [buttonIcon]
-        });
-        buttonContainer.appendChild(button);
-        button.appendChild(icon);
-        if (eventHandler !== null && eventHandler !== undefined) {
-            buttonContainer.addEventListener("click", eventHandler.bind(this));
-        }
-        return buttonContainer;
     }
 
     __createProgressBar() {
