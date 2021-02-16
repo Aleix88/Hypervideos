@@ -476,20 +476,6 @@ class TouchEventsManager {
     }
 
 }
-class VideoManagerFactory {
-
-    create(hypervideoType, containerID) {
-        switch(hypervideoType) {
-            case Hypervideo.YOUTUBE_TYPE:
-                return new YoutubeVideoManager(containerID);
-            case Hypervideo.IMAGE_TYPE:
-                return new MediaManager(containerID);
-            default:
-                return new VideoTagManager(containerID);    
-        }
-    }
-
-}
 class ControlButton {
 
     constructor(containerID) {
@@ -1499,15 +1485,15 @@ class Hypervideo {
 
         this.config = this.__assingIdToTags(config);
         
-        const videoManagerFactory = new VideoManagerFactory();
-        const videoManager = videoManagerFactory.create(this.videoType, this.containerID);
+        const mediaManagerFactory = new MediaManagerFactory();
+        const mediaManager = mediaManagerFactory.create(this.videoType, this.containerID);
 
         if (this.videoType === Hypervideo.IMAGE_TYPE) {
-            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config, videoManager);
+            const hyperImageController = new HyperimageController(this.videoURL, this.containerID, this.config, mediaManager);
             hyperImageController.createSkeleton();
         } else {
     
-            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, videoManager, this.config);
+            const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, mediaManager, this.config);
             hypervideoController.createSkeleton();
         }
 
@@ -1879,7 +1865,6 @@ class HypervideoController {
     };
 
     __videoStateChanged(state, target) {
-        const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
             case MediaManager.LOADED:
                 this.videoManager.setVolume(0.5);
@@ -1929,7 +1914,7 @@ class HypervideoController {
         const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", {classList: ["hypervideo-container"]});
 
-        this.__maintainAspectRation(hypervideo);
+        this.__maintainAspectRatio(hypervideo);
         hypervideo.appendChild(container);
 
         this.__addVideoElement(container);
@@ -1941,7 +1926,7 @@ class HypervideoController {
         this.bottomBarController.addBottomBar(container);
     }
 
-    __maintainAspectRation(hypervideo) {
+    __maintainAspectRatio(hypervideo) {
         const isVideoWidder = this.config.size.width >= this.config.size.height;
         hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : Math.floor((this.config.size.height * HypervideoController.ASPECT_RATIO.x)/HypervideoController.ASPECT_RATIO.y) + "px";
         hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : Math.floor((this.config.size.width * HypervideoController.ASPECT_RATIO.y)/HypervideoController.ASPECT_RATIO.x) + "px";
@@ -2183,4 +2168,18 @@ class TopBarController {
         topContainer.appendChild(titleHeader);
         container.appendChild(topContainer);
     }    
+}
+class MediaManagerFactory {
+
+    create(hypervideoType, containerID) {
+        switch(hypervideoType) {
+            case Hypervideo.YOUTUBE_TYPE:
+                return new YoutubeVideoManager(containerID);
+            case Hypervideo.VIDEO_TYPE:
+                return new VideoTagManager(containerID);    
+            default:
+                return new MediaManager(containerID);
+        }
+    }
+
 }

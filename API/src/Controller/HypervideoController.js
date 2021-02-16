@@ -20,7 +20,6 @@ class HypervideoController {
     };
 
     __videoStateChanged(state, target) {
-        const pauseScreen = document.getElementById(this.containerID).querySelector("x-pause-screen");
         switch (state) {
             case MediaManager.LOADED:
                 this.videoManager.setVolume(0.5);
@@ -70,7 +69,7 @@ class HypervideoController {
         const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", {classList: ["hypervideo-container"]});
 
-        this.__maintainAspectRation(hypervideo);
+        this.__maintainAspectRatio(hypervideo);
         hypervideo.appendChild(container);
 
         this.__addVideoElement(container);
@@ -82,7 +81,7 @@ class HypervideoController {
         this.bottomBarController.addBottomBar(container);
     }
 
-    __maintainAspectRation(hypervideo) {
+    __maintainAspectRatio(hypervideo) {
         const isVideoWidder = this.config.size.width >= this.config.size.height;
         hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : Math.floor((this.config.size.height * HypervideoController.ASPECT_RATIO.x)/HypervideoController.ASPECT_RATIO.y) + "px";
         hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : Math.floor((this.config.size.width * HypervideoController.ASPECT_RATIO.y)/HypervideoController.ASPECT_RATIO.x) + "px";
