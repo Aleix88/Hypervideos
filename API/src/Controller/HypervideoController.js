@@ -66,18 +66,6 @@ class HypervideoController {
         }
     }
 
-    changeButtonIcon(buttonClass, iconName) {
-        let button = document.getElementById(this.containerID).querySelector("."+buttonClass);
-        if (button.length <= 0) {
-            return;
-        }
-        let icon = button.getElementsByTagName("i");
-        if (icon.length <= 0) {
-            return;
-        }
-        icon[0].className = iconName;
-    }
-
     createSkeleton() {
         const hypervideo = document.getElementById(this.containerID);
         const container = this.htmlManager.createElement("div", {classList: ["hypervideo-container"]});

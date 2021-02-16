@@ -100,7 +100,6 @@ class YoutubeVideoManager extends MediaManager {
     }
     __onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
-            console.log();
             if (this.firstTimePlaying === true && this.player.getCurrentTime() >= 0.1) {
                 this.__loadTime(0);
             }

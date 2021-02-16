@@ -1,8 +1,8 @@
 class TagsController {
 
-    constructor(containerID, videoManager) {
+    constructor(containerID, mediaManager) {
         this.containerID = containerID;
-        this.videoManager = videoManager;
+        this.mediaManager = mediaManager;
         this.htmlManager = new HTMLManager();
         this.plugins = [];
     }
@@ -23,7 +23,7 @@ class TagsController {
             if (tag.plugin != null) {
                 plugin = tag.plugin;
             }
-            this.__createTagPluginForTagIfNeeded(tag.id, plugin)
+            this.__createPluginForTagIfNeeded(tag.id, plugin)
         }
     }
 
@@ -110,7 +110,7 @@ class TagsController {
         return tag[0];
     }
 
-    __createTagPluginForTagIfNeeded(tagID, plugin) {
+    __createPluginForTagIfNeeded(tagID, plugin) {
         if (this.plugins.hasOwnProperty(tagID) && this.plugins[tagID] != null) {return;} 
         if (plugin == null || Object.keys(plugin).length === 0) {
             this.plugins[tagID] = null;
@@ -119,7 +119,7 @@ class TagsController {
         const pluginName = plugin.name;
         const classInstance = eval(`new ${pluginName}()`);
         const tagElementsContainer = this.__createTagElementsContainer(tagID);
-        classInstance.onLoad(plugin.config, this.tagsContainer, tagElementsContainer, this.videoManager);
+        classInstance.onLoad(plugin.config, this.tagsContainer, tagElementsContainer, this.mediaManager);
         this.plugins[tagID] = classInstance;
     }
     
