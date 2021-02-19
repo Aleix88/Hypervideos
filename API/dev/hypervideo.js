@@ -1391,8 +1391,8 @@ class HyperimageController {
             } else {
                 this.imageElement.style.width = "inherit";
                 this.imageElement.style.height = "inherit";
-                this.imageContainer.style.width = this.config.size.width + "px";
-                this.imageContainer.style.height = this.config.size.height + "px";
+                this.imageContainer.style.width = "inherit";
+                this.imageContainer.style.height = "inherit";
             }
         }
 
@@ -1411,8 +1411,9 @@ class HyperimageController {
 
     createSkeleton() {
         let hypervideo = document.getElementById(this.containerID);
-        hypervideo.style.width = this.config.size.width + "px";
-        hypervideo.style.height = this.config.size.height + "px";
+        const isVideoWidder = this.config.size.width >= this.config.size.height;
+        hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : Math.floor((this.config.size.height * HypervideoController.ASPECT_RATIO.x)/HypervideoController.ASPECT_RATIO.y) + "px";
+        hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : Math.floor((this.config.size.width * HypervideoController.ASPECT_RATIO.y)/HypervideoController.ASPECT_RATIO.x) + "px";
         const container = this.htmlManager.createElement("div", {
             classList: ["hypervideo-container"]
         });
@@ -1424,7 +1425,7 @@ class HyperimageController {
 
         container.appendChild(this.imageContainer);
         this.__addImageElement(this.imageContainer);
-        this.tagController.addTagContainer(this.imageContainer);
+        this.tagController.addTagContainer(container);
         if (this.htmlManager.isDesktopBrowser() === true) {
             this.__addFullScreenButton(container);
         }
