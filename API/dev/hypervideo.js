@@ -1379,16 +1379,27 @@ class HyperimageController {
 
     __fullScreenStateChanged (isFullScreen) {
         if (this.imageContainer != null) {
+            let hypervideo = document.getElementById(this.containerID);
             if (isFullScreen === true) {
-                const imageWidthMargin = window.innerWidth - this.config.size.width;
-                const imageHeightMargin = window.innerHeight - this.config.size.height;
-                const shouldWidthShrink = imageHeightMargin >= imageWidthMargin;
-
-                this.imageElement.style.width = shouldWidthShrink ? "100%" : "auto";
-                this.imageElement.style.height = !shouldWidthShrink ? "100%" : "auto";
-                this.imageContainer.style.width = shouldWidthShrink ? "100%" : "fit-content";
-                this.imageContainer.style.height = !shouldWidthShrink ? "100%" : "fit-content";
+                setTimeout(() => {
+                    hypervideo.style.width = "100%";
+                    hypervideo.style.height = "100%";
+            
+                    const imageWidthMargin = (window.innerWidth - this.config.size.width) / this.config.size.width;
+                    const imageHeightMargin = (window.innerHeight - this.config.size.height) / this.config.size.height;
+                    const shouldWidthExpand = imageHeightMargin >= imageWidthMargin;
+                    const aspectRatio = this.config.size.width / this.config.size.height;
+                    const resizedWidth = (window.innerHeight * aspectRatio) + "px";
+                    const resizedHeight = (window.innerWidth * (1/aspectRatio)) + "px";
+                    console.log(resizedWidth, resizedHeight)
+                    this.imageElement.style.width = "100%";
+                    this.imageElement.style.height = "100%";
+                    this.imageContainer.style.width = shouldWidthExpand ? "100%" : resizedWidth;
+                    this.imageContainer.style.height = !shouldWidthExpand ? "100%" : resizedHeight;
+                }, 500);
             } else {
+                hypervideo.style.width = this.config.size.width + "px";
+                hypervideo.style.height = this.config.size.height + "px";
                 this.imageElement.style.width = "inherit";
                 this.imageElement.style.height = "inherit";
                 this.imageContainer.style.width = "inherit";
@@ -1411,9 +1422,8 @@ class HyperimageController {
 
     createSkeleton() {
         let hypervideo = document.getElementById(this.containerID);
-        const isVideoWidder = this.config.size.width >= this.config.size.height;
-        hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : Math.floor((this.config.size.height * HypervideoController.ASPECT_RATIO.x)/HypervideoController.ASPECT_RATIO.y) + "px";
-        hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : Math.floor((this.config.size.width * HypervideoController.ASPECT_RATIO.y)/HypervideoController.ASPECT_RATIO.x) + "px";
+        hypervideo.style.width = this.config.size.width + "px";
+        hypervideo.style.height = this.config.size.height + "px";
         const container = this.htmlManager.createElement("div", {
             classList: ["hypervideo-container"]
         });
@@ -1425,7 +1435,7 @@ class HyperimageController {
 
         container.appendChild(this.imageContainer);
         this.__addImageElement(this.imageContainer);
-        this.tagController.addTagContainer(container);
+        this.tagController.addTagContainer(this.imageContainer);
         if (this.htmlManager.isDesktopBrowser() === true) {
             this.__addFullScreenButton(container);
         }
@@ -1555,7 +1565,7 @@ class Hypervideo {
             .hyperimage {
                 width: 100%;
                 height: 100%;
-                object-fit: contain;
+                object-fit: fill;
             }
             
             .hypervideo-container {
