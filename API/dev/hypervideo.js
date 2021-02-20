@@ -1385,10 +1385,10 @@ class HyperimageController {
                     hypervideo.style.width = "100%";
                     hypervideo.style.height = "100%";
             
-                    const imageWidthMargin = (window.innerWidth - this.config.size.width) / this.config.size.width;
-                    const imageHeightMargin = (window.innerHeight - this.config.size.height) / this.config.size.height;
+                    const imageWidthMargin = (window.innerWidth - this.imageElement.naturalWidth) / this.imageElement.naturalWidth;
+                    const imageHeightMargin = (window.innerHeight - this.imageElement.naturalHeight) / this.imageElement.naturalHeight;
                     const shouldWidthExpand = imageHeightMargin >= imageWidthMargin;
-                    const aspectRatio = this.config.size.width / this.config.size.height;
+                    const aspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
                     const resizedWidth = (window.innerHeight * aspectRatio) + "px";
                     const resizedHeight = (window.innerWidth * (1/aspectRatio)) + "px";
                     console.log(resizedWidth, resizedHeight)
@@ -1398,8 +1398,10 @@ class HyperimageController {
                     this.imageContainer.style.height = !shouldWidthExpand ? "100%" : resizedHeight;
                 }, 500);
             } else {
-                hypervideo.style.width = this.config.size.width + "px";
-                hypervideo.style.height = this.config.size.height + "px";
+                const isVideoWidder = this.imageElement.naturalWidth >= this.imageElement.naturalHeight;
+                const aspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+                hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : (this.config.size.height * aspectRatio) + "px";
+                hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : (this.config.size.width * (1/aspectRatio)) + "px";
                 this.imageElement.style.width = "inherit";
                 this.imageElement.style.height = "inherit";
                 this.imageContainer.style.width = "inherit";
@@ -1418,12 +1420,15 @@ class HyperimageController {
 
     __imgLoaded() {
         this.__addTags();
+        let hypervideo = document.getElementById(this.containerID);
+        const isVideoWidder = this.imageElement.naturalWidth >= this.imageElement.naturalHeight;
+        const aspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+        hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : (this.config.size.height * aspectRatio) + "px";
+        hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : (this.config.size.width * (1/aspectRatio)) + "px";
     }
 
     createSkeleton() {
         let hypervideo = document.getElementById(this.containerID);
-        hypervideo.style.width = this.config.size.width + "px";
-        hypervideo.style.height = this.config.size.height + "px";
         const container = this.htmlManager.createElement("div", {
             classList: ["hypervideo-container"]
         });

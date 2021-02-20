@@ -1570,10 +1570,10 @@ var HyperimageController = /*#__PURE__*/function () {
           setTimeout(function () {
             hypervideo.style.width = "100%";
             hypervideo.style.height = "100%";
-            var imageWidthMargin = (window.innerWidth - _this10.config.size.width) / _this10.config.size.width;
-            var imageHeightMargin = (window.innerHeight - _this10.config.size.height) / _this10.config.size.height;
+            var imageWidthMargin = (window.innerWidth - _this10.imageElement.naturalWidth) / _this10.imageElement.naturalWidth;
+            var imageHeightMargin = (window.innerHeight - _this10.imageElement.naturalHeight) / _this10.imageElement.naturalHeight;
             var shouldWidthExpand = imageHeightMargin >= imageWidthMargin;
-            var aspectRatio = _this10.config.size.width / _this10.config.size.height;
+            var aspectRatio = _this10.imageElement.naturalWidth / _this10.imageElement.naturalHeight;
             var resizedWidth = window.innerHeight * aspectRatio + "px";
             var resizedHeight = window.innerWidth * (1 / aspectRatio) + "px";
             console.log(resizedWidth, resizedHeight);
@@ -1583,8 +1583,10 @@ var HyperimageController = /*#__PURE__*/function () {
             _this10.imageContainer.style.height = !shouldWidthExpand ? "100%" : resizedHeight;
           }, 500);
         } else {
-          hypervideo.style.width = this.config.size.width + "px";
-          hypervideo.style.height = this.config.size.height + "px";
+          var isVideoWidder = this.imageElement.naturalWidth >= this.imageElement.naturalHeight;
+          var aspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+          hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : this.config.size.height * aspectRatio + "px";
+          hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : this.config.size.width * (1 / aspectRatio) + "px";
           this.imageElement.style.width = "inherit";
           this.imageElement.style.height = "inherit";
           this.imageContainer.style.width = "inherit";
@@ -1604,13 +1606,17 @@ var HyperimageController = /*#__PURE__*/function () {
     key: "__imgLoaded",
     value: function __imgLoaded() {
       this.__addTags();
+
+      var hypervideo = document.getElementById(this.containerID);
+      var isVideoWidder = this.imageElement.naturalWidth >= this.imageElement.naturalHeight;
+      var aspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+      hypervideo.style.width = isVideoWidder ? this.config.size.width + "px" : this.config.size.height * aspectRatio + "px";
+      hypervideo.style.height = !isVideoWidder ? this.config.size.height + "px" : this.config.size.width * (1 / aspectRatio) + "px";
     }
   }, {
     key: "createSkeleton",
     value: function createSkeleton() {
       var hypervideo = document.getElementById(this.containerID);
-      hypervideo.style.width = this.config.size.width + "px";
-      hypervideo.style.height = this.config.size.height + "px";
       var container = this.htmlManager.createElement("div", {
         classList: ["hypervideo-container"]
       });
