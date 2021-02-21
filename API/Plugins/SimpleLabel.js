@@ -80,10 +80,12 @@ class SimpleLabel extends Plugin {
         this.labelContainer.style.maxHeight = "30%";
         this.labelContainer.style.maxWidth = "30%";
         this.labelContainer.style.pointerEvents = "all";
+        this.labelContainer.style.padding = "1em .5em";
 
         this.textElement.innerHTML = this.config.text;
         this.textElement.style.color = "white";
-        this.textElement.style.margin = "1.3em .7em";
+        this.textElement.style.margin = "0";
+
 
         this.labelContainer.appendChild(this.textElement);
         this.container.appendChild(this.labelContainer);

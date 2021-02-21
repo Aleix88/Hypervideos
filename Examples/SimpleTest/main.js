@@ -84,8 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const tagsJSON = {
     "videoTitle": "Video title",
     "size": {
-      "width": 564,
-      "height": 846
+      "width": 200,
+      "height": 200
     },
     "tags": [
       {
