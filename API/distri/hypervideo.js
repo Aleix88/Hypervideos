@@ -1948,7 +1948,7 @@ var HypervideoController = /*#__PURE__*/function () {
           var tag = _step3.value;
           var tagTimestamp = tag.timeConfig.timestamp;
           var tagDuration = tag.timeConfig.duration;
-          var isVisible = time >= tagTimestamp && time < tagTimestamp + tagDuration;
+          var isVisible = time >= parseInt(tagTimestamp) && time < parseInt(tagTimestamp) + parseInt(tagDuration);
           this.tagController.setTagVisible(tag.id, isVisible);
         }
       } catch (err) {

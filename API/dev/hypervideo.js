@@ -2017,7 +2017,7 @@ class HypervideoController {
         for (const tag of this.config.tags) {
             const tagTimestamp = tag.timeConfig.timestamp;
             const tagDuration = tag.timeConfig.duration;
-            const isVisible = time >= tagTimestamp && time < tagTimestamp + tagDuration;
+            const isVisible = time >= parseInt(tagTimestamp) && time < parseInt(tagTimestamp) + parseInt(tagDuration);
             this.tagController.setTagVisible(tag.id, isVisible);
         }
     }
