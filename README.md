@@ -4,7 +4,7 @@
 
 ------------
 
-##Documentation
+## Documentation
 ### What is Hypervideos.js?
 Hypervideos.js is an easy way to create interactive videos and images for your website in a very simple way. You will be able to add diferent interactive elements in a given timestamp of the vídeo. See the examples to a better undestanding of the concept.
 Is compatible with video/images files and YouTube videos.
@@ -87,7 +87,7 @@ Plugins are the responsable of creating the interactive element when the user in
 - Card ().
 - Questionary ().
 
-##Create your own plugin
+## Create your own plugin
 You can also create your on plugins, it's not complicated! To do this create a JS class with your Plugin name. The class should extend from Plugin (this class is imported with the Hypervideo.min.js).
 The constructor of Plugin is empty so there's no need to overwrite it.
 
@@ -112,6 +112,6 @@ The Plugin class has some methods that you could overrwrite (always calling supe
 | showElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to show the elements container. |
 | hideElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to hide the elements container. |
 
-##Hiper: Hypervideos graphical interface
+## Hiper: Hypervideos graphical interface
 If you are not a programmer but you want to use this library check out Hiper, a multi-platform program to generate the Hypervideo code. - https://github.com/Aleix88/Hiper
 
