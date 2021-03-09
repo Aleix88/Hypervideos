@@ -27,7 +27,7 @@ Next add a `<div>` in your html page. You should provide the div with the class 
 On your JS file create a object to setup your Hypervideo paràmeters. The admited parameters are the following ones:
 
 | Field | Type | Description |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | id | string | Id of the `<div>` element on your HTML |
 | src | string | Path to the image or video file. If is a video from YouTube provide the video identifier |
 | type | string | Type of the media loaded. There are 3 possible types:<br/>**Hypervideo.VIDEO_TYPE** - for video files.<br/>**Hypervideo.IMAGE_TYPE** - for image files.<br/>**Hypervideo.YOUTUBE_TYPE** - for YouTube videos.<br/>
@@ -38,7 +38,7 @@ On your JS file create a object to setup your Hypervideo paràmeters. The admite
 Tags configuration object:
 
 | Field | Type | Description |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | position | object  | Position of the tag in the video/image. Contains two fields:<br /> **x (number)** - position x in %.<br /> **y (number)** - position y in %.  |
 | timeConfig | object  | All the time parameters of the tag (*Ignore for images*). Contains two fields:<br/> **timestamp (number)** - time in seconds when the tag should appear.<br/> **duration (number)** - time in seconds of the tag duration on the video.   |
 | color | string  | Color of the tag in hex format.  |
@@ -94,7 +94,7 @@ The constructor of Plugin is empty so there's no need to overwrite it.
 The plugin class has differents attributes that you can use:
 
 | Attribute | Type | Description |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | config | object | Data that comes from the hypervideo configuration object, on the tag pluging. You can use this data to modify your interactive element content. |
 | container | HTMLElement | This element is the hypervideo container. You should only add your element here if is smaller than the video size or if you want the user to activate different tags at the same time. |
 | elementsContainer | HTMLElement | This element is the hypervideo elements container. This container is unique for this tag and it will occupy the full browser screen. Users will not be able to interact with other elements if this container is active. |
@@ -103,7 +103,7 @@ The plugin class has differents attributes that you can use:
 The Plugin class has some methods that you could overrwrite (always calling super) to implement your plugin functionalities or call:
 
 | Method | Parameters | Description |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- |
 | onLoad | config, container, elementsContainer, videoManager | This function is called when the plugin and it's atributes are loaded. In this function you should create and setup all your elements views, but don't show them to the user yet |
 | onTagClick | event | This function is called when the user clicks to the tag. Here may be a good place to show your elements views to the user. |
 | onTagHover | event | This function is called when the user hovers on the tag. |
