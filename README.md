@@ -5,8 +5,15 @@
 ------------
 
 ## Documentation
+- [What is hypervideos.js?](what-is-hypervideos.js)
+- [How to use Hypervideos.js](how-to-use-hypervideos.js)
+- [Existing plugins list](existing-plugins-list)
+- [Create your own plugin](create-your-own-plugin)
+- [See the examples](#examples)
+- [Hiper: Hypervideos graphical interface](hiper:-Hypervideos-graphical-interface)
+
 ### What is Hypervideos.js?
-Hypervideos.js is an easy way to create interactive videos and images for your website in a very simple way. You will be able to add diferent interactive elements in a given timestamp of the vídeo. See the examples to a better undestanding of the concept.
+Hypervideos.js is an easy way to create interactive videos and images for your website in a very simple way. You will be able to add diferent interactive elements in a given timestamp of the vídeo. See the [examples](#examples) to a better undestanding of the concept.
 Is compatible with video/images files and YouTube videos.
 
 ### How to use Hypervideos.js
@@ -111,6 +118,8 @@ The Plugin class has some methods that you could overrwrite (always calling supe
 | fullScreenStateChanged | `true` if the video/image is new in fullscreen mode, `false` if is not in full screen | This function is called when video enters or exit the full screen mode. |
 | showElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to show the elements container. |
 | hideElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to hide the elements container. |
+
+## Examples
 
 ## Hiper: Hypervideos graphical interface
 If you are not a programmer but you want to use this library check out Hiper, a multi-platform program to generate the Hypervideo code. - https://github.com/Aleix88/Hiper
