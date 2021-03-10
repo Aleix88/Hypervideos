@@ -31,18 +31,18 @@ function babelTask(cb) {
 function minifyTask(cb) {
     return src('./babel/*.js')
     //Unifiquem tots els fitxers en un que es dira all.js
-    .pipe(dest('./distri'))    
+    .pipe(dest('../distri'))    
     //Minimitzem el fitxer all.js
     .pipe(minify({
         ext: {
             min: '.min.js'
         }
     }))
-    .pipe(dest('./distri'));  
+    .pipe(dest('../distri'));  
 }
 
 function clean(cb) {
-    return del('./distri/**', {force:true});
+    return del('../distri/**', {force:true});
 }
 
 function concatTask(cb) {
