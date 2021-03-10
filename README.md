@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="307" height="217" src="https://github.com/Aleix88/Hypervideos/blob/main/readme-assets/hypervideos_header.png?raw=true">
+  <img width="307" height="192" src="https://github.com/Aleix88/Hypervideos/blob/main/readme-assets/hypervideos_header.png?raw=true">
 </p>
 
 ------------
@@ -22,7 +22,7 @@ You should also create and import a JS file to setup your Hypervideo.
 
     <head>
             <script src="./hypervideo.min.js"></script>
-            <script src="./SimpleLabel.js"></script>
+            <script src="./SimpleLabel.js"></script> //This is a Plugin
             <script src="./main.js"></script>
     </head>
 

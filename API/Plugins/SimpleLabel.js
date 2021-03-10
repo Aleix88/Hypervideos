@@ -77,6 +77,7 @@ class SimpleLabel extends Plugin {
         this.labelContainer.style.left = "100px";
         this.labelContainer.style.background = "rgba(0,0,0, 0.7)";
         this.labelContainer.style.borderRadius = "5px";
+        this.labelContainer.style.overflow = "hidden";
         this.labelContainer.style.maxHeight = "30%";
         this.labelContainer.style.maxWidth = "30%";
         this.labelContainer.style.pointerEvents = "all";
@@ -85,6 +86,8 @@ class SimpleLabel extends Plugin {
         this.textElement.innerHTML = this.config.text;
         this.textElement.style.color = "white";
         this.textElement.style.margin = "0";
+        this.textElement.style.maxHeight = "100%";
+        this.textElement.style.overflow = "hidden";
 
 
         this.labelContainer.appendChild(this.textElement);
