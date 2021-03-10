@@ -5,12 +5,12 @@
 ------------
 
 ## Documentation
-- [What is hypervideos.js?](what-is-hypervideos.js)
-- [How to use Hypervideos.js](how-to-use-hypervideos.js)
-- [Existing plugins list](existing-plugins-list)
-- [Create your own plugin](create-your-own-plugin)
+- [What is hypervideos.js?](#what-is-hypervideosjs)
+- [How to use Hypervideos.js](#how-to-use-hypervideosjs)
+- [Existing plugins list](#existing-plugins-list)
+- [Create your own plugin](#create-your-own-plugin)
 - [See the examples](#examples)
-- [Hiper: Hypervideos graphical interface](hiper:-Hypervideos-graphical-interface)
+- [Hiper: Hypervideos graphical interface](#hiper-hypervideos-graphical-interface)
 
 ### What is Hypervideos.js?
 Hypervideos.js is an easy way to create interactive videos and images for your website in a very simple way. You will be able to add diferent interactive elements in a given timestamp of the vídeo. See the [examples](#examples) to a better undestanding of the concept.
@@ -23,7 +23,7 @@ You should also create and import a JS file to setup your Hypervideo.
     <head>
             <script src="./hypervideo.min.js"></script>
             <script src="./SimpleLabel.js"></script>
-			<script src="./main.js"></script>
+            <script src="./main.js"></script>
     </head>
 
 
@@ -77,6 +77,7 @@ Configuration example:
                 }
             }
           }
+        ]
       };
 
 Finally instantiate the Hypervideo class and call setupHypervideo function:

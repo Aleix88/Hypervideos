@@ -1477,10 +1477,11 @@ class HyperimageController {
 
 class Hypervideo {
 
-    constructor(videoURL, videoType, hypervideoID) {
-        this.videoURL = videoURL;
-        this.videoType = videoType;
-        this.containerID = hypervideoID;
+    constructor(config) {
+        this.config = this.__assingIdToTags(config);
+        this.videoURL = this.config.src;
+        this.videoType = this.config.type;
+        this.containerID = this.config.id;
     }
 
     static YOUTUBE_TYPE = "YOUTUBE";
@@ -1491,15 +1492,11 @@ class Hypervideo {
         return document != null && (document.readyState === "interactive" || document.readyState === "complete");
     }
 
-    setupHypervideo(config) {
-
-        
+    setupHypervideo() {
         if (!this.__isDOMLoaded()) {
             throw "Error: Can't setup an hypervideo if DOM is not loaded."
         }
         this.__addGlobalStyle();
-
-        this.config = this.__assingIdToTags(config);
         
         const mediaManagerFactory = new MediaManagerFactory();
         const mediaManager = mediaManagerFactory.create(this.videoType, this.containerID);
@@ -1512,20 +1509,15 @@ class Hypervideo {
             const hypervideoController = new HypervideoController(this.videoURL, this.videoType, this.containerID, mediaManager, this.config);
             hypervideoController.createSkeleton();
         }
-
     }
 
     __assingIdToTags(config) {
-        try {
-            let i = 0;
-            config.tags = config.tags.map((t) => {
-                t.id = this.containerID + "-tag-" + i++;
-                return t;
-            })
-            return config;
-        } catch(error) {
-            throw "Error: Not valid JSON";
-        }
+        let i = 0;
+        config.tags = config.tags.map((t) => {
+            t.id = this.containerID + "-tag-" + i++;
+            return t;
+        })
+        return config;
     }
 
     __addGlobalStyle() {
