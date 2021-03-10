@@ -7,7 +7,7 @@
 ## Documentation
 - [What is hypervideos.js?](#what-is-hypervideosjs)
 - [How to use Hypervideos.js](#how-to-use-hypervideosjs)
-- [Existing plugins list](#existing-plugins-list)
+- [Existing plugins list](#plugins-list)
 - [Create your own plugin](#create-your-own-plugin)
 - [See the examples](#examples)
 - [Hiper: Hypervideos graphical interface](#hiper-hypervideos-graphical-interface)
@@ -91,9 +91,9 @@ Enjoy your Hypervideo!
 
 ## Plugins list
 Plugins are the responsable of creating the interactive element when the user interact with a tag. You can create your own plugin or use one of this list already created:
-- SimpleLabel ().
-- Card ().
-- Questionary ().
+- SimpleLabel - https://github.com/Aleix88/Hypervideo-SimpleLabel 
+- Card - https://github.com/Aleix88/Hypervideo-Card
+- Questionary - https://github.com/Aleix88/Hypervideo-Questionary
 
 ## Create your own plugin
 You can also create your on plugins, it's not complicated! To do this create a JS class with your Plugin name. The class should extend from Plugin (this class is imported with the Hypervideo.min.js).
