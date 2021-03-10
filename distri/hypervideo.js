@@ -1445,7 +1445,10 @@ var BottomBarController = /*#__PURE__*/function () {
   }, {
     key: "videoTimeChange",
     value: function videoTimeChange(time) {
-      this.progressBar.setCurrentLength(time);
+      if (this.progressBar.isMoving === false) {
+        this.progressBar.setCurrentLength(time);
+      }
+
       this.timeCounter.currentTime = time / 1000;
     }
   }, {

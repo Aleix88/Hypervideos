@@ -124,6 +124,7 @@ The Plugin class has some methods that you could overrwrite (always calling supe
 | hideElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to hide the elements container. |
 
 ## Examples
+Check out this example: https://aleix88.github.io/Hypervideos-example/
 
 ## Hiper: Hypervideos graphical interface
 If you are not a programmer but you want to use this library check out Hiper, a multi-platform program to generate the Hypervideo code. - https://github.com/Aleix88/Hiper

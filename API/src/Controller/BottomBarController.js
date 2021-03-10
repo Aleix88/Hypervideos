@@ -53,7 +53,9 @@ class BottomBarController {
     }
 
     videoTimeChange(time) {
-        this.progressBar.setCurrentLength(time);
+        if (this.progressBar.isMoving === false) {
+            this.progressBar.setCurrentLength(time);
+        }
         this.timeCounter.currentTime = time/1000;
     }
 
