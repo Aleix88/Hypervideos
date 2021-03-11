@@ -129,3 +129,8 @@ Check out this example: https://aleix88.github.io/Hypervideos-example/
 ## Hiper: Hypervideos graphical interface
 If you are not a programmer but you want to use this library check out Hiper, a multi-platform program to generate the Hypervideo code. - https://github.com/Aleix88/Hiper
 
+# Team
+The main development team is associated to Aleix Díaz's TFG and GRETEL Research Group, associated to [La Salle Campus Barcelona](https://www.salleurl.edu/en).
+- Dr. Daniel Amo Filvà: daniel.amo@salle.url.edu - [Github](https://github.com/danielamof/)
+- Aleix Díaz: aleix.diaz@students.salle.url.edu - [Github](https://github.com/Aleix88)
+
