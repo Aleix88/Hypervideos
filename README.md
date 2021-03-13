@@ -17,7 +17,7 @@ Hypervideos.js is an easy way to create interactive videos and images for your w
 Is compatible with video/images files and YouTube videos.
 
 ### How to use Hypervideos.js
-Hypervideos is very easy to use. First of all download the hypervideo.min.js (is located in the distri directory) file and import it to your HTML. Here you can also import all the plugins that you will use.
+Hypervideos is very easy to use. First of all download the hypervideo.min.js (is located in the distri directory) file and import it to your HTML. Here you can also import all the plugins that you will use ([check the existing plugins](#plugins-list) or [create your own](#create-your-own-plugin)).
 You should also create and import a JS file to setup your Hypervideo.
 
     <head>
