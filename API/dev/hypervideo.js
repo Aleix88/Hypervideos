@@ -1515,6 +1515,7 @@ class Hypervideo {
 
     __assingIdToTags(config) {
         let i = 0;
+        if (config["tags"] == null) {config["tags"] = []}
         config.tags = config.tags.map((t) => {
             t.id = this.containerID + "-tag-" + i++;
             return t;

@@ -13,7 +13,7 @@
 - [Hiper: Hypervideos graphical interface](#hiper-hypervideos-graphical-interface)
 
 ### What is Hypervideos.js?
-Hypervideos.js is an easy way to create interactive videos and images for your website in a very simple way. You will be able to add diferent interactive elements in a given timestamp of the vídeo. See the [examples](#examples) to a better undestanding of the concept.
+Hypervideos.js is an easy way to create interactive videos and images for your website in a very simple way. You will be able to add diferent interactive elements in a given timestamp of the video. See the [examples](#examples) to a better undestanding of the concept.
 Is compatible with video/images files and YouTube videos.
 
 ### How to use Hypervideos.js
@@ -31,7 +31,7 @@ Next add a `<div>` in your html page. You should provide the div with the class 
 
     <div id="hypervideo_id" class="hypervideo"></div>
 
-On your JS file create a object to setup your Hypervideo parameters. The admited parameters are the following ones:
+On your main.js file create a object to setup your Hypervideo parameters. The admited parameters are the following ones:
 
 | Field | Type | Description |
 | ------------- | ------------- | ------------- |
@@ -107,7 +107,7 @@ The plugin class has differents attributes that you can use (after onLoad method
 | Attribute | Type | Description |
 | ------------- | ------------- | ------------- |
 | config | object | Data that comes from the hypervideo configuration object. You can use this field to pass data from the main JS file. |
-| container | HTMLElement | This element is the hypervideo container. You should only add your views here if they are smaller than the video size or if you want the user to activate other tags will this is also activated. |
+| container | HTMLElement | This element is the hypervideo container. You should only add your views here if they are smaller than the video size or if you want the user to activate other tags while this is also activated. |
 | elementsContainer | HTMLElement | This element is the hypervideo elements container. This container is unique for this tag and it will fit all the browser screen. Users will not be able to interact with other elements if this container is active. |
 | videoManager | object | Instance of the video controller. You can use the following functions: <br/> - play(void) <br/> - pause(void) <br/> - restartVideo(void) <br/> - isVideoPlaying(void) : bool <br/> - getVideoDuration(void) : Returns the duration in seconds <br/> - loadProgress(Number) - Load any part of the video by a given progress. Progress should be specified between 0 and 1. <br/> - setVolume(Number) - Volume should be specified between 0 and 1.<br/>You can also get the video currentTime as an attribute. <br/> **This object will be null for images* |
 

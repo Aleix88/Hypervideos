@@ -1724,6 +1724,11 @@ var Hypervideo = /*#__PURE__*/function () {
       var _this11 = this;
 
       var i = 0;
+
+      if (config["tags"] == null) {
+        config["tags"] = [];
+      }
+
       config.tags = config.tags.map(function (t) {
         t.id = _this11.containerID + "-tag-" + i++;
         return t;
