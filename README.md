@@ -40,7 +40,7 @@ On your main.js file create a object to setup your Hypervideo parameters. The ad
 | type | string | Type of the media loaded. There are 3 possible types:<br/>**Hypervideo.VIDEO_TYPE** - for video files.<br/>**Hypervideo.IMAGE_TYPE** - for image files.<br/>**Hypervideo.YOUTUBE_TYPE** - for YouTube videos.<br/>
 | videoTitle | string  | Title for the hypervideo  |
 | size  | object  | Size of the hypervideo. Contains two fields:<br /> **width (number)** - Width in pixels.<br /> **height (number)** - Height in pixels.<br /> If the source provided is a video the size should have an aspect ratio of 16:9, if the ratio is not met, the video will be resized to match it.  |
-| tags | array of objects  | Each tag represents a "button" that will activate the interactive element. You can add as many tags as you want. Every tag is represented as an object, its fields are presented on the table below. |
+| tags (OPTIONAL)| array of objects  | Each tag represents a "button" that will activate the interactive element. You can add as many tags as you want. Every tag is represented as an object, its fields are presented on the table below. |
 
 Tags configuration object:
 
