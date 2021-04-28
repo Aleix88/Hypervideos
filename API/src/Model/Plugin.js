@@ -8,6 +8,13 @@ class Plugin {
         this.elementsContainer = elementsContainer;
         this.videoManager = videoManager;
         this.__firstClick = false;
+        this.isTagVisible = false;
+    }
+
+    tagWillAppear() {
+    }
+
+    tagWillDisappear() {
     }
 
     onTagClick(event) {

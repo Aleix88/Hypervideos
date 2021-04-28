@@ -8,6 +8,13 @@ class Plugin {
         this.elementsContainer = elementsContainer;
         this.videoManager = videoManager;
         this.__firstClick = false;
+        this.isTagVisible = false;
+    }
+
+    tagWillAppear() {
+    }
+
+    tagWillDisappear() {
     }
 
     onTagClick(event) {
@@ -2051,6 +2058,12 @@ class TagsController {
     }
 
     setTagVisible(id, isVisible) {
+        if (this.plugins[id] != null) {
+            if (this.plugins[id].isTagVisible !== isVisible) {
+                isVisible === true ? this.plugins[id].tagWillAppear() : this.plugins[id].tagWillDisappear();
+                this.plugins[id].isTagVisible = isVisible;
+            }
+        }
         const tagElement = document.querySelector("#" + this.containerID).querySelector("#"+id);
         tagElement.isVisible = isVisible;
     }

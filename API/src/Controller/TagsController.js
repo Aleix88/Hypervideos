@@ -28,6 +28,12 @@ class TagsController {
     }
 
     setTagVisible(id, isVisible) {
+        if (this.plugins[id] != null) {
+            if (this.plugins[id].isTagVisible !== isVisible) {
+                isVisible === true ? this.plugins[id].tagWillAppear() : this.plugins[id].tagWillDisappear();
+                this.plugins[id].isTagVisible = isVisible;
+            }
+        }
         const tagElement = document.querySelector("#" + this.containerID).querySelector("#"+id);
         tagElement.isVisible = isVisible;
     }
