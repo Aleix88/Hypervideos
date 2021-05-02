@@ -33,6 +33,7 @@ class Decision extends Plugin {
         this.leftButton.style.backgroundColor = "#2a83d1";
         this.leftButton.querySelector("p").style.color = "white";
         const time = this.config.leftButton.timestamp;
+        this.videoManager.play();
         if (time !== "now") {
             this.videoManager.seekTo(time);
         }
@@ -44,6 +45,7 @@ class Decision extends Plugin {
         this.leftButton.style.backgroundColor = "#2a83d1";
         this.leftButton.querySelector("p").style.color = "white";
         const time = this.config.rightButton.timestamp;
+        this.videoManager.play();
         if (time !== "now") {
             this.videoManager.seekTo(time);
         }
