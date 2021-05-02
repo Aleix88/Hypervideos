@@ -1,4 +1,4 @@
-class Decision extends Plugin {
+¡class Decision extends Plugin {
 
     constructor() {super();}
 
@@ -42,8 +42,8 @@ class Decision extends Plugin {
     _rightButtonClicked() {
         const thisReference = this;
         thisReference._deinit();
-        this.leftButton.style.backgroundColor = "#2a83d1";
-        this.leftButton.querySelector("p").style.color = "white";
+        this.rightButton.style.backgroundColor = "#2a83d1";
+        this.rightButton.querySelector("p").style.color = "white";
         const time = this.config.rightButton.timestamp;
         this.videoManager.play();
         if (time !== "now") {
@@ -57,6 +57,10 @@ class Decision extends Plugin {
         clearInterval(this.interval);
         this.counter = this.config.timeout;
         this.timeCounter.textContent = this.counter;
+        this.rightButton.style.backgroundColor = "white";
+        this.rightButton.querySelector("p").style.color = "#2a83d1";
+        this.leftButton.style.backgroundColor = "white";
+        this.leftButton.querySelector("p").style.color = "#2a83d1";
     }
 
     _hideProgressBar(hide) {
