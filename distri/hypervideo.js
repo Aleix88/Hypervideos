@@ -49,7 +49,14 @@ var Plugin = /*#__PURE__*/function () {
       this.elementsContainer = elementsContainer;
       this.videoManager = videoManager;
       this.__firstClick = false;
+      this.isTagVisible = false;
     }
+  }, {
+    key: "tagWillAppear",
+    value: function tagWillAppear() {}
+  }, {
+    key: "tagWillDisappear",
+    value: function tagWillDisappear() {}
   }, {
     key: "onTagClick",
     value: function onTagClick(event) {
@@ -316,6 +323,13 @@ var VideoTagManager = /*#__PURE__*/function (_MediaManager) {
       return !video.paused;
     }
   }, {
+    key: "seekTo",
+    value: function seekTo(time) {
+      var video = document.getElementById(this.containerID).querySelector("video");
+      video.currentTime = time;
+      this.notify(video.currentTime * 1000);
+    }
+  }, {
     key: "getVideoDuration",
     value: function getVideoDuration() {
       var video = document.getElementById(this.containerID).querySelector("video");
@@ -431,6 +445,15 @@ var YoutubeVideoManager = /*#__PURE__*/function (_MediaManager2) {
       }
 
       return this.player.getPlayerState() == YT.PlayerState.PLAYING;
+    }
+  }, {
+    key: "seekTo",
+    value: function seekTo(time) {
+      if (this.player === null) {
+        return;
+      }
+
+      this.__loadTime(time);
     }
   }, {
     key: "loadProgress",
@@ -2022,6 +2045,13 @@ var TagsController = /*#__PURE__*/function () {
   }, {
     key: "setTagVisible",
     value: function setTagVisible(id, isVisible) {
+      if (this.plugins[id] != null) {
+        if (this.plugins[id].isTagVisible !== isVisible) {
+          isVisible === true ? this.plugins[id].tagWillAppear() : this.plugins[id].tagWillDisappear();
+          this.plugins[id].isTagVisible = isVisible;
+        }
+      }
+
       var tagElement = document.querySelector("#" + this.containerID).querySelector("#" + id);
       tagElement.isVisible = isVisible;
     }

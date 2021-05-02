@@ -76,6 +76,31 @@ const youtubeConfig = {
                     }
                 }
             }
+        },
+        {
+            "position": {
+                "x": 90,
+                "y": 90
+            },
+            "timeConfig": {
+                "timestamp": 10,
+                "duration": 2
+            },
+            "color": "#ffffff",
+            "plugin": {
+                "name": "Decision",
+                "config": {
+                    "timeout": 5,
+                    "rightButton": {
+                        "text": "Second option",
+                        "timestamp": 2
+                    },
+                    "leftButton": {
+                        "text": "First option",
+                        "timestamp": "now"
+                    }
+                }
+            }
         }
     ]
 };
@@ -86,7 +111,7 @@ const videoConfig = {
     "type": Hypervideo.VIDEO_TYPE,
     "videoTitle": "Hypervideo from a file",
     "size": {
-        "width": 640,
+        "width": 300,
         "height": 360
     },
     "tags": [
@@ -154,6 +179,31 @@ const videoConfig = {
                       "href": "https://www.google.es", 
                       "backgroundColor": "rgb(138 104 43)",
                       "textColor": "white"
+                    }
+                }
+            }
+        },
+        {
+            "position": {
+                "x": 90,
+                "y": 90
+            },
+            "timeConfig": {
+                "timestamp": 10,
+                "duration": 2
+            },
+            "color": "#ffffff",
+            "plugin": {
+                "name": "Decision",
+                "config": {
+                    "timeout": 5,
+                    "rightButton": {
+                        "text": "Second option",
+                        "timestamp": 2
+                    },
+                    "leftButton": {
+                        "text": "First option",
+                        "timestamp": "now"
                     }
                 }
             }
@@ -243,11 +293,15 @@ const imageConfig = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log(youtubeConfig)
+
     const youtubeHypervideo = new Hypervideo(youtubeConfig);
     const fileHypervideo = new Hypervideo(videoConfig);
     const hyperimage = new Hypervideo(imageConfig);
-    youtubeHypervideo.setupHypervideo(youtubeConfig);
+
+    youtubeHypervideo.setupHypervideo();
     fileHypervideo.setupHypervideo();
     hyperimage.setupHypervideo();
+
 });
+
+

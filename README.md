@@ -109,13 +109,15 @@ The plugin class has differents attributes that you can use (after onLoad method
 | config | object | Data that comes from the hypervideo configuration object. You can use this field to pass data from the main JS file. |
 | container | HTMLElement | This element is the hypervideo container. You should only add your views here if they are smaller than the video size or if you want the user to activate other tags while this is also activated. |
 | elementsContainer | HTMLElement | This element is the hypervideo elements container. This container is unique for this tag and it will fit all the browser screen. Users will not be able to interact with other elements if this container is active. |
-| videoManager | object | Instance of the video controller. You can use the following functions: <br/> - play(void) <br/> - pause(void) <br/> - restartVideo(void) <br/> - isVideoPlaying(void) : bool <br/> - getVideoDuration(void) : Returns the duration in seconds <br/> - loadProgress(Number) - Load any part of the video by a given progress. Progress should be specified between 0 and 1. <br/> - setVolume(Number) - Volume should be specified between 0 and 1.<br/>You can also get the video currentTime as an attribute. <br/> **This object will be null for images* |
+| videoManager | object | Instance of the video controller. You can use the following functions: <br/> - play(void) <br/> - pause(void) <br/> - restartVideo(void) <br/> - isVideoPlaying(void) : bool <br/> - getVideoDuration(void) : Returns the duration in seconds <br/> - loadProgress(Number) - Load any part of the video by a given progress. Progress should be specified between 0 and 1. <br/> - seekTo(Number) - Load any time of the video. Time should be in seconds. <br/> - setVolume(Number) - Volume should be specified between 0 and 1.<br/>You can also get the video currentTime as an attribute. <br/> **This object will be null for images* |
 
 The Plugin class has some methods that you could overrwrite (always calling super) to implement your plugin functionalities or call:
 
 | Method | Parameters | Description |
 | ------------- | ------------- | ------------- |
 | onLoad | config, container, elementsContainer, videoManager | This function is called when the plugin and it's atributes are loaded. In this function you should create and setup all your views, but don't show them to the user yet, wait for an interaction with the tag. |
+| tagWillAppear | void | This function is called when the tag is going to appear in the screen. |
+| tagWillDisappear | void | This function is called when the tag is going to disappear from the screen. |
 | onTagClick | event | This function is called when the user clicks on the tag. This may be a good place to show your views to the user. |
 | onTagHover | event | This function is called when the user hovers on the tag. |
 | onTagLeave | event | This function is called when the users move the cursor outside the tag. |
