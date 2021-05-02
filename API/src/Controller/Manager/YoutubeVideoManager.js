@@ -26,6 +26,11 @@ class YoutubeVideoManager extends MediaManager {
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
     }
 
+    seekTo(time) {
+        if (this.player === null) {return;}
+        this.__loadTime(time);
+    }
+
     get currentTime() {
         if (this.player === null) {return;}
         return this.player.getCurrentTime();

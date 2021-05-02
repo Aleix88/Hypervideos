@@ -203,6 +203,12 @@ class VideoTagManager extends MediaManager {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         return !video.paused;
     }
+    
+    seekTo(time) {
+        const video = document.getElementById(this.containerID).querySelector("video"); 
+        video.currentTime = time;
+        this.notify(video.currentTime * 1000);
+    }
 
     get currentTime() {
         const video = document.getElementById(this.containerID).querySelector("video"); 
@@ -213,8 +219,6 @@ class VideoTagManager extends MediaManager {
         const video = document.getElementById(this.containerID).querySelector("video"); 
         return video.duration;
     }
-
-
     
     //0-1
     loadProgress(progress) {
@@ -285,6 +289,11 @@ class YoutubeVideoManager extends MediaManager {
     isVideoPlaying() {
         if (this.player === null) {return;}
         return this.player.getPlayerState() == YT.PlayerState.PLAYING;
+    }
+
+    seekTo(time) {
+        if (this.player === null) {return;}
+        this.__loadTime(time);
     }
 
     get currentTime() {
