@@ -97,6 +97,7 @@ Plugins are the responsable of creating the interactive element when the user in
 - SimpleLabel - https://github.com/Aleix88/Hypervideo-SimpleLabel 
 - Card - https://github.com/Aleix88/Hypervideo-Card
 - Questionary - https://github.com/Aleix88/Hypervideo-Questionary
+- Decision - https://github.com/Aleix88/Hypervideo-Decision
 
 ## Create your own plugin
 You can also create your on plugins. To do this create a JS class with your Plugin name. The class should extend from Plugin (this class is imported with the Hypervideo.min.js).
@@ -124,6 +125,12 @@ The Plugin class has some methods that you could overrwrite (always calling supe
 | fullScreenStateChanged | `true` if the video/image is now in fullscreen mode, `false` if is not in full screen | This function is called when video enters or exit the full screen mode. |
 | showElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to show the elements container. |
 | hideElementsContainer | void | DO NOT OVERWRITE THIS METHOD. You can call this method whenever you need to hide the elements container. |
+
+## Code style guide
+In order to keep the code clean, the following guidelines must be followed:
+
+1 - Each code statement must end in a semicolon.
+2 - Private functions names must start with two lower bars. Ex: __myPrivateFunction().  
 
 ## Examples
 Check out this example: https://aleix88.github.io/Hypervideos-example/
