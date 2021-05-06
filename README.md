@@ -129,7 +129,7 @@ The Plugin class has some methods that you could overrwrite (always calling supe
 ## Code style guide
 In order to keep the code clean, the following guidelines must be followed:
 
-1 - Each code statement must end in a semicolon.
+1 - Each code statement must end in a semicolon.<br/>
 2 - Private functions names must start with two lower bars. Ex: __myPrivateFunction().  
 
 ## Examples
