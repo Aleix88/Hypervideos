@@ -9,6 +9,7 @@
 - [How to use Hypervideos.js](#how-to-use-hypervideosjs)
 - [Existing plugins list](#plugins-list)
 - [Create your own plugin](#create-your-own-plugin)
+- [Code style guide](#code-style-guide)
 - [See the examples](#examples)
 - [Hiper: Hypervideos graphical interface](#hiper-hypervideos-graphical-interface)
 
